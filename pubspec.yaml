@@ -30,13 +30,13 @@ flutter:
 
   uses-material-design: true
 
-assets:
-  - images/
-  - images/logo/
-  - images/products/
-  - images/flags/
+  assets:
+    - images/
+    - images/logo/
+    - images/products/
+    - images/flags/
 
-fonts:
-  - family: Raleway
-    fonts:
-      - asset: fonts/Raleway-Regular.ttf
+  fonts:
+    - family: Raleway
+      fonts:
+        - asset: fonts/Raleway-Regular.ttf
