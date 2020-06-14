@@ -35,91 +35,97 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'Bussiness Name',
-          style: kLabelStyle,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
+//        Text(
+//          'Business Name',
+//          style: kLabelStyle,
+//        ),
+//        SizedBox(
+//          height: 8.0,
+//        ),
         Container(
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
           child: TextFormField(
-            decoration: tFBoxDecorationStyle,
+            decoration: InputDecoration(
+              labelText: 'Business name',
+              prefixIcon: Icon(Icons.business),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: 10.0,
+              ),
+              border: OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[900],
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[400],
+                ),
+              ),
+            ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'business name is required';
+              }
+              return null;
+            },
           ),
         ),
       ],
     );
   }
 
-//  Widget _buildBusinessNameTF() {
-//    return Column(
-//      crossAxisAlignment: CrossAxisAlignment.start,
-//      children: <Widget>[
+  Widget _buildPhoneNumberTF() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
 //        Text(
-//          'Bussiness Name',
+//          'Phone Number',
 //          style: kLabelStyle,
 //        ),
 //        SizedBox(
 //          height: 8.0,
 //        ),
-//        Container(
-//          alignment: Alignment.centerLeft,
-//          decoration: kBoxDecorationStyle,
-//          height: 50.0,
-//          child: TextFormField(
-//            style: TextStyle(color: Colors.white),
-//            decoration: InputDecoration(
-//              border: InputBorder.none,
-//              contentPadding: EdgeInsets.only(top: 14.0),
-//              prefixIcon: Icon(
-//                Icons.business,
-//                color: Colors.white,
-//              ),
-//              hintText: 'bussiness name',
-//              hintStyle: kHintTextStyle,
-//            ),
-//            validator: (value) {
-//              if (value.isEmpty) {
-//                return 'bussiness name is required';
-//              }
-//              return null;
-//            },
-//          ),
-//        ),
-//      ],
-//    );
-//  }
-
-  Widget _buildPhoneNumberTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Phone Number',
-          style: kLabelStyle,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
         Container(
+          padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: TextField(
-            style: TextStyle(color: Colors.white),
-            keyboardType: TextInputType.number,
+          child: TextFormField(
+            keyboardType: TextInputType.phone,
             decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.phone,
-                color: Colors.white,
+              labelText: 'phone number',
+              prefixIcon: Icon(Icons.phone),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: 10.0,
               ),
-              hintText: 'phone number',
-              hintStyle: kHintTextStyle,
+              border: OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[900],
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[400],
+                ),
+              ),
             ),
+            validator: (value) {
+              String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
+              RegExp regExp = new RegExp(pattern);
+              if (value.isEmpty) {
+                return 'phone number is required';
+              } else if (!regExp.hasMatch(value)) {
+                return 'Please enter valid phone number';
+              }
+              return null;
+            },
           ),
         ),
       ],
@@ -130,60 +136,71 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'Username',
-          style: kLabelStyle,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
+//        Text(
+//          'Username',
+//          style: kLabelStyle,
+//        ),
+//        SizedBox(
+//          height: 8.0,
+//        ),
         Container(
+          padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: TextField(
-            style: TextStyle(color: Colors.white),
+          child: TextFormField(
             decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.person_outline,
-                color: Colors.white,
+              labelText: 'username',
+              prefixIcon: Icon(Icons.person_outline),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: 10.0,
               ),
-              hintText: 'username',
-              hintStyle: kHintTextStyle,
+              border: OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[900],
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[400],
+                ),
+              ),
             ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'username is required';
+              } else if (value.length < 5) {
+                return 'username must be greater than 5 character long';
+              }
+              return null;
+            },
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPasswordTF(String title, String placeholder) {
+  Widget _buildPasswordTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          title,
-          style: kLabelStyle,
-        ),
-        SizedBox(
-          height: 8.0,
-        ),
+//        Text(
+//          'title',
+//          style: kLabelStyle,
+//        ),
+//        SizedBox(
+//          height: 8.0,
+//        ),
         Container(
+          padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: TextField(
+          child: TextFormField(
             obscureText: _obscureText,
-            style: TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.lock_outline,
-                color: Colors.white,
-              ),
+              labelText: 'password',
+              prefixIcon: Icon(Icons.lock_outline),
               suffixIcon: IconButton(
                 onPressed: _toggle,
                 icon: _obscureText
@@ -193,18 +210,87 @@ class _RegisterPageState extends State<RegisterPage> {
                       )
                     : Icon(
                         Icons.visibility,
-                        color: Colors.white,
+                        color: Colors.grey[700],
                       ),
               ),
-              suffixStyle: TextStyle(color: Colors.white),
-              hintText: placeholder,
-              hintStyle: kHintTextStyle,
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: 10.0,
+              ),
+              border: OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[900],
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[400],
+                ),
+              ),
             ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'password is required';
+              } else if (value.length < 4) {
+                return 'password must be greater than 4 character long';
+              }
+              return null;
+            },
           ),
         ),
       ],
     );
   }
+
+//  Widget _buildPasswordTF(String title, String placeholder) {
+//    return Column(
+//      crossAxisAlignment: CrossAxisAlignment.start,
+//      children: <Widget>[
+//        Text(
+//          title,
+//          style: kLabelStyle,
+//        ),
+//        SizedBox(
+//          height: 8.0,
+//        ),
+//        Container(
+//          alignment: Alignment.centerLeft,
+//          decoration: kBoxDecorationStyle,
+//          height: 50.0,
+//          child: TextField(
+//            obscureText: _obscureText,
+//            style: TextStyle(color: Colors.white),
+//            decoration: InputDecoration(
+//              border: InputBorder.none,
+//              contentPadding: EdgeInsets.only(top: 14.0),
+//              prefixIcon: Icon(
+//                Icons.lock_outline,
+//                color: Colors.white,
+//              ),
+//              suffixIcon: IconButton(
+//                onPressed: _toggle,
+//                icon: _obscureText
+//                    ? Icon(
+//                        Icons.visibility_off,
+//                        color: Colors.grey,
+//                      )
+//                    : Icon(
+//                        Icons.visibility,
+//                        color: Colors.white,
+//                      ),
+//              ),
+//              suffixStyle: TextStyle(color: Colors.white),
+//              hintText: placeholder,
+//              hintStyle: kHintTextStyle,
+//            ),
+//          ),
+//        ),
+//      ],
+//    );
+//  }
 
   // Toggles the password show status
   void _toggle() {
@@ -334,7 +420,7 @@ class _RegisterPageState extends State<RegisterPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Bussiness Location',
+            'Business Location',
             style: kLabelStyle,
           ),
           SizedBox(
@@ -487,7 +573,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       key: homeScaffoldKey,
       appBar: AppBar(
-        title: Text('Register Bussiness Account'),
+        title: Text('Register Business Account'),
         centerTitle: true,
         backgroundColor: Colors.teal[700],
       ),
@@ -497,21 +583,21 @@ class _RegisterPageState extends State<RegisterPage> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.teal[600],
-                      Colors.teal[400],
-                      Colors.teal[200],
-                    ],
-                  ),
-                ),
-              ),
+//              Container(
+//                height: double.infinity,
+//                width: double.infinity,
+//                decoration: BoxDecoration(
+//                  gradient: LinearGradient(
+//                    begin: Alignment.topCenter,
+//                    end: Alignment.bottomCenter,
+//                    colors: [
+//                      Colors.teal[600],
+//                      Colors.teal[400],
+//                      Colors.teal[200],
+//                    ],
+//                  ),
+//                ),
+//              ),
               Center(
                 child: Form(
                   key: _registerFormKey,
@@ -526,27 +612,27 @@ class _RegisterPageState extends State<RegisterPage> {
                           children: <Widget>[
                             _buildBusinessNameTF(),
                             SizedBox(
-                              height: 15.0,
+                              height: 25.0,
                             ),
                             _buildPhoneNumberTF(),
                             SizedBox(
-                              height: 15.0,
+                              height: 25.0,
                             ),
                             _buildUsernameTF(),
                             SizedBox(
-                              height: 15.0,
+                              height: 25.0,
                             ),
-                            _buildPasswordTF('Password', 'Enter password'),
+                            _buildPasswordTF(),
                             SizedBox(
-                              height: 15.0,
+                              height: 25.0,
                             ),
                             _buildSelectCountryDropDownF(),
                             SizedBox(
-                              height: 15.0,
+                              height: 25.0,
                             ),
                             _buildLocationFT(),
                             SizedBox(
-                              height: 15.0,
+                              height: 25.0,
                             ),
                             _buildRegisterBtn(),
                           ],
