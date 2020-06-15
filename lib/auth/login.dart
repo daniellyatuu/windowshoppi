@@ -213,39 +213,34 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Sign In'),
-        centerTitle: true,
-        backgroundColor: Colors.teal[700],
-      ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.teal[600],
-                      Colors.teal[400],
-                      Colors.teal[200],
-                    ],
-                  ),
-                ),
-              ),
+//              Container(
+//                height: double.infinity,
+//                width: double.infinity,
+//                decoration: BoxDecoration(
+//                  gradient: LinearGradient(
+//                    begin: Alignment.topCenter,
+//                    end: Alignment.bottomCenter,
+//                    colors: [
+//                      Colors.teal[600],
+//                      Colors.teal[400],
+//                      Colors.teal[200],
+//                    ],
+//                  ),
+//                ),
+//              ),
               Center(
                 child: ListView(
                   shrinkWrap: true,
                   children: <Widget>[
                     Container(
                       padding: EdgeInsets.symmetric(
-                          horizontal: 40.0, vertical: 40.0),
+                          horizontal: 40.0, vertical: 30.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
@@ -255,7 +250,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           _buildPasswordTF(),
                           _buildForgotPasswordBtn(),
-                          _buildRememberMeCheckbox(),
+//                          _buildRememberMeCheckbox(),
                           _buildLoginBtn(),
                           _buildSignWithText(),
                           _buildSocialBtnRow(),
@@ -265,29 +260,29 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
               ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Divider(),
-                  GestureDetector(
-                    onTap: () => Navigator.push(
-                      context,
-                      FadeRoute(
-                        widget: RegisterPage(),
-                      ),
-                    ),
-                    child: Card(
-                      color: Colors.black,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 10.0),
-                        alignment: Alignment.center,
-                        width: double.infinity,
-                        child: _buildSignUpBtn(),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+//              Column(
+//                mainAxisAlignment: MainAxisAlignment.end,
+//                children: <Widget>[
+//                  Divider(),
+//                  GestureDetector(
+//                    onTap: () => Navigator.push(
+//                      context,
+//                      FadeRoute(
+//                        widget: RegisterPage(),
+//                      ),
+//                    ),
+//                    child: Card(
+//                      color: Colors.black,
+//                      child: Container(
+//                        padding: EdgeInsets.symmetric(vertical: 10.0),
+//                        alignment: Alignment.center,
+//                        width: double.infinity,
+//                        child: _buildSignUpBtn(),
+//                      ),
+//                    ),
+//                  ),
+//                ],
+//              ),
             ],
           ),
         ),

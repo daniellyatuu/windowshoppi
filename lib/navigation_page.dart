@@ -5,7 +5,7 @@ import 'package:windowshoppi/explore/explore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:custom_navigator/custom_navigation.dart';
 import 'package:windowshoppi/search/search.dart';
-import 'package:windowshoppi/auth/login.dart';
+import 'package:windowshoppi/auth/user_auth.dart';
 
 class AppNavigation extends StatefulWidget {
   @override
@@ -20,7 +20,7 @@ class _AppNavigationState extends State<AppNavigation> {
     HomePage(),
     Explore(),
     Search(),
-    LoginPage(),
+    UserAuth(),
   ];
 
   void onTappedBar(int index) {

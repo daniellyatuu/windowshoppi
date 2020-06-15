@@ -23,10 +23,29 @@ class _RegisterPageState extends State<RegisterPage> {
   String _activeCountry = 'Tanzania';
   String _activeFlag = 'tz.png';
   String _activeLocation = 'search location';
+  bool isLocationSelected = false;
+  String latitude, longitude;
   String _countryIOS2 = 'tz';
   String _countryLanguage = 'en';
 
+  String dropdownValue = 'One';
+
+  String _activeCategory = 'select category';
+  bool isCategorySelected = false;
+
+  List<String> categories = [
+    'Store',
+    'Restaurant',
+    'Hotel',
+    'Game Center',
+    'Internet Cafe',
+    'Movie Point',
+  ];
+
   final _registerFormKey = GlobalKey<FormState>();
+
+  // form data
+  String _businessName, _phoneNumber, _userName, _passWord;
 
   // Initially password is obscure
   bool _obscureText = true;
@@ -73,6 +92,7 @@ class _RegisterPageState extends State<RegisterPage> {
               }
               return null;
             },
+            onSaved: (value) => _businessName = value,
           ),
         ),
       ],
@@ -83,13 +103,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-//        Text(
-//          'Phone Number',
-//          style: kLabelStyle,
-//        ),
-//        SizedBox(
-//          height: 8.0,
-//        ),
         Container(
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
@@ -126,6 +139,7 @@ class _RegisterPageState extends State<RegisterPage> {
               }
               return null;
             },
+            onSaved: (value) => _phoneNumber = value,
           ),
         ),
       ],
@@ -176,6 +190,7 @@ class _RegisterPageState extends State<RegisterPage> {
               }
               return null;
             },
+            onSaved: (value) => _userName = value,
           ),
         ),
       ],
@@ -186,13 +201,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-//        Text(
-//          'title',
-//          style: kLabelStyle,
-//        ),
-//        SizedBox(
-//          height: 8.0,
-//        ),
         Container(
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
@@ -239,60 +247,13 @@ class _RegisterPageState extends State<RegisterPage> {
               }
               return null;
             },
+            onSaved: (value) => _passWord = value,
           ),
         ),
       ],
     );
   }
 
-//  Widget _buildPasswordTF(String title, String placeholder) {
-//    return Column(
-//      crossAxisAlignment: CrossAxisAlignment.start,
-//      children: <Widget>[
-//        Text(
-//          title,
-//          style: kLabelStyle,
-//        ),
-//        SizedBox(
-//          height: 8.0,
-//        ),
-//        Container(
-//          alignment: Alignment.centerLeft,
-//          decoration: kBoxDecorationStyle,
-//          height: 50.0,
-//          child: TextField(
-//            obscureText: _obscureText,
-//            style: TextStyle(color: Colors.white),
-//            decoration: InputDecoration(
-//              border: InputBorder.none,
-//              contentPadding: EdgeInsets.only(top: 14.0),
-//              prefixIcon: Icon(
-//                Icons.lock_outline,
-//                color: Colors.white,
-//              ),
-//              suffixIcon: IconButton(
-//                onPressed: _toggle,
-//                icon: _obscureText
-//                    ? Icon(
-//                        Icons.visibility_off,
-//                        color: Colors.grey,
-//                      )
-//                    : Icon(
-//                        Icons.visibility,
-//                        color: Colors.white,
-//                      ),
-//              ),
-//              suffixStyle: TextStyle(color: Colors.white),
-//              hintText: placeholder,
-//              hintStyle: kHintTextStyle,
-//            ),
-//          ),
-//        ),
-//      ],
-//    );
-//  }
-
-  // Toggles the password show status
   void _toggle() {
     setState(() {
       _obscureText = !_obscureText;
@@ -306,7 +267,7 @@ class _RegisterPageState extends State<RegisterPage> {
           context: context,
           builder: (context) => Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10.0),
+              borderRadius: BorderRadius.circular(0.0),
             ),
             child: Container(
               width: MediaQuery.of(context).size.width / 2,
@@ -314,26 +275,26 @@ class _RegisterPageState extends State<RegisterPage> {
               child: ListView(
                 children: <Widget>[
                   Container(
+                    color: Colors.teal,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
                     alignment: Alignment.center,
                     child: Text(
                       'Select Country',
-                      style: Theme.of(context).textTheme.subtitle1,
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
-                  Divider(),
                   GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop(
                         {"flag": "tz.png", "name": "Tanzania", "iso2": "tz"},
                       );
                     },
-                    child: Card(
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: AssetImage('images/flags/tz.png'),
-                        ),
-                        title: Text('Tanzania'),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: AssetImage('images/flags/tz.png'),
                       ),
+                      title: Text('Tanzania'),
                     ),
                   ),
                   GestureDetector(
@@ -342,13 +303,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         {"flag": "kenya.png", "name": 'Kenya', "iso2": "ke"},
                       );
                     },
-                    child: Card(
-                      child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage: AssetImage('images/flags/kenya.png'),
-                        ),
-                        title: Text('Kenya'),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundImage: AssetImage('images/flags/kenya.png'),
                       ),
+                      title: Text('Kenya'),
                     ),
                   ),
                 ],
@@ -356,32 +315,28 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         );
-        print(_selectedCountry['name']);
-        setState(() {
-          _activeFlag = _selectedCountry['flag'];
-          _activeCountry = _selectedCountry['name'];
+        if (_selectedCountry != null) {
+          print(_selectedCountry['name']);
+          setState(
+            () {
+              _activeFlag = _selectedCountry['flag'];
+              _activeCountry = _selectedCountry['name'];
 
-          // clear business location field
-          _activeLocation = 'search location';
+              // clear business location field
+              _activeLocation = 'search location';
 
-          // change search location coverage
-          _countryIOS2 = _selectedCountry['iso2'];
-        });
+              // change search location coverage
+              _countryIOS2 = _selectedCountry['iso2'];
+            },
+          );
+        }
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'Select Country',
-            style: kLabelStyle,
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
           Container(
             alignment: Alignment.centerLeft,
             decoration: kBoxDecorationStyle,
-//            height: 50.0,
             child: Padding(
               padding:
                   const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
@@ -389,7 +344,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: <Widget>[
                   SizedBox(
                     width: 40.0,
-                    child: Image.asset('images/flags/${_activeFlag}'),
+                    child: Image.asset('images/flags/$_activeFlag'),
                   ),
                   SizedBox(
                     width: 15.0,
@@ -397,12 +352,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   Expanded(
                     child: Text(
                       '$_activeCountry',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: Colors.black),
                     ),
                   ),
                   Icon(
                     Icons.arrow_drop_down,
-                    color: Colors.white,
+                    color: Colors.black,
                   ),
                 ],
               ),
@@ -419,13 +374,6 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'Business Location',
-            style: kLabelStyle,
-          ),
-          SizedBox(
-            height: 8.0,
-          ),
           Container(
             alignment: Alignment.centerLeft,
             decoration: kBoxDecorationStyle,
@@ -437,23 +385,19 @@ class _RegisterPageState extends State<RegisterPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Icon(
-                    Icons.location_on,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.location_on, color: Colors.grey),
                   SizedBox(
                     width: 15.0,
                   ),
                   Expanded(
-                    child: Text(
-                      _activeLocation,
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: isLocationSelected
+                        ? Text(_activeLocation)
+                        : Text(
+                            _activeLocation,
+                            style: TextStyle(color: Colors.grey),
+                          ),
                   ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.white,
-                  ),
+                  Icon(Icons.arrow_drop_down),
                 ],
               ),
             ),
@@ -493,9 +437,11 @@ class _RegisterPageState extends State<RegisterPage> {
           await _places.getDetailsByPlaceId(p.placeId);
       final lat = detail.result.geometry.location.lat;
       final lng = detail.result.geometry.location.lng;
-      print(p.description);
       setState(() {
         _activeLocation = p.description;
+        latitude = lat.toString();
+        longitude = lng.toString();
+        isLocationSelected = true;
       });
 //      scaffold.showSnackBar(
 //        SnackBar(content: Text("${p.description} - $lat/$lng")),
@@ -503,6 +449,105 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
   // LOCATION .END
+
+  Widget _buildSelectCategoryDropDownF() {
+    return GestureDetector(
+      onTap: () async {
+        var _selectedCategory = await showDialog(
+          context: context,
+          builder: (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0.0),
+            ),
+            child: Container(
+              width: MediaQuery.of(context).size.width / 2,
+              height: MediaQuery.of(context).size.height / 2,
+              child: ListView(
+                children: <Widget>[
+                  Container(
+                    color: Colors.teal,
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Select Business Category',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  if (categories.length != 0)
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).pop(categories[index]);
+                          },
+                          child: ListTile(
+                            leading: CircleAvatar(
+                              child: Text(categories[index][0].toUpperCase()),
+                            ),
+                            title: Text(categories[index]),
+                          ),
+                        );
+                      },
+                    ),
+                  if (categories.length == 0)
+                    Container(
+                      padding: EdgeInsets.all(30.0),
+                      alignment: Alignment.center,
+                      child: Text(
+                        'no registered category',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+        if (_selectedCategory != null) {
+          print(_selectedCategory);
+          setState(() {
+            _activeCategory = _selectedCategory;
+            isCategorySelected = true;
+          });
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            alignment: Alignment.centerLeft,
+            decoration: kBoxDecorationStyle,
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Icon(Icons.category, color: Colors.grey),
+                  SizedBox(
+                    width: 15.0,
+                  ),
+                  Expanded(
+                    child: isCategorySelected
+                        ? Text(_activeCategory)
+                        : Text(
+                            _activeCategory,
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                  ),
+                  Icon(Icons.arrow_drop_down),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildRegisterBtn() {
     return Container(
@@ -537,7 +582,29 @@ class _RegisterPageState extends State<RegisterPage> {
 //                    isSubmitted = !isSubmitted;
 //                  });
                   if (_registerFormKey.currentState.validate()) {
-                    print('send data to http');
+                    _registerFormKey.currentState.save();
+
+                    if (_activeCountry != null) {
+                      if (isLocationSelected) {
+                        if (isCategorySelected) {
+                          print('send data to http');
+                          print(_businessName);
+                          print(_phoneNumber);
+                          print(_userName);
+                          print(_passWord);
+                          print(_activeCountry);
+                          print(_activeLocation);
+                          print(latitude);
+                          print(longitude);
+                        } else {
+                          print('category is required');
+                        }
+                      } else {
+                        print('business location is required');
+                      }
+                    } else {
+                      print('country is required');
+                    }
                   }
                 },
                 color: Colors.white,
@@ -572,32 +639,12 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: homeScaffoldKey,
-      appBar: AppBar(
-        title: Text('Register Business Account'),
-        centerTitle: true,
-        backgroundColor: Colors.teal[700],
-      ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-//              Container(
-//                height: double.infinity,
-//                width: double.infinity,
-//                decoration: BoxDecoration(
-//                  gradient: LinearGradient(
-//                    begin: Alignment.topCenter,
-//                    end: Alignment.bottomCenter,
-//                    colors: [
-//                      Colors.teal[600],
-//                      Colors.teal[400],
-//                      Colors.teal[200],
-//                    ],
-//                  ),
-//                ),
-//              ),
               Center(
                 child: Form(
                   key: _registerFormKey,
@@ -606,7 +653,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: <Widget>[
                       Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 40.0, vertical: 40.0),
+                            horizontal: 40.0, vertical: 30.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -631,6 +678,10 @@ class _RegisterPageState extends State<RegisterPage> {
                               height: 25.0,
                             ),
                             _buildLocationFT(),
+                            SizedBox(
+                              height: 25.0,
+                            ),
+                            _buildSelectCategoryDropDownF(),
                             SizedBox(
                               height: 25.0,
                             ),
