@@ -20,26 +20,54 @@ final homeScaffoldKey = GlobalKey<ScaffoldState>();
 class _RegisterPageState extends State<RegisterPage> {
   bool isSubmitted = false;
 
-  String _activeCountry = 'Tanzania';
-  String _activeFlag = 'tz.png';
-  String _activeLocation = 'search location';
-  bool isLocationSelected = false;
-  String latitude, longitude;
+  // for country
+  String _activeCountry = "Tanzania";
   String _countryIOS2 = 'tz';
   String _countryLanguage = 'en';
+  List<Map> _country = [
+    {
+      "id": 1,
+      "name": "Tanzania",
+      "image": "images/flags/tz.png",
+      "ios2": "tz",
+      "language": "en",
+    },
+    {
+      "id": 2,
+      "name": "Kenya",
+      "image": "images/flags/kenya.png",
+      "ios2": "ke",
+      "language": "en",
+    },
+  ];
 
-  String dropdownValue = 'One';
+  // for location
+  String _activeLocation = 'search location';
+  bool isLocationSelected = false;
+  bool _showLocationError = false;
+  String latitude, longitude;
 
-  String _activeCategory = 'select category';
+  // for category
+  String _activeCategory = 'Store';
+  int _activeCategoryId = 1;
   bool isCategorySelected = false;
-
-  List<String> categories = [
-    'Store',
-    'Restaurant',
-    'Hotel',
-    'Game Center',
-    'Internet Cafe',
-    'Movie Point',
+  List<Map> _category = [
+    {
+      "id": 1,
+      "name": "Store",
+    },
+    {
+      "id": 2,
+      "name": "Hotel",
+    },
+    {
+      "id": 3,
+      "name": "Game Center",
+    },
+    {
+      "id": 4,
+      "name": "Restaurant",
+    },
   ];
 
   final _registerFormKey = GlobalKey<FormState>();
@@ -150,13 +178,6 @@ class _RegisterPageState extends State<RegisterPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-//        Text(
-//          'Username',
-//          style: kLabelStyle,
-//        ),
-//        SizedBox(
-//          height: 8.0,
-//        ),
         Container(
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
@@ -261,109 +282,61 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildSelectCountryDropDownF() {
-    return GestureDetector(
-      onTap: () async {
-        var _selectedCountry = await showDialog(
-          context: context,
-          builder: (context) => Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(0.0),
-            ),
-            child: Container(
-              width: MediaQuery.of(context).size.width / 2,
-              height: MediaQuery.of(context).size.height / 2,
-              child: ListView(
-                children: <Widget>[
-                  Container(
-                    color: Colors.teal,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Select Country',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop(
-                        {"flag": "tz.png", "name": "Tanzania", "iso2": "tz"},
-                      );
-                    },
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage('images/flags/tz.png'),
-                      ),
-                      title: Text('Tanzania'),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop(
-                        {"flag": "kenya.png", "name": 'Kenya', "iso2": "ke"},
-                      );
-                    },
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: AssetImage('images/flags/kenya.png'),
-                      ),
-                      title: Text('Kenya'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return Container(
+      decoration: kBoxDecorationStyle,
+      child: ButtonTheme(
+        alignedDropdown: true,
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          isDense: true,
+          hint: Text('select country'),
+          value: _activeCountry,
+          onChanged: (String newValue) {
+            setState(() {
+              _activeCountry = newValue;
+            });
+          },
+          validator: (value) {
+            if (value == null) {
+              return 'country is required';
+            }
+            return null;
+          },
+          onSaved: (value) => _activeCountry = value,
+          decoration: InputDecoration(
+            border: InputBorder.none,
           ),
-        );
-        if (_selectedCountry != null) {
-          print(_selectedCountry['name']);
-          setState(
-            () {
-              _activeFlag = _selectedCountry['flag'];
-              _activeCountry = _selectedCountry['name'];
+          items: _country.map(
+            (Map map) {
+              return DropdownMenuItem<String>(
+                onTap: () {
+                  setState(() {
+                    // clear business location field
+                    _activeLocation = 'search location';
 
-              // clear business location field
-              _activeLocation = 'search location';
-
-              // change search location coverage
-              _countryIOS2 = _selectedCountry['iso2'];
+                    // change search location coverage
+                    _countryIOS2 = map["ios2"];
+                  });
+                },
+                value: map["name"].toString(),
+                child: Row(
+                  children: <Widget>[
+                    SizedBox(
+                      width: 40.0,
+                      child: Image.asset('${map["image"]}'),
+                    ),
+                    SizedBox(
+                      width: 15.0,
+                    ),
+                    Expanded(
+                      child: Text(map["name"]),
+                    ),
+                  ],
+                ),
+              );
             },
-          );
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-              child: Row(
-                children: <Widget>[
-                  SizedBox(
-                    width: 40.0,
-                    child: Image.asset('images/flags/$_activeFlag'),
-                  ),
-                  SizedBox(
-                    width: 15.0,
-                  ),
-                  Expanded(
-                    child: Text(
-                      '$_activeCountry',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    color: Colors.black,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ).toList(),
+        ),
       ),
     );
   }
@@ -402,6 +375,16 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
+          Visibility(
+            visible: _showLocationError,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(15, 5, 0, 0),
+              child: Text(
+                'location is required',
+                style: TextStyle(color: Colors.red[400]),
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -442,6 +425,7 @@ class _RegisterPageState extends State<RegisterPage> {
         latitude = lat.toString();
         longitude = lng.toString();
         isLocationSelected = true;
+        _showLocationError = false;
       });
 //      scaffold.showSnackBar(
 //        SnackBar(content: Text("${p.description} - $lat/$lng")),
@@ -451,100 +435,56 @@ class _RegisterPageState extends State<RegisterPage> {
   // LOCATION .END
 
   Widget _buildSelectCategoryDropDownF() {
-    return GestureDetector(
-      onTap: () async {
-        var _selectedCategory = await showDialog(
-          context: context,
-          builder: (context) => Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(0.0),
-            ),
-            child: Container(
-              width: MediaQuery.of(context).size.width / 2,
-              height: MediaQuery.of(context).size.height / 2,
-              child: ListView(
-                children: <Widget>[
-                  Container(
-                    color: Colors.teal,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Select Business Category',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  if (categories.length != 0)
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).pop(categories[index]);
-                          },
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              child: Text(categories[index][0].toUpperCase()),
-                            ),
-                            title: Text(categories[index]),
-                          ),
-                        );
-                      },
-                    ),
-                  if (categories.length == 0)
-                    Container(
-                      padding: EdgeInsets.all(30.0),
-                      alignment: Alignment.center,
-                      child: Text(
-                        'no registered category',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ),
-                ],
-              ),
-            ),
+    return Container(
+      decoration: kBoxDecorationStyle,
+      child: ButtonTheme(
+        alignedDropdown: true,
+        child: DropdownButtonFormField<String>(
+          isExpanded: true,
+          isDense: true,
+          hint: Text('select business category'),
+          value: _activeCategory,
+          onChanged: (String newValue) {
+            setState(() {
+              _activeCategory = newValue;
+            });
+          },
+          validator: (value) {
+            if (value == null) {
+              return 'business category is required';
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            border: InputBorder.none,
           ),
-        );
-        if (_selectedCategory != null) {
-          print(_selectedCategory);
-          setState(() {
-            _activeCategory = _selectedCategory;
-            isCategorySelected = true;
-          });
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            alignment: Alignment.centerLeft,
-            decoration: kBoxDecorationStyle,
-            child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Icon(Icons.category, color: Colors.grey),
-                  SizedBox(
-                    width: 15.0,
-                  ),
-                  Expanded(
-                    child: isCategorySelected
-                        ? Text(_activeCategory)
-                        : Text(
-                            _activeCategory,
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                  ),
-                  Icon(Icons.arrow_drop_down),
-                ],
-              ),
-            ),
-          ),
-        ],
+          items: _category.map(
+            (Map map) {
+              return DropdownMenuItem<String>(
+                onTap: () {
+                  setState(() {
+                    _activeCategoryId = map["id"];
+                  });
+                },
+                value: map["name"].toString(),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      Icons.category,
+                      color: Colors.grey,
+                    ),
+                    SizedBox(
+                      width: 15.0,
+                    ),
+                    Expanded(
+                      child: Text(map["name"]),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ).toList(),
+        ),
       ),
     );
   }
@@ -584,26 +524,22 @@ class _RegisterPageState extends State<RegisterPage> {
                   if (_registerFormKey.currentState.validate()) {
                     _registerFormKey.currentState.save();
 
-                    if (_activeCountry != null) {
-                      if (isLocationSelected) {
-                        if (isCategorySelected) {
-                          print('send data to http');
-                          print(_businessName);
-                          print(_phoneNumber);
-                          print(_userName);
-                          print(_passWord);
-                          print(_activeCountry);
-                          print(_activeLocation);
-                          print(latitude);
-                          print(longitude);
-                        } else {
-                          print('category is required');
-                        }
-                      } else {
-                        print('business location is required');
-                      }
+                    if (isLocationSelected) {
+                      print('send data to http');
+                      print(_businessName);
+                      print(_phoneNumber);
+                      print(_userName);
+                      print(_passWord);
+                      print(_activeCountry);
+                      print(_activeCategory);
+                      print(_activeCategoryId);
+                      print(_activeLocation);
+                      print(latitude);
+                      print(longitude);
                     } else {
-                      print('country is required');
+                      setState(() {
+                        _showLocationError = true;
+                      });
                     }
                   }
                 },
