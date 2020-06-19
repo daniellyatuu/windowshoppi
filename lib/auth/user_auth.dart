@@ -9,7 +9,7 @@ class UserAuth extends StatefulWidget {
 }
 
 class _UserAuthState extends State<UserAuth> {
-  Color primaryColor = Colors.teal[700];
+  Color primaryColor = Colors.red;
 
   @override
   Widget build(BuildContext context) {
@@ -23,30 +23,30 @@ class _UserAuthState extends State<UserAuth> {
               setState(() {
                 switch (index) {
                   case 0:
-                    primaryColor = Colors.teal[700];
+                    primaryColor = Colors.red;
                     break;
                   case 1:
-                    primaryColor = Colors.teal[800];
+                    primaryColor = Colors.red[600];
                     break;
                 }
               });
             },
             tabs: <Widget>[
               Tab(
-                icon: FaIcon(FontAwesomeIcons.signInAlt),
-                text: 'login',
-              ),
-              Tab(
                 icon: Icon(Icons.person_add),
                 text: 'register',
+              ),
+              Tab(
+                icon: FaIcon(FontAwesomeIcons.signInAlt),
+                text: 'login',
               ),
             ],
           ),
         ),
         body: TabBarView(
           children: <Widget>[
-            LoginPage(),
             RegisterPage(),
+            LoginPage(),
           ],
         ),
       ),

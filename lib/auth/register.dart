@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:windowshoppi/location/flutter_google_places.dart';
@@ -19,6 +20,10 @@ final homeScaffoldKey = GlobalKey<ScaffoldState>();
 
 class _RegisterPageState extends State<RegisterPage> {
   bool isSubmitted = false;
+
+  // validate username
+  bool _isUsernameLoading = false;
+  bool _isUsernameGood = false;
 
   // for country
   String _activeCountry = "Tanzania";
@@ -42,14 +47,14 @@ class _RegisterPageState extends State<RegisterPage> {
   ];
 
   // for location
-  String _activeLocation = 'search location';
+  String _activeLocation = 'enter location';
   bool isLocationSelected = false;
   bool _showLocationError = false;
   String latitude, longitude;
 
   // for category
-  String _activeCategory = 'Store';
-  int _activeCategoryId = 1;
+  String _activeCategory;
+  int _activeCategoryId;
   bool isCategorySelected = false;
   List<Map> _category = [
     {
@@ -103,15 +108,15 @@ class _RegisterPageState extends State<RegisterPage> {
               border: OutlineInputBorder(),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
+//                borderSide: BorderSide(
+//                  color: Colors.teal[900],
+//                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
+//                borderSide: BorderSide(
+//                  color: Colors.teal[400],
+//                ),
               ),
             ),
             validator: (value) {
@@ -166,6 +171,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 return 'Please enter valid phone number';
               }
               return null;
+
+//              if (value.isEmpty) {
+//                return 'phone number is required';
+//              } else if (regExp.hasMatch(value) || value == 'daniel') {
+//                return 'good';
+//              }
+//              return 'please enter valid phone number';
             },
             onSaved: (value) => _phoneNumber = value,
           ),
@@ -185,6 +197,15 @@ class _RegisterPageState extends State<RegisterPage> {
             decoration: InputDecoration(
               labelText: 'username',
               prefixIcon: Icon(Icons.person_outline),
+              suffixIcon: _isUsernameLoading
+                  ? CupertinoActivityIndicator()
+                  : _isUsernameGood
+                      ? Icon(
+                          Icons.check,
+                          color: Colors.teal,
+                          size: 20,
+                        )
+                      : null,
               contentPadding: EdgeInsets.symmetric(
                 vertical: 0.0,
                 horizontal: 10.0,
@@ -210,6 +231,30 @@ class _RegisterPageState extends State<RegisterPage> {
                 return 'username must be greater than 5 character long';
               }
               return null;
+            },
+            onChanged: (value) {
+              setState(() {
+                _isUsernameLoading = true;
+              });
+              Timer(Duration(seconds: 1), () {
+                print(value);
+                setState(() {
+                  _isUsernameLoading = false;
+                });
+
+                if (value.length > 5) {
+                  setState(() {
+                    _isUsernameGood = true;
+                  });
+                } else if (value.length == 0) {
+                  _isUsernameLoading = false;
+                  _isUsernameGood = false;
+                } else {
+                  setState(() {
+                    _isUsernameGood = false;
+                  });
+                }
+              });
             },
             onSaved: (value) => _userName = value,
           ),
@@ -518,9 +563,6 @@ class _RegisterPageState extends State<RegisterPage> {
               padding: const EdgeInsets.fromLTRB(8.0, 0.0, 0.0, 0.0),
               child: RaisedButton(
                 onPressed: () {
-//                  setState(() {
-//                    isSubmitted = !isSubmitted;
-//                  });
                   if (_registerFormKey.currentState.validate()) {
                     _registerFormKey.currentState.save();
 
@@ -588,8 +630,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     shrinkWrap: true,
                     children: <Widget>[
                       Container(
+                        alignment: Alignment.center,
+                        padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+                        child: Text(
+                          'create your business account',
+                          style: TextStyle(fontSize: 25),
+                        ),
+                      ),
+                      Container(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 40.0, vertical: 30.0),
+                            horizontal: 40.0, vertical: 20.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[

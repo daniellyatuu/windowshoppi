@@ -24,7 +24,8 @@ class _AppNavigationState extends State<AppNavigation> {
   ];
 
   void onTappedBar(int index) {
-    navigatorKey.currentState.maybePop();
+    navigatorKey.currentState.popUntil((route) => route.isFirst);
+
     setState(() {
       _currentIndex = index;
     });
@@ -52,17 +53,17 @@ class _AppNavigationState extends State<AppNavigation> {
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
             title: Text('discover'),
-            backgroundColor: Colors.blue,
+            backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.search),
             title: Text('search'),
-            backgroundColor: Colors.pink[900],
+            backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
             title: Text(isLoggedIn ? 'My Account' : 'Login/Register'),
-            backgroundColor: Colors.teal[700],
+            backgroundColor: Colors.red,
           ),
         ],
       ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:windowshoppi/auth/register.dart';
 import 'package:windowshoppi/utilities/constants.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
+import 'discover_account.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -12,26 +12,59 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _rememberMe = false;
 
+  // Initially password is obscure
+  bool _obscureText = true;
+
+  // form data
+  String _userName, _passWord;
+
+  Widget _buildWindowshoppiTitle() {
+    return Column(
+      children: <Widget>[
+        Text(
+          'windowshoppi',
+          style: TextStyle(fontSize: 28, fontFamily: 'Itim'),
+        ),
+      ],
+    );
+  }
+
   Widget _buildUsernameTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
+          padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: TextField(
-            style: TextStyle(color: Colors.white),
+          child: TextFormField(
             decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.person_outline,
-                color: Colors.white,
+              labelText: 'username',
+              prefixIcon: Icon(Icons.person_outline),
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: 10.0,
               ),
-              hintText: 'Enter username',
-              hintStyle: kHintTextStyle,
+              border: OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[900],
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[400],
+                ),
+              ),
             ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'username is required';
+              }
+              return null;
+            },
+            onSaved: (value) => _userName = value,
           ),
         ),
       ],
@@ -43,26 +76,62 @@ class _LoginPageState extends State<LoginPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Container(
+          padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 50.0,
-          child: TextField(
-            obscureText: true,
-            style: TextStyle(color: Colors.white),
+          child: TextFormField(
+            obscureText: _obscureText,
             decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.lock_outline,
-                color: Colors.white,
+              labelText: 'password',
+              prefixIcon: Icon(Icons.lock_outline),
+              suffixIcon: IconButton(
+                onPressed: _toggle,
+                icon: _obscureText
+                    ? Icon(
+                        Icons.visibility_off,
+                        color: Colors.grey,
+                      )
+                    : Icon(
+                        Icons.visibility,
+                        color: Colors.grey[700],
+                      ),
               ),
-              hintText: 'Enter password',
-              hintStyle: kHintTextStyle,
+              contentPadding: EdgeInsets.symmetric(
+                vertical: 0.0,
+                horizontal: 10.0,
+              ),
+              border: OutlineInputBorder(),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[900],
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10.0),
+                borderSide: BorderSide(
+                  color: Colors.teal[400],
+                ),
+              ),
             ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'password is required';
+              } else if (value.length < 4) {
+                return 'password must be greater than 4 character long';
+              }
+              return null;
+            },
+            onSaved: (value) => _passWord = value,
           ),
         ),
       ],
     );
+  }
+
+  void _toggle() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   Widget _buildForgotPasswordBtn() {
@@ -70,7 +139,11 @@ class _LoginPageState extends State<LoginPage> {
       alignment: Alignment.centerRight,
       child: FlatButton(
         onPressed: () {
-          print('forgot password');
+          Navigator.push(
+              context,
+              FadeRoute(
+                widget: DiscoverAccount(),
+              ));
         },
         child: Text(
           'Forgot Password?',
@@ -187,29 +260,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildSignUpBtn() {
-    return RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: 'don\'t have an account? ',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          TextSpan(
-            text: 'Sign Up',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -219,21 +269,6 @@ class _LoginPageState extends State<LoginPage> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: <Widget>[
-//              Container(
-//                height: double.infinity,
-//                width: double.infinity,
-//                decoration: BoxDecoration(
-//                  gradient: LinearGradient(
-//                    begin: Alignment.topCenter,
-//                    end: Alignment.bottomCenter,
-//                    colors: [
-//                      Colors.teal[600],
-//                      Colors.teal[400],
-//                      Colors.teal[200],
-//                    ],
-//                  ),
-//                ),
-//              ),
               Center(
                 child: ListView(
                   shrinkWrap: true,
@@ -244,16 +279,20 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+                          _buildWindowshoppiTitle(),
+                          SizedBox(
+                            height: 25.0,
+                          ),
                           _buildUsernameTF(),
                           SizedBox(
-                            height: 15.0,
+                            height: 25.0,
                           ),
                           _buildPasswordTF(),
                           _buildForgotPasswordBtn(),
 //                          _buildRememberMeCheckbox(),
                           _buildLoginBtn(),
-                          _buildSignWithText(),
-                          _buildSocialBtnRow(),
+//                          _buildSignWithText(),
+//                          _buildSocialBtnRow(),
                         ],
                       ),
                     ),

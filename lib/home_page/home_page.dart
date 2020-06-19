@@ -15,7 +15,10 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('windowshoppi'),
+        title: Text(
+          'windowshoppi ',
+          style: TextStyle(fontFamily: 'Itim'),
+        ),
         actions: <Widget>[
           SelectCountry(),
         ],

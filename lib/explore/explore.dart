@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/horizontal_list/horizontal_list.dart';
-import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
+import 'top_section.dart';
+import 'post_section.dart';
+import 'post_details.dart';
 
 class Explore extends StatefulWidget {
   @override
@@ -29,8 +31,10 @@ class _ExploreState extends State<Explore> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: Text('windowshoppi'),
+        title: Text(
+          'windowshoppi',
+          style: TextStyle(fontFamily: 'Itim'),
+        ),
         actions: <Widget>[
           SelectCountry(),
         ],
@@ -64,120 +68,11 @@ class SinglePost extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          /// first row
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Row(
-//                mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: NetworkImage(
-                              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80'),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.0,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
-                            'Account name',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16.0,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
-                            'Location',
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 13.0),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                OutlineButton(
-                  onPressed: () {},
-                  child: Text(
-                    "visit",
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  borderSide: BorderSide(color: Colors.red),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                    side: BorderSide(
-                      color: Colors.red,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          ///second row
-          Flexible(
-            fit: FlexFit.loose,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Details(imageUrl: imgUrl),
-                  ),
-                );
-              },
-              child: Image.network(
-                imgUrl,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-
-          ///third row
+          TopSection(),
+          PostSection(imageUrl: imgUrl),
           BottomSection(postImage: imgUrl),
           PostDetails(),
         ],
-      ),
-    );
-  }
-}
-
-class PostDetails extends StatefulWidget {
-  @override
-  _PostDetailsState createState() => _PostDetailsState();
-}
-
-class _PostDetailsState extends State<PostDetails> {
-  String description = 'some description about the product';
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(15.0),
-      child: Text(
-        description,
-        textAlign: TextAlign.justify,
       ),
     );
   }
