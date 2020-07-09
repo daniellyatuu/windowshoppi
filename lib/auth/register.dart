@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:windowshoppi/location/flutter_google_places.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:windowshoppi/utilities/constants.dart';
 import 'dart:async';
-import 'package:google_maps_webservice/places.dart';
 
 const kGoogleApiKey = "AIzaSyAQSCSiJMsoMca0n65p0vPv5Em8Uk8FjLQ";
 
@@ -106,18 +106,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-//                borderSide: BorderSide(
-//                  color: Colors.teal[900],
-//                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-//                borderSide: BorderSide(
-//                  color: Colors.teal[400],
-//                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -149,18 +139,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
@@ -211,18 +191,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -292,18 +262,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -415,7 +375,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             style: TextStyle(color: Colors.grey),
                           ),
                   ),
-                  Icon(Icons.arrow_drop_down),
+                  Icon(Icons.arrow_drop_down, color: Colors.black54),
                 ],
               ),
             ),

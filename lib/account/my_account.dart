@@ -9,10 +9,8 @@ import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/explore/post_details.dart';
 import 'my_account_bottom_section.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'dart:io';
 import 'dart:async';
-import 'package:image_picker/image_picker.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
 class MyAccount extends StatefulWidget {
   @override
@@ -21,80 +19,107 @@ class MyAccount extends StatefulWidget {
 
 class _MyAccountState extends State<MyAccount>
     with AutomaticKeepAliveClientMixin<MyAccount> {
-  bool dialVisible = true;
-  File file;
+  bool _isPostBtnVisible = true;
 
-  void setDialVisible(bool value) {
+  final _postFormKey = GlobalKey<FormState>();
+
+  String postCaptionText;
+
+  // #######################
+  // images selection .start
+  // #######################
+
+  List<Asset> _images = List<Asset>();
+  String _error = 'NoError';
+
+  Future<void> loadAssets() async {
+    List<Asset> resultList = List<Asset>();
+    String error = 'NoError';
+
+    try {
+      resultList = await MultiImagePicker.pickImages(
+        maxImages: 300,
+        enableCamera: true,
+        selectedAssets: _images,
+        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+        materialOptions: MaterialOptions(
+          actionBarColor: "#008080",
+          actionBarTitle: "Choose Photo",
+          statusBarColor: '#006868',
+          allViewTitle: "All Photos",
+          useDetailsView: false,
+        ),
+      );
+    } on Exception catch (e) {
+      error = e.toString();
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
     setState(() {
-      dialVisible = value;
+      _images = resultList;
+      _error = error;
+    });
+
+    // check error if exist
+    if (_error == 'NoError') {
+      setState(() {
+        _isPostBtnVisible = true;
+      });
+    } else {
+      _isPostBtnVisible = false;
+    }
+  }
+
+  void clearImage() {
+    setState(() {
+      _images = List<Asset>();
     });
   }
 
-  SpeedDial buildSpeedDial() {
-    return SpeedDial(
-      animatedIcon: AnimatedIcons.menu_close,
-      animatedIconTheme: IconThemeData(size: 22.0),
-      visible: dialVisible,
-      curve: Curves.bounceIn,
-      children: [
-        SpeedDialChild(
-          child: Icon(Icons.camera_alt),
-          backgroundColor: Colors.teal,
-          onTap: () {
-            _openCamera();
-          },
-          label: 'Take a photo',
-          labelStyle: TextStyle(fontWeight: FontWeight.w500),
-          labelBackgroundColor: Colors.teal,
+//  Widget buildGridView() {
+//    return GridView.count(
+//      crossAxisCount: 3,
+//      children: List.generate(_images.length, (index) {
+//        Asset asset = _images[index];
+//        return AssetThumb(
+//          asset: asset,
+//          width: 300,
+//          height: 300,
+//        );
+//      }),
+//    );
+//  }
+
+  Widget _postCaption() {
+    return Row(
+      children: <Widget>[
+        CircleAvatar(
+          radius: 20.0,
+          backgroundColor: Colors.grey,
+          backgroundImage: NetworkImage(
+              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
         ),
-        SpeedDialChild(
-          child: Icon(Icons.photo_album),
-          backgroundColor: Colors.blue,
-          onTap: () {
-            _browseFromGallery();
-          },
-          labelWidget: Container(
-            color: Colors.blue,
-            margin: EdgeInsets.only(right: 10),
-            padding: EdgeInsets.all(6),
-            child: Text('Choose from gallery'),
+        SizedBox(width: 10.0),
+        Expanded(
+          child: TextFormField(
+            decoration: InputDecoration(
+              hintText: 'Write Caption...',
+              border: InputBorder.none,
+            ),
+            onSaved: (value) => postCaptionText = value,
           ),
         ),
       ],
     );
   }
 
-  void _browseFromGallery() async {
-    // ignore: deprecated_member_use
-    File imageFile = await ImagePicker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 1920,
-      maxHeight: 1200,
-      imageQuality: 80,
-    );
-    setState(() {
-      file = imageFile;
-    });
-  }
-
-  void _openCamera() async {
-    // ignore: deprecated_member_use
-    File imageFile = await ImagePicker.pickImage(
-      source: ImageSource.camera,
-      maxWidth: 1920,
-      maxHeight: 1200,
-      imageQuality: 80,
-    );
-    setState(() {
-      file = imageFile;
-    });
-  }
-
-  void clearImage() {
-    setState(() {
-      file = null;
-    });
-  }
+  // #####################
+  // images selection .end
+  // #####################
 
   String view = "grid"; // default view
 
@@ -381,11 +406,22 @@ class _MyAccountState extends State<MyAccount>
     );
   }
 
+//  @override
+//  void initState() {
+//    print(_images);
+//    if (_images.length == 0) {
+//      print('no images selected');
+//    } else {
+//      print('images selected');
+//    }
+//    super.initState();
+//  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context); // reloads state when opened again
 
-    return file == null
+    return _images.length == 0
         ? Scaffold(
             appBar: AppBar(
               title: Text('my account'),
@@ -399,15 +435,95 @@ class _MyAccountState extends State<MyAccount>
                 _buildUserPosts(),
               ],
             ),
-            floatingActionButton: buildSpeedDial(),
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: Colors.black,
+              onPressed: loadAssets,
+              tooltip: 'post a photo',
+              child: Icon(Icons.add_box),
+            ),
           )
         : Scaffold(
             appBar: AppBar(
-              title: Text('Post'),
+              title: Text('new post'),
               leading: IconButton(
-                icon: Icon(Icons.clear),
                 onPressed: clearImage,
+                icon: Icon(Icons.clear),
               ),
+              actions: <Widget>[
+                Visibility(
+                  visible: _isPostBtnVisible,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (_postFormKey.currentState.validate()) {
+                          _postFormKey.currentState.save();
+                          print(postCaptionText);
+                          print(_images);
+                        }
+                      },
+                      child: Row(
+                        children: <Widget>[
+                          Text('POST ',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 18)),
+                          Icon(Icons.send, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            body: Center(
+              child: _error == 'NoError'
+                  ? Form(
+                      key: _postFormKey,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ListView(
+                          children: <Widget>[
+                            _postCaption(),
+                            Divider(),
+                            GridView.count(
+                              physics: ScrollPhysics(),
+                              shrinkWrap: true,
+                              crossAxisCount: 3,
+                              children: List.generate(
+                                _images.length,
+                                (index) {
+                                  Asset asset = _images[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.all(2.0),
+                                    child: AssetThumb(
+                                      asset: asset,
+                                      width: 300,
+                                      height: 300,
+                                      spinner: Center(
+                                        child: SizedBox(
+                                          width: 22,
+                                          height: 22,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: OutlineButton(
+                                onPressed: loadAssets,
+                                child: Text('add more photos'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Text(_error),
             ),
           );
   }

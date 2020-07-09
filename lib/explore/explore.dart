@@ -7,6 +7,11 @@ import 'package:windowshoppi/myappbar/select_country.dart';
 import 'top_section.dart';
 import 'post_section.dart';
 import 'post_details.dart';
+import 'package:windowshoppi/models/product.dart';
+import 'package:http/http.dart' as http;
+import 'package:carousel_pro/carousel_pro.dart';
+import 'package:transparent_image/transparent_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Explore extends StatefulWidget {
   @override
@@ -14,19 +19,6 @@ class Explore extends StatefulWidget {
 }
 
 class _ExploreState extends State<Explore> {
-  List<String> imageList = [
-    'https://lh5.googleusercontent.com/proxy/XuQ0Dc8ews6V2G3iQqp8oYWupJdK3s1WxJ_n1cXFaDGmpMzIbceiEgo7i1GqFoz_Ppf4MCe4uWQSXX431u3MgHzlpdUMRoU',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUTcsi010F5zBOmMN24rnbstMgM3rh8u_dWrWQXPLu_UXuUB1E&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIbNH5TdL5-CyiwdqglmGeKdHgIl8-BcFFTHMWUIVis5-q0I2T&s',
-    'https://api.time.com/wp-content/uploads/2018/11/sweetfoam-sustainable-product.jpg?quality=85',
-    'https://lh3.googleusercontent.com/kcuyhFJT68FzCgfH-Ow8DdUiL1xgUp6rdAHpSDqF3Eg8j4HQ3O9ANxsyy_EpiTBvhXnLvNvOmI1ygIONDgIV_4xHYyxyd5y5f0EHAQ=w262-l90-sg-rj',
-    'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-red-select-2019?wid=940&hei=1112&fmt=png-alpha&qlt=80&.v=1566956144763',
-    'https://static.livebooks.com/abc61dbc6e9c403b917975eb48d2d97d/i/f2c81f819c994f5eb2312f9948520c2a/1/4SoifmQp7LJ6yDtMuFY2x/Swan-Optic-22089.jpg',
-    'https://www.apple.com/v/product-red/o/images/meta/og__dbjwy50zuc02.png?202005090509',
-    'https://www.hindipro.com/wp-content/uploads/2019/12/avatar-images-of-god-krishna-and-radha-hinduism.jpg',
-    'https://in.canon/media/image/2018/05/03/642e7bbeae5741e3b872e082626c0151_eos6d-mkii-ef-24-70m-l.png',
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,39 +32,143 @@ class _ExploreState extends State<Explore> {
         ],
       ),
       drawer: AppDrawer(),
-      body: Column(
-        children: <Widget>[
-          AppCategory(),
-          Expanded(
-            child: ListView.builder(
-              itemCount: imageList.length,
-              itemBuilder: (context, index) {
-                return SinglePost(imgUrl: imageList[index]);
-              },
-            ),
-          ),
-        ],
+      body: FutureBuilder(
+        future: fetchProduct(http.Client()),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            print(snapshot.error);
+          }
+          return snapshot.hasData
+              ? SinglePost(product: snapshot.data)
+              : Center(child: CircularProgressIndicator(strokeWidth: 3.0));
+        },
       ),
     );
   }
 }
 
 class SinglePost extends StatelessWidget {
-  final String imgUrl;
-  SinglePost({Key key, this.imgUrl}) : super(key: key);
+  final List<Product> product;
+  SinglePost({Key key, this.product}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          TopSection(),
-          PostSection(imageUrl: imgUrl),
-          BottomSection(postImage: imgUrl),
-          PostDetails(),
-        ],
+    return ListView.builder(
+        itemCount: product.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                TopSection(
+                  account: product[index].accountName,
+                  location: product[index].businessLocation,
+                ),
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: Carousel(
+                    boxFit: BoxFit.cover,
+                    autoplay: false,
+                    animationCurve: Curves.fastOutSlowIn,
+                    dotSize: 4.0,
+                    dotIncreasedColor: Color(0xFFFF335C),
+                    dotBgColor: Colors.transparent,
+                    dotPosition: DotPosition.bottomCenter,
+                    dotColor: Colors.black,
+                    dotVerticalPadding: 2.0,
+                    showIndicator: true,
+                    indicatorBgPadding: 5.0,
+                    images: [
+                      for (var image in product[index].productPhoto)
+//                        Image.network(
+//                          image.filename,
+//                          fit: BoxFit.cover,
+//                          loadingBuilder: (BuildContext context, Widget child,
+//                              ImageChunkEvent loadingProgress) {
+//                            if (loadingProgress == null) return child;
+//                            return Center(
+//                              child: CupertinoActivityIndicator(),
+//                            );
+//                          },
+//                        ),
+                        CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: image.filename,
+                          progressIndicatorBuilder:
+                              (context, url, downloadProgress) =>
+                                  CupertinoActivityIndicator(),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+//                        Column(
+//                          mainAxisAlignment: MainAxisAlignment.start,
+//                          mainAxisSize: MainAxisSize.min,
+//                          crossAxisAlignment: CrossAxisAlignment.stretch,
+//                          children: <Widget>[
+//                            Flexible(
+//                              fit: FlexFit.loose,
+//                              child: FadeInImage.memoryNetwork(
+//                                placeholder: kTransparentImage,
+//                                image: image.filename,
+//                                fit: BoxFit.cover,
+//                              ),
+//                            ),
+//                          ],
+//                        ),
+                    ],
+                  ),
+                ),
+//                PostSection(imageUrl: imgUrl),
+//          BottomSection(postImage: imgUrl),
+                PostDetails(),
+              ],
+            ),
+          );
+        });
+  }
+}
+
+//Column(
+//children: <Widget>[
+//AppCategory(),
+//Expanded(
+//child: ListView.builder(
+//itemCount: imageList.length,
+//itemBuilder: (context, index) {
+//return SinglePost(imgUrl: imageList[index]);
+//},
+//),
+//),
+//],
+//),
+
+/// This is the stateless widget that the main application instantiates.
+class MyStatelessWidget extends StatelessWidget {
+  MyStatelessWidget({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Image.network(
+        'https://example.com/image.jpg',
+        loadingBuilder: (BuildContext context, Widget child,
+            ImageChunkEvent loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes
+                  : null,
+            ),
+          );
+        },
       ),
     );
   }

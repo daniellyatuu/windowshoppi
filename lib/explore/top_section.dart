@@ -3,6 +3,9 @@ import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/account/account.dart';
 
 class TopSection extends StatelessWidget {
+  final String account, location;
+  TopSection({Key key, this.account, this.location}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -16,6 +19,7 @@ class TopSection extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
+                  color: Colors.grey,
                   shape: BoxShape.circle,
                   image: DecorationImage(
                     fit: BoxFit.cover,
@@ -33,7 +37,7 @@ class TopSection extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     child: Text(
-                      'Account name',
+                      '$account',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -44,7 +48,7 @@ class TopSection extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     child: Text(
-                      'Location',
+                      '$location',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 13.0),
                     ),

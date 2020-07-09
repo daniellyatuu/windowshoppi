@@ -45,18 +45,8 @@ class _LoginPageState extends State<LoginPage> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -100,18 +90,8 @@ class _LoginPageState extends State<LoginPage> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               if (value.isEmpty) {
