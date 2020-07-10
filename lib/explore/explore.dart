@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/horizontal_list/horizontal_list.dart';
@@ -33,10 +36,13 @@ class _ExploreState extends State<Explore> {
       ),
       drawer: AppDrawer(),
       body: FutureBuilder(
-        future: fetchProduct(http.Client()),
+        future: fetchProduct(http.Client(), ALL_PRODUCT_URL),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             print(snapshot.error);
+//            Center(
+//              child: Text('display error'),
+//            );
           }
           return snapshot.hasData
               ? SinglePost(product: snapshot.data)
@@ -47,13 +53,49 @@ class _ExploreState extends State<Explore> {
   }
 }
 
-class SinglePost extends StatelessWidget {
+class SinglePost extends StatefulWidget {
   final List<Product> product;
+
   SinglePost({Key key, this.product}) : super(key: key);
+
+  @override
+  _SinglePostState createState() => _SinglePostState();
+}
+
+class _SinglePostState extends State<SinglePost> {
+  ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('check scrolling in here');
+    print(widget.product);
+
+    _scrollController.addListener(() {
+//      print(_scrollController.position.pixels);
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
+        loadMorePost(nextLink);
+        setState(() {});
+
+//        print(nextLink);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-        itemCount: product.length,
+        controller: _scrollController,
+        itemCount: widget.product.length,
         itemBuilder: (context, index) {
           return Card(
             child: Column(
@@ -62,66 +104,15 @@ class SinglePost extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 TopSection(
-                  account: product[index].accountName,
-                  location: product[index].businessLocation,
+                  account: widget.product[index].accountName,
+                  location: widget.product[index].businessLocation,
                 ),
-                AspectRatio(
-                  aspectRatio: 1,
-                  child: Carousel(
-                    boxFit: BoxFit.cover,
-                    autoplay: false,
-                    animationCurve: Curves.fastOutSlowIn,
-                    dotSize: 4.0,
-                    dotIncreasedColor: Color(0xFFFF335C),
-                    dotBgColor: Colors.transparent,
-                    dotPosition: DotPosition.bottomCenter,
-                    dotColor: Colors.black,
-                    dotVerticalPadding: 2.0,
-                    showIndicator: true,
-                    indicatorBgPadding: 5.0,
-                    images: [
-                      for (var image in product[index].productPhoto)
-//                        Image.network(
-//                          image.filename,
-//                          fit: BoxFit.cover,
-//                          loadingBuilder: (BuildContext context, Widget child,
-//                              ImageChunkEvent loadingProgress) {
-//                            if (loadingProgress == null) return child;
-//                            return Center(
-//                              child: CupertinoActivityIndicator(),
-//                            );
-//                          },
-//                        ),
-                        CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl: image.filename,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) =>
-                                  CupertinoActivityIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        ),
-//                        Column(
-//                          mainAxisAlignment: MainAxisAlignment.start,
-//                          mainAxisSize: MainAxisSize.min,
-//                          crossAxisAlignment: CrossAxisAlignment.stretch,
-//                          children: <Widget>[
-//                            Flexible(
-//                              fit: FlexFit.loose,
-//                              child: FadeInImage.memoryNetwork(
-//                                placeholder: kTransparentImage,
-//                                image: image.filename,
-//                                fit: BoxFit.cover,
-//                              ),
-//                            ),
-//                          ],
-//                        ),
-                    ],
-                  ),
-                ),
-//                PostSection(imageUrl: imgUrl),
-//          BottomSection(postImage: imgUrl),
-                PostDetails(),
+//                PostSection(postImage: product[index].productPhoto),
+                PostSection(postData: widget.product[index]),
+                BottomSection(
+                    callNo: widget.product[index].callNumber,
+                    whatsapp: widget.product[index].whatsappNumber),
+                PostDetails(caption: widget.product[index].caption),
               ],
             ),
           );

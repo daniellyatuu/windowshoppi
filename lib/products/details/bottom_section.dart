@@ -3,18 +3,11 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
-import 'dart:async';
-import 'dart:io';
-import 'dart:convert';
 
-class BottomSection extends StatefulWidget {
-  final String postImage;
-  BottomSection({Key key, this.postImage}) : super(key: key);
-  @override
-  _BottomSectionState createState() => _BottomSectionState();
-}
+class BottomSection extends StatelessWidget {
+  final String callNo, whatsapp;
+  BottomSection({Key key, this.callNo, this.whatsapp}) : super(key: key);
 
-class _BottomSectionState extends State<BottomSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -28,7 +21,7 @@ class _BottomSectionState extends State<BottomSection> {
                 children: <Widget>[
                   InkWell(
                     onTap: () {
-                      call('+255653900085');
+                      call(callNo);
                     },
                     child: CircleAvatar(
                       backgroundColor: Colors.blue,
@@ -43,28 +36,32 @@ class _BottomSectionState extends State<BottomSection> {
                   Text('call'),
                 ],
               ),
-              SizedBox(
-                width: 15.0,
-              ),
-              Column(
-                children: <Widget>[
-                  InkWell(
-                    onTap: () {
-                      chat("+255625636291", "Hello");
-                    },
-                    child: CircleAvatar(
-                      backgroundColor: Color(0xFF06B862),
-                      radius: 15.0,
-                      child: FaIcon(
-                        FontAwesomeIcons.whatsapp,
-                        size: 15.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  Text('chat'),
-                ],
-              ),
+              whatsapp != null
+                  ? SizedBox(
+                      width: 15.0,
+                    )
+                  : Text(''),
+              whatsapp != null
+                  ? Column(
+                      children: <Widget>[
+                        InkWell(
+                          onTap: () {
+                            chat("+255625636291", "Hello");
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Color(0xFF06B862),
+                            radius: 15.0,
+                            child: FaIcon(
+                              FontAwesomeIcons.whatsapp,
+                              size: 15.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        Text('chat'),
+                      ],
+                    )
+                  : Text(''),
               SizedBox(
                 width: 15.0,
               ),
@@ -116,6 +113,117 @@ class _BottomSectionState extends State<BottomSection> {
     );
   }
 }
+
+//class BottomSection extends StatefulWidget {
+//  final String callNo, whatsapp;
+//  BottomSection({Key key, this.callNo, this.whatsapp}) : super(key: key);
+//
+//  @override
+//  _BottomSectionState createState() => _BottomSectionState();
+//}
+//
+//class _BottomSectionState extends State<BottomSection> {
+//  @override
+//  Widget build(BuildContext context) {
+//    return Padding(
+//      padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0),
+//      child: Row(
+//        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//        children: <Widget>[
+//          Row(
+//            children: <Widget>[
+//              Column(
+//                children: <Widget>[
+//                  InkWell(
+//                    onTap: () {
+//                      call(widget.callNo);
+//                    },
+//                    child: CircleAvatar(
+//                      backgroundColor: Colors.blue,
+//                      radius: 15.0,
+//                      child: FaIcon(
+//                        FontAwesomeIcons.phone,
+//                        size: 15.0,
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                  ),
+//                  Text('call'),
+//                ],
+//              ),
+//              SizedBox(
+//                width: 15.0,
+//              ),
+//              Column(
+//                children: <Widget>[
+//                  InkWell(
+//                    onTap: () {
+//                      chat("+255625636291", "Hello");
+//                    },
+//                    child: CircleAvatar(
+//                      backgroundColor: Color(0xFF06B862),
+//                      radius: 15.0,
+//                      child: FaIcon(
+//                        FontAwesomeIcons.whatsapp,
+//                        size: 15.0,
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                  ),
+//                  Text('chat'),
+//                ],
+//              ),
+//              SizedBox(
+//                width: 15.0,
+//              ),
+//              Column(
+//                children: <Widget>[
+//                  InkWell(
+//                    onTap: () {
+//                      FlutterShareMe().shareToSystem(msg: 'message content');
+//                    },
+//                    child: CircleAvatar(
+//                      backgroundColor: Colors.black87,
+//                      radius: 15.0,
+//                      child: FaIcon(
+//                        FontAwesomeIcons.shareAlt,
+//                        size: 15.0,
+//                        color: Colors.white,
+//                      ),
+//                    ),
+//                  ),
+//                  Text('share'),
+//                ],
+//              ),
+//            ],
+//          ),
+//          RaisedButton(
+//            color: Color(0xFF06B862),
+//            shape: RoundedRectangleBorder(
+//              borderRadius: BorderRadius.circular(18.0),
+//            ),
+//            onPressed: () {
+//              shareToWhatsapp();
+//            },
+//            child: Row(
+//              children: <Widget>[
+//                FaIcon(
+//                  FontAwesomeIcons.whatsapp,
+//                  size: 15.0,
+//                  color: Colors.white,
+//                ),
+//                Text(
+//                  ' share now',
+//                  style: TextStyle(color: Colors.white),
+//                ),
+//              ],
+//            ),
+//          ),
+//        ],
+//      ),
+//    );
+//  }
+//}
 
 call(String userNo) {
   String phoneNumber = "tel:$userNo";

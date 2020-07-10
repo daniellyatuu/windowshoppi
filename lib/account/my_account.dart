@@ -362,12 +362,12 @@ class _MyAccountState extends State<MyAccount>
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                FadeRoute(
-                  widget: Details(imageUrl: _posts[index]),
-                ),
-              );
+//              Navigator.push(
+//                context,
+//                FadeRoute(
+//                  widget: Details(imageUrl: _posts[index]),
+//                ),
+//              );
             },
             child: FadeInImage.memoryNetwork(
               placeholder: kTransparentImage,
@@ -398,7 +398,7 @@ class _MyAccountState extends State<MyAccount>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           AccountTopSection(),
-          PostSection(imageUrl: imgUrl),
+//          PostSection(imageUrl: imgUrl),
           MyAccountBottomSection(postImage: imgUrl),
           PostDetails(),
         ],

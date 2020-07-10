@@ -102,12 +102,12 @@ class _ProductsState extends State<Products> {
             itemBuilder: (context, imageUrl) {
               return InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    FadeRoute(
-                      widget: Details(imageUrl: imageList[imageUrl]),
-                    ),
-                  );
+//                  Navigator.push(
+//                    context,
+//                    FadeRoute(
+//                      widget: Details(imageUrl: imageList[imageUrl]),
+//                    ),
+//                  );
                 },
                 child: Container(
                   padding: EdgeInsets.all(5),
