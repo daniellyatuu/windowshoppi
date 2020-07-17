@@ -5,7 +5,7 @@ import 'global.dart';
 import 'package:flutter/material.dart';
 
 class Product {
-  final int id;
+  int id;
   final String accountName,
       callNumber,
       whatsappNumber,
@@ -23,7 +23,6 @@ class Product {
     this.productPhoto,
   });
 
-  // this is static method
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
@@ -50,37 +49,3 @@ class Images {
     );
   }
 }
-
-//String nextLink = '';
-//Future<List<Product>> fetchProduct(http.Client client, url) async {
-////  final response = await client.get(ALL_PRODUCT_URL);
-//  final response = await client.get(url);
-//
-//  print(response.statusCode);
-//  print('pass up here');
-//  if (response.statusCode == 200) {
-//    Map<String, dynamic> mapResponse = json.decode(response.body);
-////    print(mapResponse);
-////    print(mapResponse);
-//    nextLink = mapResponse['next'];
-//    if (mapResponse["count"] != "") {
-//      final products = mapResponse["results"].cast<Map<String, dynamic>>();
-//      final listOfProducts = await products.map<Product>((json) {
-//        return Product.fromJson(json);
-//      }).toList();
-//      return listOfProducts;
-//    } else {
-//      return [];
-//    }
-//  } else {
-//    throw Exception('fail to load data from internet');
-//  }
-//}
-//
-//void loadMorePost(nextUrl) {
-//  print('down here');
-//  print(nextUrl);
-//  if (nextUrl != null) {
-//    fetchProduct(http.Client(), nextUrl);
-//  }
-//}

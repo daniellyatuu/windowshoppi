@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:windowshoppi/models/product.dart';
 
 class SelectCountry extends StatelessWidget {
   @override
@@ -17,7 +18,7 @@ class SelectCountry extends StatelessWidget {
                 actions: <Widget>[
                   CupertinoActionSheetAction(
                     onPressed: () {
-                      Navigator.of(context).pop('Tanzania id');
+                      Navigator.of(context).pop({'id': 1, 'name': 'Tanzania'});
                     },
                     isDefaultAction: true,
                     child: Row(
@@ -36,7 +37,7 @@ class SelectCountry extends StatelessWidget {
                   ),
                   CupertinoActionSheetAction(
                     onPressed: () {
-                      Navigator.of(context).pop('Kenya id');
+                      Navigator.of(context).pop({'id': 2, 'name': 'Kenya'});
                     },
                     isDefaultAction: false,
                     child: Text('Kenya'),
@@ -52,7 +53,8 @@ class SelectCountry extends StatelessWidget {
             );
           },
         );
-        print('selected country $selectedCountry');
+
+        print(selectedCountry);
       },
       child: Row(
         children: <Widget>[
