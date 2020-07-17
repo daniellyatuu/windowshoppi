@@ -40,3 +40,7 @@ flutter:
     - family: Raleway
       fonts:
         - asset: fonts/Raleway-Regular.ttf
+
+    - family: Itim
+      fonts:
+        - asset: fonts/Itim-Regular.ttf

@@ -1,20 +1,101 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:transparent_image/transparent_image.dart';
-import 'package:windowshoppi/explore/post_details.dart';
-import 'package:windowshoppi/explore/post_section.dart';
-import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
-import 'account_top_section.dart';
+import 'package:transparent_image/transparent_image.dart';
+import 'package:windowshoppi/account/account_top_section.dart';
+import 'package:windowshoppi/explore/post_section.dart';
+import 'package:windowshoppi/products/details/details.dart';
+import 'package:windowshoppi/explore/post_details.dart';
+import 'my_account_bottom_section.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
+import 'dart:io';
+import 'dart:async';
+import 'package:image_picker/image_picker.dart';
 
-class ProfilePage extends StatefulWidget {
-  _ProfilePage createState() => _ProfilePage();
+class MyAccount extends StatefulWidget {
+  @override
+  _MyAccountState createState() => _MyAccountState();
 }
 
-class _ProfilePage extends State<ProfilePage>
-    with AutomaticKeepAliveClientMixin<ProfilePage> {
+class _MyAccountState extends State<MyAccount>
+    with AutomaticKeepAliveClientMixin<MyAccount> {
+  bool dialVisible = true;
+  File file;
+
+  void setDialVisible(bool value) {
+    setState(() {
+      dialVisible = value;
+    });
+  }
+
+  SpeedDial buildSpeedDial() {
+    return SpeedDial(
+      animatedIcon: AnimatedIcons.menu_close,
+      animatedIconTheme: IconThemeData(size: 22.0),
+      visible: dialVisible,
+      curve: Curves.bounceIn,
+      children: [
+        SpeedDialChild(
+          child: Icon(Icons.camera_alt),
+          backgroundColor: Colors.teal,
+          onTap: () {
+            _openCamera();
+          },
+          label: 'Take a photo',
+          labelStyle: TextStyle(fontWeight: FontWeight.w500),
+          labelBackgroundColor: Colors.teal,
+        ),
+        SpeedDialChild(
+          child: Icon(Icons.photo_album),
+          backgroundColor: Colors.blue,
+          onTap: () {
+            _browseFromGallery();
+          },
+          labelWidget: Container(
+            color: Colors.blue,
+            margin: EdgeInsets.only(right: 10),
+            padding: EdgeInsets.all(6),
+            child: Text('Choose from gallery'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _browseFromGallery() async {
+    // ignore: deprecated_member_use
+    File imageFile = await ImagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1920,
+      maxHeight: 1200,
+      imageQuality: 80,
+    );
+    setState(() {
+      file = imageFile;
+    });
+  }
+
+  void _openCamera() async {
+    // ignore: deprecated_member_use
+    File imageFile = await ImagePicker.pickImage(
+      source: ImageSource.camera,
+      maxWidth: 1920,
+      maxHeight: 1200,
+      imageQuality: 80,
+    );
+    setState(() {
+      file = imageFile;
+    });
+  }
+
+  void clearImage() {
+    setState(() {
+      file = null;
+    });
+  }
+
   String view = "grid"; // default view
 
   Widget _accountHeader() {
@@ -23,10 +104,10 @@ class _ProfilePage extends State<ProfilePage>
       child: Column(
         children: <Widget>[
           _topAccountSection(),
-          _accountCommunication(),
+          _accountDetails(),
           Container(
             alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 5.0),
             child: Text(
               'daniellyatuu@gmail.com',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -40,6 +121,8 @@ class _ProfilePage extends State<ProfilePage>
               textAlign: TextAlign.justify,
             ),
           ),
+//          Text('$file'),
+          _editProfileBtn(),
         ],
       ),
     );
@@ -69,56 +152,68 @@ class _ProfilePage extends State<ProfilePage>
     );
   }
 
-  Widget _accountCommunication() {
-    return Row(
-      children: <Widget>[
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: RaisedButton(
-              color: Colors.blue,
-              onPressed: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  FaIcon(
+  Widget _accountDetails() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5.0, horizontal: 4.0),
+      margin: EdgeInsets.only(top: 5.0),
+      decoration: BoxDecoration(
+//        color: Color(0xFFE5E5E5),
+//        borderRadius: BorderRadius.circular(2),
+          ),
+      width: double.infinity,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundColor: Colors.blue,
+                  radius: 15.0,
+                  child: FaIcon(
                     FontAwesomeIcons.phone,
                     size: 15.0,
                     color: Colors.white,
                   ),
-                  Text(
-                    ' CALL',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                SizedBox(
+                  width: 8.0,
+                ),
+                Expanded(
+                  child: Text(
+                    '+255653900085',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: RaisedButton(
-              color: Color(0xFF06B862),
-              onPressed: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  FaIcon(
+          Expanded(
+            child: Row(
+              children: <Widget>[
+                CircleAvatar(
+                  backgroundColor: Color(0xFF06B862),
+                  radius: 15.0,
+                  child: FaIcon(
                     FontAwesomeIcons.whatsapp,
                     size: 15.0,
                     color: Colors.white,
                   ),
-                  Text(
-                    ' CHAT',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
+                SizedBox(
+                  width: 8.0,
+                ),
+                Expanded(
+                  child: Text(
+                    '+255653900085',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -143,6 +238,38 @@ class _ProfilePage extends State<ProfilePage>
         ),
       ],
     );
+  }
+
+  Widget _editProfileBtn() {
+    return Container(
+      width: double.infinity,
+      child: OutlineButton(
+        onPressed: () {},
+//      padding: EdgeIn,
+        child: Text('edit profile'),
+      ),
+    );
+//    return Container(
+//      width: double.infinity,
+//      child: FlatButton(
+//        padding: EdgeInsets.all(0.0),
+//        onPressed: () {
+//          print('edit profile');
+//        },
+//        child: Container(
+//          padding: EdgeInsets.symmetric(vertical: 5.0),
+//          decoration: BoxDecoration(
+//            border: Border.all(color: Colors.grey),
+//            borderRadius: BorderRadius.circular(5.0),
+//          ),
+//          alignment: Alignment.center,
+//          child: Text(
+//            'edit profile',
+//            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+//          ),
+//        ),
+//      ),
+//    );
   }
 
   Widget _buildImageViewButtonBar() {
@@ -179,26 +306,10 @@ class _ProfilePage extends State<ProfilePage>
     );
   }
 
-  Widget _buildProfileFollowButton() {
-    return Container(
-      padding: EdgeInsets.only(top: 4.0),
-      child: FlatButton(
-        onPressed: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            'edit profile',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          width: 200.0,
-          height: 27.0,
-        ),
-      ),
-    );
+  changeView(String viewName) {
+    setState(() {
+      view = viewName;
+    });
   }
 
   List<String> _posts = [
@@ -263,7 +374,7 @@ class _ProfilePage extends State<ProfilePage>
         children: <Widget>[
           AccountTopSection(),
           PostSection(imageUrl: imgUrl),
-          BottomSection(postImage: imgUrl),
+          MyAccountBottomSection(postImage: imgUrl),
           PostDetails(),
         ],
       ),
@@ -274,29 +385,31 @@ class _ProfilePage extends State<ProfilePage>
   Widget build(BuildContext context) {
     super.build(context); // reloads state when opened again
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'windowshoppi ',
-          style: TextStyle(fontFamily: 'Itim'),
-        ),
-      ),
-      body: ListView(
-        children: <Widget>[
-          _accountHeader(),
-          Divider(height: 5),
-          _buildImageViewButtonBar(),
-          Divider(height: 0.0),
-          _buildUserPosts(),
-        ],
-      ),
-    );
-  }
-
-  changeView(String viewName) {
-    setState(() {
-      view = viewName;
-    });
+    return file == null
+        ? Scaffold(
+            appBar: AppBar(
+              title: Text('my account'),
+            ),
+            body: ListView(
+              children: <Widget>[
+                _accountHeader(),
+                Divider(height: 0.0),
+                _buildImageViewButtonBar(),
+                Divider(height: 0.0),
+                _buildUserPosts(),
+              ],
+            ),
+            floatingActionButton: buildSpeedDial(),
+          )
+        : Scaffold(
+            appBar: AppBar(
+              title: Text('Post'),
+              leading: IconButton(
+                icon: Icon(Icons.clear),
+                onPressed: clearImage,
+              ),
+            ),
+          );
   }
 
   // ensures state is kept when switching pages

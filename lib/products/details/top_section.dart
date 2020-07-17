@@ -32,7 +32,7 @@ class TopSection extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PageAccount(),
+              builder: (context) => ProfilePage(),
             ),
           );
         },

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'top_section.dart';
 import 'image_section.dart';
 import 'bottom_section.dart';
 import 'description_section.dart';
+import 'package:windowshoppi/explore/top_section.dart';
 
 class Details extends StatefulWidget {
   final String imageUrl;

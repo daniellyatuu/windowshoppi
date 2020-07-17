@@ -13,6 +13,7 @@ class AppCategory extends StatelessWidget {
           Category(listTitle: 'Restaurants'),
           Category(listTitle: 'Hotels'),
           Category(listTitle: 'NightLife'),
+          Category(listTitle: 'Game Center'),
         ],
       ),
     );
@@ -28,15 +29,13 @@ class Category extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 100,
-      child: InkWell(
-        child: Card(
-          child: Center(
-            child: Text(
-              listTitle,
-              overflow: TextOverflow.ellipsis,
-            ),
+    return Card(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: Text(
+            listTitle,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),
