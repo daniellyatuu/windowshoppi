@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'login.dart';
 import 'register.dart';
+import 'package:windowshoppi/account/my_account.dart';
 
 class UserAuth extends StatefulWidget {
   @override
@@ -10,9 +11,9 @@ class UserAuth extends StatefulWidget {
 
 class _UserAuthState extends State<UserAuth> {
   Color primaryColor = Colors.red;
+  bool _isLoggedIn = false;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _loginRegisterPage() {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -51,5 +52,10 @@ class _UserAuthState extends State<UserAuth> {
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _isLoggedIn ? MyAccount() : _loginRegisterPage();
   }
 }

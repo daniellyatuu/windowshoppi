@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:windowshoppi/utilities/constants.dart';
 
 class DiscoverAccount extends StatefulWidget {
   @override
@@ -26,18 +27,8 @@ class _DiscoverAccountState extends State<DiscoverAccount> {
                 horizontal: 10.0,
               ),
               border: OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(14.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[900],
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(
-                  color: Colors.teal[400],
-                ),
-              ),
+              focusedBorder: kFocusedBorder,
+              enabledBorder: kEnabledBorder,
             ),
             validator: (value) {
               if (value.isEmpty) {

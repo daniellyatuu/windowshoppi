@@ -3,9 +3,7 @@ import 'package:windowshoppi/splash_screen/splash_screen.dart';
 import 'package:windowshoppi/navigation_page.dart';
 
 void main() {
-  runApp(
-    MyApp(),
-  );
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {

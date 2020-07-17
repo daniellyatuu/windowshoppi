@@ -87,7 +87,7 @@ class _ProductsState extends State<Products> {
     'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-red-select-2019?wid=940&hei=1112&fmt=png-alpha&qlt=80&.v=1566956144763',
     'https://static.livebooks.com/abc61dbc6e9c403b917975eb48d2d97d/i/f2c81f819c994f5eb2312f9948520c2a/1/4SoifmQp7LJ6yDtMuFY2x/Swan-Optic-22089.jpg',
     'https://www.apple.com/v/product-red/o/images/meta/og__dbjwy50zuc02.png?202005090509',
-    'https://www.hindipro.com/wp-content/uploads/2019/12/avatar-images-of-god-krishna-and-radha-hinduism.jpg',
+    'https://api.time.com/wp-content/uploads/2018/11/sweetfoam-sustainable-product.jpg?quality=85',
     'https://in.canon/media/image/2018/05/03/642e7bbeae5741e3b872e082626c0151_eos6d-mkii-ef-24-70m-l.png',
   ];
   @override
@@ -102,12 +102,12 @@ class _ProductsState extends State<Products> {
             itemBuilder: (context, imageUrl) {
               return InkWell(
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    FadeRoute(
-                      widget: Details(imageUrl: imageList[imageUrl]),
-                    ),
-                  );
+//                  Navigator.push(
+//                    context,
+//                    FadeRoute(
+//                      widget: Details(imageUrl: imageList[imageUrl]),
+//                    ),
+//                  );
                 },
                 child: Container(
                   padding: EdgeInsets.all(5),

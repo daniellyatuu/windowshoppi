@@ -23,7 +23,7 @@ class _AppNavigationState extends State<AppNavigation> {
     UserAuth(),
   ];
 
-  void onTappedBar(int index) {
+  void _onTappedBar(int index) {
     navigatorKey.currentState.popUntil((route) => route.isFirst);
 
     setState(() {
@@ -42,7 +42,9 @@ class _AppNavigationState extends State<AppNavigation> {
         pageRoute: PageRoutes.materialPageRoute,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        onTap: onTappedBar,
+        showUnselectedLabels: true,
+        selectedItemColor: Colors.black,
+        onTap: _onTappedBar,
         currentIndex: _currentIndex,
         items: [
           BottomNavigationBarItem(

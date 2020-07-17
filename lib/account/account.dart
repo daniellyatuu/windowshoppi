@@ -226,12 +226,12 @@ class _ProfilePage extends State<ProfilePage>
         itemBuilder: (context, index) {
           return GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                FadeRoute(
-                  widget: Details(imageUrl: _posts[index]),
-                ),
-              );
+//              Navigator.push(
+//                context,
+//                FadeRoute(
+//                  widget: Details(imageUrl: _posts[index]),
+//                ),
+//              );
             },
             child: FadeInImage.memoryNetwork(
               placeholder: kTransparentImage,
@@ -262,8 +262,8 @@ class _ProfilePage extends State<ProfilePage>
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           AccountTopSection(),
-          PostSection(imageUrl: imgUrl),
-          BottomSection(postImage: imgUrl),
+//          PostSection(imageUrl: imgUrl),
+          BottomSection(),
           PostDetails(),
         ],
       ),
