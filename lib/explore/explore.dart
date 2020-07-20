@@ -39,8 +39,7 @@ class _ExploreState extends State<Explore> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.fetchProduct(
-        ALL_PRODUCT_URL, clearCachedData = true, firstLoading = true);
+    fetchProduct(ALL_PRODUCT_URL, clearCachedData = true, firstLoading = true);
 
     _scrollController.addListener(
       () {
@@ -132,63 +131,89 @@ class _ExploreState extends State<Explore> {
 
           return RefreshIndicator(
             onRefresh: refresh,
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: data == null ? 0 : data.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                if (index < data.length) {
-                  return Card(
+            child: data.length == 0
+                ? Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        TopSection(
-                          account: data[index].accountName,
-                          location: data[index].businessLocation,
-                        ),
-                        PostSection(postImage: data[index].productPhoto),
-                        BottomSection(
-                            callNo: data[index].callNumber,
-                            whatsapp: data[index].whatsappNumber),
-                        PostDetails(caption: data[index].caption),
-                      ],
-                    ),
-                  );
-                } else if (_isLoadingMoreData) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 30.0),
-                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        SizedBox(
-                          height: 18.0,
-                          width: 18.0,
-                          child: CircularProgressIndicator(strokeWidth: 1.0),
+                        GestureDetector(
+                          onTap: () {
+                            fetchProduct(ALL_PRODUCT_URL,
+                                clearCachedData = true, firstLoading = true);
+                          },
+                          child: Icon(
+                            Icons.refresh,
+                            size: 45,
+                            color: Colors.grey[500],
+                          ),
                         ),
                         Text(
-                          '  please wait..',
-                          style: TextStyle(
-                            color: Colors.teal,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15.0,
-                          ),
+                          'No post',
+                          style: TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
-                  );
-                } else {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Center(
-                        child: Text(
-                      'no more data',
-                      style: TextStyle(color: Colors.teal),
-                    )),
-                  );
-                }
-              },
-            ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    itemCount: data == null ? 0 : data.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index < data.length) {
+                        return Card(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 0.0, vertical: 4.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              TopSection(
+                                account: data[index].accountName,
+                                location: data[index].businessLocation,
+                              ),
+                              PostSection(postImage: data[index].productPhoto),
+                              BottomSection(
+                                  callNo: data[index].callNumber,
+                                  whatsapp: data[index].whatsappNumber),
+                              PostDetails(caption: data[index].caption),
+                            ],
+                          ),
+                        );
+                      } else if (_isLoadingMoreData) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 30.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 18.0,
+                                width: 18.0,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 1.0),
+                              ),
+                              Text(
+                                '  please wait..',
+                                style: TextStyle(
+                                  color: Colors.teal,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Center(
+                              child: Text(
+                            'no more data',
+                            style: TextStyle(color: Colors.teal),
+                          )),
+                        );
+                      }
+                    },
+                  ),
           );
         },
       ),

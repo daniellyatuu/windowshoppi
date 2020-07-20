@@ -15,9 +15,9 @@ class DatabaseHelper {
 
   /// country table
   static final table_2 = 'country';
-  static final table_2ColumnId = 'id';
-  static final table_2ColumnCountryId = 'country_id';
-  static final table_2ColumnCountryName = 'country_name';
+  static final table_2ColumnId = 'country_id';
+  static final table_2ColumnCountryId = 'id';
+  static final table_2ColumnCountryName = 'name';
   static final table_2ColumnCountryFlag = 'flag';
   static final table_2ColumnCountryIos2 = 'ios2';
   static final table_2ColumnCountryLanguage = 'language';
@@ -52,18 +52,11 @@ class DatabaseHelper {
 
     // then create again
     batch.execute(
-        "CREATE TABLE $table_1($table_1ColumnId INTEGER PRIMARY KEY, $table_1ColumnName TEXT NOT NULL, $table_1ColumnCountryId INTEGER NOT NULL)");
-    batch.execute(
         "CREATE TABLE $table_2($table_2ColumnId INTEGER PRIMARY KEY, $table_2ColumnCountryId INTEGER NOT NULL, $table_2ColumnCountryName TEXT NOT NULL, $table_2ColumnCountryFlag TEXT NOT NULL, $table_2ColumnCountryIos2 NOT NULL, $table_2ColumnCountryLanguage TEXT NOT NULL, $table_2ColumnCountryCode TEXT NOT NULL, $table_2ColumnCountryTimezone TEXT NOT NULL)");
+    batch.execute(
+        "CREATE TABLE $table_1($table_1ColumnId INTEGER PRIMARY KEY, $table_1ColumnName TEXT NOT NULL, $table_1ColumnCountryId INTEGER NOT NULL, FOREIGN KEY ($table_1ColumnCountryId) REFERENCES $table_2($table_2ColumnId))");
     List<dynamic> result = await batch.commit();
     print(result);
-//    await db.execute('''
-//    CREATE TABLE $table_1(
-//    $table_1ColumnId INTEGER PRIMARY KEY,
-//    $table_1ColumnName TEXT NOT NULL,
-//    $table_1ColumnAge INTEGER NOT NULL,
-//    )
-//    ''');
   }
 
   /// save data
@@ -73,10 +66,41 @@ class DatabaseHelper {
     return await db.insert(table_2, row);
   }
 
+  /// save country data and insert first country as ACTIVE COUNTRY to user table
+  Future<int> insertCountryData(row) async {
+    Database db = await instance.database;
+    Batch batch = db.batch();
+    row.asMap().forEach((index, value) => batch.insert(table_2, value));
+    await batch.commit();
+  }
+
   /// get all data
   Future<List<Map<String, dynamic>>> queryAllRows() async {
     print('get all data');
     Database db = await instance.database;
     return await db.query(table_2);
+  }
+
+  /// clean database
+  Future<void> cleanDatabase() async {
+    try {
+      Database db = await instance.database;
+      await db.transaction((txn) async {
+        var batch = txn.batch();
+        batch.delete(table_1);
+        batch.delete(table_2);
+        await batch.commit();
+      });
+    } catch (error) {
+      throw Exception('DbBase.cleanDatabase: ' + error.toString());
+    }
+  }
+
+  /// count query
+  Future countCountry() async {
+    Database db = await instance.database;
+    return Sqflite.firstIntValue(
+      await db.rawQuery('SELECT COUNT(*) FROM $table_2'),
+    );
   }
 }
