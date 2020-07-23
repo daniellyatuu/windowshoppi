@@ -67,6 +67,13 @@ class _HomePageState extends State<HomePage> {
     print(x);
   }
 
+  void _getUser() async {
+    final allUsers = await dbHelper.getUser();
+    allUsers.forEach(
+      (row) => print(row),
+    );
+  }
+
 //  @override
 //  void initState() {
 //    // TODO: implement initState
@@ -113,7 +120,7 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(),
+          SelectCountry(onCountryChanged: () => null),
         ],
       ),
       drawer: AppDrawer(),
@@ -143,6 +150,12 @@ class _HomePageState extends State<HomePage> {
               _countCountry();
             },
             child: Text('count country'),
+          ),
+          RaisedButton(
+            onPressed: () {
+              _getUser();
+            },
+            child: Text('get user data'),
           ),
           AppCategory(),
 //          Products(),

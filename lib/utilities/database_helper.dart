@@ -56,29 +56,85 @@ class DatabaseHelper {
     batch.execute(
         "CREATE TABLE $table_1($table_1ColumnId INTEGER PRIMARY KEY, $table_1ColumnName TEXT NOT NULL, $table_1ColumnCountryId INTEGER NOT NULL, FOREIGN KEY ($table_1ColumnCountryId) REFERENCES $table_2($table_2ColumnId))");
     List<dynamic> result = await batch.commit();
-    print(result);
   }
 
   /// save data
   Future<int> insert(Map<String, dynamic> row) async {
-    print('save data');
     Database db = await instance.database;
     return await db.insert(table_2, row);
   }
 
+  /// save data to user table
+  Future insertUserData(Map<String, dynamic> row) async {
+//    print('step 9: save userdata here');
+    Database db = await instance.database;
+    await db.insert(table_1, row);
+  }
+
+  /// get active country
+  Future getActiveCountryFromUserTable() async {
+//    print('step 5: inside db, get active id country');
+    Database db = await instance.database;
+    var _countryId = await db
+        .rawQuery("SELECT $table_1ColumnCountryId FROM $table_1 LIMIT 1");
+
+    if (_countryId.length != 0) {
+      // select country data
+      var activeCountry = await getCountry(_countryId[0]['active_country_id']);
+//      print('step 7: pass to front page returned country');
+      return activeCountry;
+    } else {
+      return null;
+    }
+  }
+
+  Future getCountry(id) async {
+//    print('step 6: get active country by using received id');
+    Database db = await instance.database;
+    var res = await db.query(table_2, where: "country_id = ?", whereArgs: [id]);
+    return res.isNotEmpty ? res.first : Null;
+  }
+
+  Future getCountry2(id) async {
+//    print('step 2: get data by selected country id');
+    Database db = await instance.database;
+    var res = await db.query(table_2, where: "id = ?", whereArgs: [id]);
+//    print('step 3: pass retrieved id to user table');
+
+    await updateUser(res[0]['country_id']);
+//    print('step 5: get saved result');
+    return res.isNotEmpty ? true : Null;
+  }
+
+  Future updateUser(id) async {
+//    print('step 4: update user table');
+    Database db = await instance.database;
+    await db.rawQuery(
+        "UPDATE $table_1 SET $table_1ColumnCountryId=? WHERE $table_1ColumnName=?",
+        [id, 'username']);
+  }
+
   /// save country data and insert first country as ACTIVE COUNTRY to user table
-  Future<int> insertCountryData(row) async {
+  Future insertCountryData(row) async {
     Database db = await instance.database;
     Batch batch = db.batch();
     row.asMap().forEach((index, value) => batch.insert(table_2, value));
-    await batch.commit();
+    List<dynamic> result = await batch.commit();
+//    print("step 5: return saved id's");
+    return result;
   }
 
   /// get all data
   Future<List<Map<String, dynamic>>> queryAllRows() async {
-    print('get all data');
+//    print('step 2: get data from local db');
     Database db = await instance.database;
     return await db.query(table_2);
+  }
+
+  /// get user data
+  Future<List<Map<String, dynamic>>> getUser() async {
+    Database db = await instance.database;
+    return await db.query(table_1);
   }
 
   /// clean database
