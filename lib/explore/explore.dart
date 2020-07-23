@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:windowshoppi/models/global.dart';
@@ -23,222 +22,201 @@ class Explore extends StatefulWidget {
 
 class _ExploreState extends State<Explore> {
   ScrollController _scrollController = ScrollController();
-  List data;
+  var data = new List<Product>();
   String nextUrl;
+  bool firstLoading,
+      _isInitialLoading = false,
+      isLoadMore,
+      _isLoadingMoreData = true,
+      clearCachedData,
+      _isGettingServerData;
+
+  dispose() {
+    super.dispose();
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    this.fetchProduct(http.Client(), ALL_PRODUCT_URL);
+    fetchProduct(ALL_PRODUCT_URL, clearCachedData = true, firstLoading = true);
 
-    _scrollController.addListener(() {
+    _scrollController.addListener(
+      () {
 //      print(_scrollController.position.pixels);
-      if (_scrollController.position.pixels ==
-          _scrollController.position.maxScrollExtent) {
-        if (nextUrl != null) {
-          this.fetchProduct(http.Client(), nextUrl);
-        }
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          if (nextUrl != null && _isGettingServerData == false) {
+            print('load more');
+            this.fetchProduct(
+                nextUrl, clearCachedData = false, firstLoading = false);
+          }
 
-//        print(nextUrl);
+          if (nextUrl == null) {
+            setState(() {
+              _isLoadingMoreData = false;
+            });
+          }
+        }
+      },
+    );
+  }
+
+  Future fetchProduct(url, clearCachedData, firstLoading) async {
+    // get active country in here
+    print('get active country in here');
+
+    setState(() {
+      _isGettingServerData = true;
+      if (firstLoading) {
+        _isInitialLoading = true;
+      }
+    });
+
+    final response = await http.get(url);
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      var productData = json.decode(response.body);
+      nextUrl = productData['next'];
+      setState(() {
+        Iterable list = productData['results'];
+        print(clearCachedData);
+        if (clearCachedData) {
+          data = list.map((model) => Product.fromJson(model)).toList();
+        } else {
+          data.addAll(list.map((model) => Product.fromJson(model)).toList());
+        }
+      });
+      print(data);
+    } else {
+      throw Exception('failed to load data from internet');
+    }
+
+    setState(() {
+      _isGettingServerData = false;
+      if (firstLoading) {
+        _isInitialLoading = false;
       }
     });
   }
 
-  Future<List<Product>> fetchProduct(http.Client client, url) async {
-//  final response = await client.get(ALL_PRODUCT_URL);
-    final response = await client.get(url);
-
-    if (response.statusCode == 200) {
-      Map<String, dynamic> mapResponse = json.decode(response.body);
-
-      nextUrl = mapResponse['next'];
-      if (mapResponse["count"] != "") {
-        final products = mapResponse["results"].cast<Map<String, dynamic>>();
-        final listOfProducts = await products.map<Product>((json) {
-          return Product.fromJson(json);
-        }).toList();
-//        return listOfProducts;
-
-        setState(() {
-          data = listOfProducts;
-        });
-      } else {
-        return [];
-      }
-    } else {
-      throw Exception('failed to load data from internet');
-    }
+  Future<void> refresh() {
+    setState(() {
+      _isLoadingMoreData = true;
+    });
+    return fetchProduct(
+        ALL_PRODUCT_URL, clearCachedData = true, firstLoading = true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('http get'),
+        title: Text(
+          'windowshoppi',
+          style: TextStyle(fontFamily: 'Itim'),
+        ),
+        actions: <Widget>[
+          SelectCountry(),
+        ],
       ),
-      body: ListView.builder(
-        controller: _scrollController,
-        itemCount: data == null ? 0 : data.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Card(
-            child: Container(
-              height: 200,
-              color: Colors.blue,
-              child: Text(data[index].caption),
-            ),
+      drawer: AppDrawer(),
+      body: Builder(
+        builder: (_) {
+          if (_isInitialLoading) {
+            return Center(
+              child: CircularProgressIndicator(strokeWidth: 2.0),
+            );
+          }
+
+          return RefreshIndicator(
+            onRefresh: refresh,
+            child: data.length == 0
+                ? Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        GestureDetector(
+                          onTap: () {
+                            fetchProduct(ALL_PRODUCT_URL,
+                                clearCachedData = true, firstLoading = true);
+                          },
+                          child: Icon(
+                            Icons.refresh,
+                            size: 45,
+                            color: Colors.grey[500],
+                          ),
+                        ),
+                        Text(
+                          'No post',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    itemCount: data == null ? 0 : data.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      if (index < data.length) {
+                        return Card(
+                          margin: EdgeInsets.symmetric(
+                              horizontal: 0.0, vertical: 4.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              TopSection(
+                                account: data[index].accountName,
+                                location: data[index].businessLocation,
+                              ),
+                              PostSection(postImage: data[index].productPhoto),
+                              BottomSection(
+                                  callNo: data[index].callNumber,
+                                  whatsapp: data[index].whatsappNumber),
+                              PostDetails(caption: data[index].caption),
+                            ],
+                          ),
+                        );
+                      } else if (_isLoadingMoreData) {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 30.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(
+                                height: 18.0,
+                                width: 18.0,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 1.0),
+                              ),
+                              Text(
+                                '  please wait..',
+                                style: TextStyle(
+                                  color: Colors.teal,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Padding(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          child: Center(
+                              child: Text(
+                            'no more data',
+                            style: TextStyle(color: Colors.teal),
+                          )),
+                        );
+                      }
+                    },
+                  ),
           );
         },
       ),
     );
   }
 }
-
-//class Explore extends StatefulWidget {
-//  @override
-//  _ExploreState createState() => _ExploreState();
-//}
-//
-//class _ExploreState extends State<Explore> {
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: Text(
-//          'windowshoppi',
-//          style: TextStyle(fontFamily: 'Itim'),
-//        ),
-//        actions: <Widget>[
-//          SelectCountry(),
-//        ],
-//      ),
-//      drawer: AppDrawer(),
-//      body: FutureBuilder(
-//        future: fetchProduct(http.Client(), ALL_PRODUCT_URL),
-//        builder: (context, snapshot) {
-//          if (snapshot.hasError) {
-//            print(snapshot.error);
-////            Center(
-////              child: Text('display error'),
-////            );
-//          }
-//          return snapshot.hasData
-//              ? SinglePost(product: snapshot.data)
-//              : Center(child: CircularProgressIndicator(strokeWidth: 3.0));
-//        },
-//      ),
-//    );
-//  }
-//}
-//
-//class SinglePost extends StatefulWidget {
-//  final List<Product> product;
-//
-//  SinglePost({Key key, this.product}) : super(key: key);
-//
-//  @override
-//  _SinglePostState createState() => _SinglePostState();
-//}
-//
-//class _SinglePostState extends State<SinglePost> {
-//  ScrollController _scrollController = ScrollController();
-//
-//  @override
-//  void initState() {
-//    // TODO: implement initState
-//    super.initState();
-//    print('check scrolling in here');
-//    print(widget.product);
-//
-//    _scrollController.addListener(() {
-////      print(_scrollController.position.pixels);
-//      if (_scrollController.position.pixels ==
-//          _scrollController.position.maxScrollExtent) {
-//        loadMorePost(nextLink);
-//        setState(() {});
-//
-////        print(nextLink);
-//      }
-//    });
-//  }
-//
-//  @override
-//  void dispose() {
-//    // TODO: implement dispose
-//    _scrollController.dispose();
-//    super.dispose();
-//  }
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return ListView.builder(
-//        controller: _scrollController,
-//        itemCount: widget.product.length,
-//        itemBuilder: (context, index) {
-//          return Card(
-//            child: Column(
-//              mainAxisAlignment: MainAxisAlignment.start,
-//              mainAxisSize: MainAxisSize.min,
-//              crossAxisAlignment: CrossAxisAlignment.stretch,
-//              children: <Widget>[
-//                TopSection(
-//                  account: widget.product[index].accountName,
-//                  location: widget.product[index].businessLocation,
-//                ),
-////                PostSection(postImage: product[index].productPhoto),
-//                PostSection(postData: widget.product[index]),
-//                BottomSection(
-//                    callNo: widget.product[index].callNumber,
-//                    whatsapp: widget.product[index].whatsappNumber),
-//                PostDetails(caption: widget.product[index].caption),
-//              ],
-//            ),
-//          );
-//        });
-//  }
-//}
-//
-////Column(
-////children: <Widget>[
-////AppCategory(),
-////Expanded(
-////child: ListView.builder(
-////itemCount: imageList.length,
-////itemBuilder: (context, index) {
-////return SinglePost(imgUrl: imageList[index]);
-////},
-////),
-////),
-////],
-////),
-//
-///// This is the stateless widget that the main application instantiates.
-//class MyStatelessWidget extends StatelessWidget {
-//  MyStatelessWidget({Key key}) : super(key: key);
-//
-//  @override
-//  Widget build(BuildContext context) {
-//    return DecoratedBox(
-//      decoration: BoxDecoration(
-//        color: Colors.white,
-//        border: Border.all(),
-//        borderRadius: BorderRadius.circular(20),
-//      ),
-//      child: Image.network(
-//        'https://example.com/image.jpg',
-//        loadingBuilder: (BuildContext context, Widget child,
-//            ImageChunkEvent loadingProgress) {
-//          if (loadingProgress == null) return child;
-//          return Center(
-//            child: CircularProgressIndicator(
-//              value: loadingProgress.expectedTotalBytes != null
-//                  ? loadingProgress.cumulativeBytesLoaded /
-//                      loadingProgress.expectedTotalBytes
-//                  : null,
-//            ),
-//          );
-//        },
-//      ),
-//    );
-//  }
-//}
