@@ -7,17 +7,27 @@ import 'global.dart';
 
 class Country {
   int id;
-  final String countryName;
+  final String countryName, ios2, language, countryCode, timezone, flag;
 
   Country({
     this.id,
     this.countryName,
+    this.ios2,
+    this.language,
+    this.countryCode,
+    this.timezone,
+    this.flag,
   });
 
   factory Country.fromJson(Map<String, dynamic> json) {
     return Country(
       id: json['id'],
       countryName: json['name'],
+      ios2: json['ios2'],
+      language: json['language'],
+      countryCode: json['countryCode'],
+      timezone: json['timezone'],
+      flag: json['flag'],
     );
   }
 }

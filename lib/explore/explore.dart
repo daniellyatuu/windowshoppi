@@ -6,6 +6,7 @@ import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/horizontal_list/horizontal_list.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
+import 'package:windowshoppi/utilities/database_helper.dart';
 import 'top_section.dart';
 import 'post_section.dart';
 import 'post_details.dart';
@@ -21,6 +22,7 @@ class Explore extends StatefulWidget {
 }
 
 class _ExploreState extends State<Explore> {
+  final dbHelper = DatabaseHelper.instance;
   ScrollController _scrollController = ScrollController();
   var data = new List<Product>();
   String nextUrl;
@@ -47,7 +49,7 @@ class _ExploreState extends State<Explore> {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
           if (nextUrl != null && _isGettingServerData == false) {
-            print('load more');
+//            print('load more');
             this.fetchProduct(
                 nextUrl, clearCachedData = false, firstLoading = false);
           }
@@ -63,8 +65,7 @@ class _ExploreState extends State<Explore> {
   }
 
   Future fetchProduct(url, clearCachedData, firstLoading) async {
-    // get active country in here
-    print('get active country in here');
+    var country = await _activeCountry();
 
     setState(() {
       _isGettingServerData = true;
@@ -72,22 +73,22 @@ class _ExploreState extends State<Explore> {
         _isInitialLoading = true;
       }
     });
-
-    final response = await http.get(url);
-    print(response.statusCode);
+    var newUrl = url + country['id'].toString();
+    final response = await http.get(newUrl);
+//    print(response.statusCode);
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
       nextUrl = productData['next'];
       setState(() {
         Iterable list = productData['results'];
-        print(clearCachedData);
+//        print(clearCachedData);
         if (clearCachedData) {
           data = list.map((model) => Product.fromJson(model)).toList();
         } else {
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
         }
       });
-      print(data);
+//      print(data);
     } else {
       throw Exception('failed to load data from internet');
     }
@@ -98,6 +99,11 @@ class _ExploreState extends State<Explore> {
         _isInitialLoading = false;
       }
     });
+  }
+
+  _activeCountry() async {
+    var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
+    return activeCountryData;
   }
 
   Future<void> refresh() {
@@ -117,7 +123,7 @@ class _ExploreState extends State<Explore> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(),
+          SelectCountry(onCountryChanged: () => refresh()),
         ],
       ),
       drawer: AppDrawer(),
@@ -179,7 +185,7 @@ class _ExploreState extends State<Explore> {
                             ],
                           ),
                         );
-                      } else if (_isLoadingMoreData) {
+                      } else if (_isLoadingMoreData && data.length > 15) {
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 30.0),
                           child: Row(
@@ -206,10 +212,13 @@ class _ExploreState extends State<Explore> {
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.0),
                           child: Center(
-                              child: Text(
-                            'no more data',
-                            style: TextStyle(color: Colors.teal),
-                          )),
+                            child: data.length > 15
+                                ? Text(
+                                    'no more data',
+                                    style: TextStyle(color: Colors.teal),
+                                  )
+                                : Text(''),
+                          ),
                         );
                       }
                     },

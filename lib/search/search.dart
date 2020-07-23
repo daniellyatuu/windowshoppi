@@ -197,7 +197,7 @@ class _SearchState extends State<Search> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(),
+          SelectCountry(onCountryChanged: () => null),
         ],
       ),
       body: ListView(
