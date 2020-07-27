@@ -26,7 +26,10 @@ class _HomePageState extends State<HomePage> {
   var data = new List<Product>();
   String newUrl, nextUrl;
   bool removeListData, _isGettingServerData, firstLoading;
-  bool _isInitialLoading = true, _isLoadingMoreData = true;
+  bool _isInitialLoading = true,
+      _isLoadingMoreData = true,
+      _isFilterByCategory = false,
+      _isFilterByCategoryLoading = false;
   int activeCategory = 0;
 
   @override
@@ -54,6 +57,7 @@ class _HomePageState extends State<HomePage> {
 
           if (nextUrl == null) {
             setState(() {
+              print('remove load more indicator');
               _isLoadingMoreData = false;
             });
           }
@@ -96,7 +100,7 @@ class _HomePageState extends State<HomePage> {
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
         }
       });
-//      print(data);
+      print(data.length);
     } else {
       throw Exception('failed to load data from internet');
     }
@@ -133,6 +137,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> filterProductByCategory(id) async {
     setState(() {
       _isLoadingMoreData = true;
+      activeCategory = id;
     });
     fetchProduct(
         ALL_PRODUCT_URL, removeListData = true, firstLoading = true, id);
@@ -153,41 +158,46 @@ class _HomePageState extends State<HomePage> {
       drawer: AppDrawer(),
       body: RefreshIndicator(
         onRefresh: refresh,
-        child: _isGettingServerData == false && data.length == 0
-            ? Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    GestureDetector(
-                      onTap: () {
-                        fetchProduct(ALL_PRODUCT_URL, removeListData = true,
-                            firstLoading = true, activeCategory);
-                      },
-                      child: Icon(
-                        Icons.refresh,
-                        size: 45,
-                        color: Colors.grey[500],
-                      ),
-                    ),
-                    Text(
-                      'No post',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
-              )
-            : _isInitialLoading
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ProductCategory(
+                onFetchingData: (categoryId) =>
+                    filterProductByCategory(categoryId)),
+
+//                  Products(products: data),
+            _isInitialLoading
                 ? Center(
                     child: CircularProgressIndicator(strokeWidth: 2.0),
                   )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      ProductCategory(
-                          onFetchingData: (categoryId) =>
-                              filterProductByCategory(categoryId)),
-//                    Products(products: data),
-                      Expanded(
+                : _isGettingServerData == false && data.length == 0
+                    ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                fetchProduct(
+                                    ALL_PRODUCT_URL,
+                                    removeListData = true,
+                                    firstLoading = true,
+                                    activeCategory);
+                              },
+                              child: Icon(
+                                Icons.refresh,
+                                size: 45,
+                                color: Colors.grey[500],
+                              ),
+                            ),
+                            Text(
+                              'No post',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Expanded(
                         child: Container(
                           child: StaggeredGridView.countBuilder(
                               physics: BouncingScrollPhysics(),
@@ -195,7 +205,11 @@ class _HomePageState extends State<HomePage> {
                               crossAxisCount: 2,
                               crossAxisSpacing: 1,
                               mainAxisSpacing: 1,
-                              itemCount: data == null ? 0 : data.length + 1,
+                              itemCount: data == null
+                                  ? 0
+                                  : _isLoadingMoreData
+                                      ? data.length + 1
+                                      : data.length,
                               itemBuilder: (context, index) {
                                 if (index < data.length) {
                                   return InkWell(
@@ -244,8 +258,8 @@ class _HomePageState extends State<HomePage> {
                               }),
                         ),
                       ),
-                    ],
-                  ),
+          ],
+        ),
       ),
     );
   }
