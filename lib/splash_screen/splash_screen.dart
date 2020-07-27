@@ -32,8 +32,9 @@ class _SplashScreenState extends State<SplashScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       CircleAvatar(
-                        radius: 50.0,
-                        backgroundImage: AssetImage('images/logo/logo.jpeg'),
+                        radius: 45.0,
+                        backgroundImage:
+                            AssetImage('images/logo/logo_200_200.png'),
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 5.0),

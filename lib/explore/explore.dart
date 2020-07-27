@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
-import 'package:windowshoppi/horizontal_list/horizontal_list.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
 import 'top_section.dart';
@@ -23,35 +22,33 @@ class Explore extends StatefulWidget {
 
 class _ExploreState extends State<Explore> {
   final dbHelper = DatabaseHelper.instance;
+
   ScrollController _scrollController = ScrollController();
   var data = new List<Product>();
-  String nextUrl;
-  bool firstLoading,
-      _isInitialLoading = false,
-      isLoadMore,
-      _isLoadingMoreData = true,
-      clearCachedData,
-      _isGettingServerData;
+  String newUrl, nextUrl;
+  bool removeListData, _isGettingServerData, firstLoading;
+  bool _isInitialLoading = true, _isLoadingMoreData = true;
+  int activeCategory = 0;
 
   dispose() {
     super.dispose();
+    _scrollController.dispose();
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchProduct(ALL_PRODUCT_URL, clearCachedData = true, firstLoading = true);
+    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
+        activeCategory);
 
     _scrollController.addListener(
       () {
-//      print(_scrollController.position.pixels);
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
           if (nextUrl != null && _isGettingServerData == false) {
-//            print('load more');
-            this.fetchProduct(
-                nextUrl, clearCachedData = false, firstLoading = false);
+            fetchProduct(nextUrl, removeListData = false, firstLoading = false,
+                activeCategory);
           }
 
           if (nextUrl == null) {
@@ -64,25 +61,33 @@ class _ExploreState extends State<Explore> {
     );
   }
 
-  Future fetchProduct(url, clearCachedData, firstLoading) async {
-    var country = await _activeCountry();
-
+  Future fetchProduct(url, removeListData, firstLoading, activeCategory) async {
     setState(() {
+      _isInitialLoading = firstLoading ? true : false;
       _isGettingServerData = true;
-      if (firstLoading) {
-        _isInitialLoading = true;
-      }
     });
-    var newUrl = url + country['id'].toString();
+
+    if (_isInitialLoading) {
+      var country = await _activeCountry();
+      newUrl = url +
+          '?category=' +
+          activeCategory.toString() +
+          '&country=' +
+          country['id'].toString();
+    } else {
+      newUrl = url;
+    }
+
     final response = await http.get(newUrl);
 //    print(response.statusCode);
+
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
       nextUrl = productData['next'];
+
       setState(() {
         Iterable list = productData['results'];
-//        print(clearCachedData);
-        if (clearCachedData) {
+        if (removeListData) {
           data = list.map((model) => Product.fromJson(model)).toList();
         } else {
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
@@ -94,10 +99,8 @@ class _ExploreState extends State<Explore> {
     }
 
     setState(() {
+      _isInitialLoading = false;
       _isGettingServerData = false;
-      if (firstLoading) {
-        _isInitialLoading = false;
-      }
     });
   }
 
@@ -106,12 +109,22 @@ class _ExploreState extends State<Explore> {
     return activeCountryData;
   }
 
-  Future<void> refresh() {
+  Future<void> refresh() async {
+    await Future.delayed(Duration(milliseconds: 700));
+
     setState(() {
       _isLoadingMoreData = true;
     });
-    return fetchProduct(
-        ALL_PRODUCT_URL, clearCachedData = true, firstLoading = true);
+    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
+        activeCategory);
+  }
+
+  Future<void> refreshOnChangeCountry() async {
+    setState(() {
+      _isLoadingMoreData = true;
+    });
+    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
+        activeCategory);
   }
 
   @override
@@ -123,44 +136,41 @@ class _ExploreState extends State<Explore> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(onCountryChanged: () => refresh()),
+          SelectCountry(onCountryChanged: () => refreshOnChangeCountry()),
         ],
       ),
       drawer: AppDrawer(),
-      body: Builder(
-        builder: (_) {
-          if (_isInitialLoading) {
-            return Center(
-              child: CircularProgressIndicator(strokeWidth: 2.0),
-            );
-          }
-
-          return RefreshIndicator(
-            onRefresh: refresh,
-            child: data.length == 0
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            fetchProduct(ALL_PRODUCT_URL,
-                                clearCachedData = true, firstLoading = true);
-                          },
-                          child: Icon(
-                            Icons.refresh,
-                            size: 45,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                        Text(
-                          'No post',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: _isGettingServerData == false && data.length == 0
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        fetchProduct(ALL_PRODUCT_URL, removeListData = true,
+                            firstLoading = true, activeCategory);
+                      },
+                      child: Icon(
+                        Icons.refresh,
+                        size: 45,
+                        color: Colors.grey[500],
+                      ),
                     ),
+                    Text(
+                      'No post',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              )
+            : _isInitialLoading
+                ? Center(
+                    child: CircularProgressIndicator(strokeWidth: 2.0),
                   )
                 : ListView.builder(
+                    physics: BouncingScrollPhysics(),
                     controller: _scrollController,
                     itemCount: data == null ? 0 : data.length + 1,
                     itemBuilder: (BuildContext context, int index) {
@@ -185,7 +195,7 @@ class _ExploreState extends State<Explore> {
                             ],
                           ),
                         );
-                      } else if (_isLoadingMoreData && data.length > 15) {
+                      } else if (_isLoadingMoreData && data.length >= 15) {
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 30.0),
                           child: Row(
@@ -223,8 +233,6 @@ class _ExploreState extends State<Explore> {
                       }
                     },
                   ),
-          );
-        },
       ),
     );
   }
