@@ -1,66 +1,62 @@
 import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:windowshoppi/models/country.dart';
+import 'package:windowshoppi/models/category_model.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/product.dart';
-import 'package:windowshoppi/products/details/details.dart';
-import 'package:windowshoppi/products/products.dart';
-import 'package:windowshoppi/drawer/app_drawer.dart';
-import 'package:windowshoppi/myappbar/select_country.dart';
-import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
-import 'package:windowshoppi/product_category/product_category.dart';
 import 'package:http/http.dart' as http;
+import 'package:windowshoppi/routes/fade_transition.dart';
+import 'package:windowshoppi/products/details/details.dart';
 
-class HomePage extends StatefulWidget {
+class CategoryProduct extends StatefulWidget {
+  final Category categoryData;
+  CategoryProduct({this.categoryData});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  _CategoryProductState createState() => _CategoryProductState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _CategoryProductState extends State<CategoryProduct> {
   final dbHelper = DatabaseHelper.instance;
 
   ScrollController _scrollController = ScrollController();
-
   var data = new List<Product>();
   String newUrl, nextUrl;
   bool removeListData, _isGettingServerData, firstLoading;
   bool _isInitialLoading = true;
-  int activeCategory = 0;
   int allProducts = 0;
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _scrollController.dispose();
-  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    fetchProduct(SEARCH_POST, removeListData = true, firstLoading = true,
+        widget.categoryData.id);
 
     _scrollController.addListener(
       () {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
+          print('load more');
           if (nextUrl != null && _isGettingServerData == false) {
             fetchProduct(nextUrl, removeListData = false, firstLoading = false,
-                activeCategory);
+                widget.categoryData.id);
           }
         }
       },
     );
   }
 
-  Future fetchProduct(url, removeListData, firstLoading, activeCategory) async {
+  dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  Future fetchProduct(url, removeListData, firstLoading, categoryId) async {
     setState(() {
       _isInitialLoading = firstLoading ? true : false;
       _isGettingServerData = true;
@@ -68,17 +64,16 @@ class _HomePageState extends State<HomePage> {
 
     if (_isInitialLoading) {
       var country = await _activeCountry();
-
-      newUrl = url +
-          '?category=' +
-          activeCategory.toString() +
-          '&country=' +
-          country['id'].toString();
+      newUrl =
+          url + categoryId.toString() + '/?country=' + country['id'].toString();
     } else {
       newUrl = url;
     }
 
+//    print(newUrl);
+
     final response = await http.get(newUrl);
+//    print(response.statusCode);
 
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
@@ -93,7 +88,8 @@ class _HomePageState extends State<HomePage> {
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
         }
       });
-//      print(data.length);
+//      print(data);
+//      print(nextUrl);
     } else {
       throw Exception('failed to load data from internet');
     }
@@ -106,91 +102,76 @@ class _HomePageState extends State<HomePage> {
 
   _activeCountry() async {
     var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
-    if (activeCountryData == null) {
-      var _country = await _fetchCountry();
-      return _country;
-    } else {
-      return activeCountryData;
-    }
-  }
-
-  Future _fetchCountry() async {
-    final response = await http.get(ALL_COUNTRY_URL);
-
-    if (response.statusCode == 200) {
-      var countryData = json.decode(response.body);
-
-      // save data locally
-      await _insert(countryData);
-
-      var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
-      return activeCountryData;
-    } else {
-      throw Exception('failed to load data from internet');
-    }
-  }
-
-  _insert(data) async {
-    var savedId = await dbHelper.insertCountryData(data);
-    await _insertUser(savedId[0]);
-  }
-
-  _insertUser(data) async {
-    // user data
-    Map<String, dynamic> row = {
-      DatabaseHelper.table_1ColumnName: 'username',
-      DatabaseHelper.table_1ColumnCountryId: data
-    };
-    await dbHelper.insertUserData(row);
+    return activeCountryData;
   }
 
   Future<void> refresh() async {
     await Future.delayed(Duration(milliseconds: 700));
 
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    fetchProduct(SEARCH_POST, removeListData = true, firstLoading = true,
+        widget.categoryData.id);
   }
 
-  Future<void> refreshOnChangeCountry() async {
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
-  }
-
-  Future<void> filterProductByCategory(id) async {
-    setState(() {
-      activeCategory = id;
-    });
-    fetchProduct(
-        ALL_PRODUCT_URL, removeListData = true, firstLoading = true, id);
+  Widget _locationFT() {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Colors.grey),
+        ),
+      ),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: GestureDetector(
+//              onTap: _searchLocation,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 12.0, horizontal: 10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Icon(Icons.location_on, color: Colors.grey),
+                    SizedBox(
+                      width: 15.0,
+                    ),
+//                    Expanded(
+//                      child: isLocationSelected
+//                          ? Text(_activeLocation)
+//                          : Text(
+//                        _activeLocation,
+//                        style: TextStyle(color: Colors.grey),
+//                      ),
+//                    ),
+                    Icon(Icons.arrow_drop_down, color: Colors.black54),
+                  ],
+                ),
+              ),
+            ),
+          ),
+//          isLocationSelected
+//              ? IconButton(
+//            onPressed: _clearLocation,
+//            icon: Icon(Icons.clear),
+//          )
+//              : Text('')
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'windowshoppi ',
-          style: TextStyle(fontFamily: 'Itim'),
-        ),
-        actions: <Widget>[
-          SelectCountry(
-            onCountryChanged: () => refreshOnChangeCountry(),
-            countryIos2: (value) => null,
-          ),
-        ],
+        title: Text(widget.categoryData.title),
       ),
-      drawer: AppDrawer(),
       body: RefreshIndicator(
         onRefresh: refresh,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            ProductCategory(
-                onFetchingData: (categoryId) =>
-                    filterProductByCategory(categoryId)),
-
-//                  Products(products: data),
+//          _locationFT(),
             _isInitialLoading
                 ? Expanded(
                     child: Container(
@@ -205,34 +186,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   )
                 : _isGettingServerData == false && data.length == 0
-                    ?
-//            Padding(
-//                        padding: const EdgeInsets.only(top: 40.0),
-//                        child: Column(
-//                          mainAxisAlignment: MainAxisAlignment.center,
-//                          children: <Widget>[
-//                            GestureDetector(
-//                              onTap: () {
-//                                fetchProduct(
-//                                    ALL_PRODUCT_URL,
-//                                    removeListData = true,
-//                                    firstLoading = true,
-//                                    activeCategory);
-//                              },
-//                              child: Icon(
-//                                Icons.refresh,
-//                                size: 40,
-//                                color: Colors.grey[500],
-//                              ),
-//                            ),
-//                            Text(
-//                              'No post',
-//                              style: TextStyle(fontSize: 12),
-//                            ),
-//                          ],
-//                        ),
-//                      )
-                    Expanded(
+                    ? Expanded(
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           child: Column(
@@ -241,10 +195,10 @@ class _HomePageState extends State<HomePage> {
                               GestureDetector(
                                 onTap: () {
                                   fetchProduct(
-                                      ALL_PRODUCT_URL,
+                                      SEARCH_POST,
                                       removeListData = true,
                                       firstLoading = true,
-                                      activeCategory);
+                                      widget.categoryData.id);
                                 },
                                 child: Icon(
                                   Icons.refresh,
@@ -360,15 +314,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-//CachedNetworkImage(
-//fit: BoxFit.cover,
-//imageUrl: data[index]
-//.productPhoto[0]
-//.filename,
-//progressIndicatorBuilder: (context,
-//url, downloadProgress) =>
-//CupertinoActivityIndicator(),
-//errorWidget: (context, url, error) =>
-//Icon(Icons.error),
-//),

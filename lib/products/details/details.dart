@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:windowshoppi/explore/post_details.dart';
+import 'package:windowshoppi/models/product.dart';
 import 'image_section.dart';
 import 'bottom_section.dart';
 import 'description_section.dart';
 import 'package:windowshoppi/explore/top_section.dart';
 
 class Details extends StatelessWidget {
-  final singlePost;
+  final Product singlePost;
   Details({Key key, this.singlePost}) : super(key: key);
 
   @override
@@ -32,30 +33,3 @@ class Details extends StatelessWidget {
     );
   }
 }
-
-//class Details extends StatefulWidget {
-//  final singlePost;
-//  Details({Key key, this.singlePost}) : super(key: key);
-//
-//  @override
-//  _DetailsState createState() => _DetailsState();
-//}
-//
-//class _DetailsState extends State<Details> {
-//  @override
-//  Widget build(BuildContext context) {
-//    return Scaffold(
-//      appBar: AppBar(
-//        title: Text('product name'),
-//      ),
-//      body: ListView(
-//        children: <Widget>[
-//          TopSection(),
-////          ImageSection(postImage: widget.imageUrl),
-////          BottomSection(),
-////          DescriptionSection(),
-//        ],
-//      ),
-//    );
-//  }
-//}
