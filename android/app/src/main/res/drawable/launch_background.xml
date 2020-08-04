@@ -11,12 +11,12 @@
     </item> -->
 
     <item
-        android:width="110dp"
-        android:height="137.5dp"
+        android:width="100dp"
+        android:height="100dp"
         android:gravity="center">
         <bitmap
             android:gravity="fill"
-            android:src="@drawable/logo_200_300"
+            android:src="@drawable/logo_200_200"
             android:mipMap="true"/>
     </item>
 </layer-list>

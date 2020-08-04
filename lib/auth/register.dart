@@ -599,11 +599,9 @@ class _RegisterPageState extends State<RegisterPage> {
     } else if (response.statusCode == 201) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       if (_user['response'] == 'success') {
-        print('save data to shared preference');
         localStorage.setString('token', _user['token']);
         localStorage.setBool('isRegistered', true);
       }
-
       widget.isLoginStatus(true);
       return _user;
     } else {

@@ -15,7 +15,9 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 
 class MyAccount extends StatefulWidget {
   final Function(bool) isLoginStatus;
-  MyAccount({@required this.isLoginStatus});
+  final Function(bool) userLogoutSuccessFully;
+  MyAccount(
+      {@required this.isLoginStatus, @required this.userLogoutSuccessFully});
   @override
   _MyAccountState createState() => _MyAccountState();
 }
@@ -109,6 +111,8 @@ class _MyAccountState extends State<MyAccount>
         SizedBox(width: 10.0),
         Expanded(
           child: TextFormField(
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
               hintText: 'Write Caption...',
               border: InputBorder.none,
@@ -438,7 +442,9 @@ class _MyAccountState extends State<MyAccount>
                       SharedPreferences localStorage =
                           await SharedPreferences.getInstance();
                       localStorage.remove('token'); // remove auth token
+                      localStorage.setBool('isRegistered', true);
                       widget.isLoginStatus(false);
+                      widget.userLogoutSuccessFully(true);
                     },
                     child: Card(
                       color: Colors.teal,
@@ -463,7 +469,7 @@ class _MyAccountState extends State<MyAccount>
               ],
             ),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.red,
               onPressed: loadAssets,
               tooltip: 'post a photo',
               child: Icon(Icons.add_box),

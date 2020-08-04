@@ -119,29 +119,10 @@ class _HomePageState extends State<HomePage> {
 
     if (response.statusCode == 200) {
       var countryData = json.decode(response.body);
-
-      // save data locally
-      await _insert(countryData);
-
-      var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
-      return activeCountryData;
+      return countryData[0];
     } else {
       throw Exception('failed to load data from internet');
     }
-  }
-
-  _insert(data) async {
-    var savedId = await dbHelper.insertCountryData(data);
-    await _insertUser(savedId[0]);
-  }
-
-  _insertUser(data) async {
-    // user data
-    Map<String, dynamic> row = {
-      DatabaseHelper.table_1ColumnName: 'username',
-      DatabaseHelper.table_1ColumnCountryId: data
-    };
-    await dbHelper.insertUserData(row);
   }
 
   Future<void> refresh() async {
@@ -163,6 +144,13 @@ class _HomePageState extends State<HomePage> {
     fetchProduct(
         ALL_PRODUCT_URL, removeListData = true, firstLoading = true, id);
   }
+
+//  void _getAllCountry() async {
+//    final allRows = await dbHelper.queryAllRows();
+//    allRows.forEach(
+//      (row) => print(row),
+//    );
+//  }
 
   @override
   Widget build(BuildContext context) {

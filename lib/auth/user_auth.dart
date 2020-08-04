@@ -13,7 +13,7 @@ class UserAuth extends StatefulWidget {
 class _UserAuthState extends State<UserAuth> {
   Color primaryColor = Colors.red;
   bool _isLoggedIn, _isRegistered;
-  bool isLoading = true;
+  bool isLoading = true, _isLoggedOut = false;
 
   Widget _loginRegisterPage() {
     return DefaultTabController(
@@ -50,7 +50,9 @@ class _UserAuthState extends State<UserAuth> {
         body: TabBarView(
           children: <Widget>[
             RegisterPage(isLoginStatus: (value) => _changeStatus(value)),
-            LoginPage(),
+            LoginPage(
+                isLoginStatus: (value) => _changeStatus(value),
+                isLoggedOut: _isLoggedOut),
           ],
         ),
       ),
@@ -67,7 +69,6 @@ class _UserAuthState extends State<UserAuth> {
   }
 
   void _checkUserLogin() async {
-    print('start');
     setState(() {
       isLoading = true;
     });
@@ -95,7 +96,6 @@ class _UserAuthState extends State<UserAuth> {
       }
     }
 
-    print('stop');
     setState(() {
       isLoading = false;
     });
@@ -111,15 +111,25 @@ class _UserAuthState extends State<UserAuth> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(
-            child: SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(strokeWidth: 2.0),
+        ? Scaffold(
+            appBar: AppBar(),
+            body: Center(
+              child: SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(strokeWidth: 2.0),
+              ),
             ),
           )
         : _isLoggedIn
-            ? MyAccount(isLoginStatus: (value) => _changeStatus(value))
+            ? MyAccount(
+                isLoginStatus: (value) => _changeStatus(value),
+                userLogoutSuccessFully: (value) {
+                  setState(() {
+                    _isLoggedOut = true;
+                  });
+                },
+              )
             : _loginRegisterPage();
   }
 }
