@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/utilities/constants.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'discover_account.dart';
@@ -20,7 +21,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _loginFormKey = GlobalKey<FormState>();
 
-  bool _isNotificationVisible = false, _isLogoutVisible = false;
+  bool _isNotificationVisible = false,
+      _isLogoutVisible = false,
+      _isLogin = false;
 
   // Initially password is obscure
   bool _obscureText = true;
@@ -146,58 +149,62 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 15.0),
       width: double.infinity,
-      child: RaisedButton(
-        onPressed: () async {
-          if (_loginFormKey.currentState.validate()) {
-            _loginFormKey.currentState.save();
-            setState(() {
-              _isNotificationVisible = false;
-              _isLogoutVisible = false;
-            });
-            var loginInfo = {
-              'username': _userName,
-              'password': _passWord,
-            };
+      child: AbsorbPointer(
+        absorbing: _isLogin ? true : false,
+        child: RaisedButton(
+          onPressed: () async {
+            if (_loginFormKey.currentState.validate()) {
+              _loginFormKey.currentState.save();
+              setState(() {
+                _isNotificationVisible = false;
+                _isLogoutVisible = false;
+              });
+              var loginInfo = {
+                'username': _userName,
+                'password': _passWord,
+              };
 
-            showDialog(
-              barrierDismissible: true,
-              context: context,
-              builder: (context) {
-                var res = _loginUser(loginInfo);
-                res.then(
-                  (value) async {
-                    Navigator.of(context).pop(true);
-                  },
-                );
-                return AlertDialog(
-                  content: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(
-                        height: 20.0,
-                        width: 20.0,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.0,
-                        ),
+              setState(() {
+                _isLogin = true;
+              });
+
+              await _loginUser(loginInfo);
+
+              setState(() {
+                _isLogin = false;
+              });
+            }
+          },
+          color: _isLogin ? Colors.grey[200] : Colors.white,
+          child: _isLogin
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(strokeWidth: 1.0),
+                    ),
+                    SizedBox(width: 8.0),
+                    Text(
+                      'please wait...',
+                      style: TextStyle(
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
                       ),
-                      SizedBox(width: 10.0),
-                      Text('please wait..'),
-                    ],
+                    ),
+                  ],
+                )
+              : Text(
+                  'LOGIN',
+                  style: TextStyle(
+                    color: Colors.teal,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
                   ),
-                );
-              },
-            );
-          }
-        },
-        color: Colors.white,
-        child: Text(
-          'LOGIN',
-          style: TextStyle(
-            color: Colors.teal,
-            letterSpacing: 1.5,
-            fontWeight: FontWeight.bold,
-            fontSize: 14.0,
-          ),
+                ),
         ),
       ),
     );
@@ -335,27 +342,31 @@ class _LoginPageState extends State<LoginPage> {
 
     var _user = json.decode(response.body);
 
-//    print(response.statusCode);
-
     if (_user['non_field_errors'] != null) {
-      if (_user['non_field_errors'][0] ==
-          'Unable to log in with provided credentials.') {
+      if (_user['non_field_errors'][0] == 'invalid_account') {
         setState(() {
           _isNotificationVisible = true;
         });
         dismissNotification();
-        return null;
       }
+      return null;
     }
 
     if (response.statusCode == 200) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
-      print(_user['token']);
-      localStorage.setString('token', _user['token']);
+      localStorage.setBool(isRegistered, true);
+      localStorage.setString(userToken, _user['token']);
+      localStorage.setString(businessName, _user['business_name']);
+      localStorage.setString(businessLocation, _user['business_location']);
+      localStorage.setString(bio, _user['bio']);
+      localStorage.setString(whatsapp, _user['whatsapp']);
+      localStorage.setString(callNumber, _user['call']);
+      localStorage.setString(profileImage, _user['profile_image']);
+      localStorage.setString(userMail, _user['email']);
       widget.isLoginStatus(true);
-      return null;
+      return _user;
     } else {
-//      throw Exception('Failed to register user.');
+//      throw Exception('Failed to login user.');
       return 'failed to login user';
     }
   }
@@ -388,7 +399,6 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    print('check logout status');
     if (widget.isLoggedOut == true) {
       _isLogoutVisible = widget.isLoggedOut;
       dismissLogoutNotification();

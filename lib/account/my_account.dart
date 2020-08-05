@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:windowshoppi/account/account_top_section.dart';
@@ -24,11 +25,19 @@ class MyAccount extends StatefulWidget {
 
 class _MyAccountState extends State<MyAccount>
     with AutomaticKeepAliveClientMixin<MyAccount> {
-  bool _isPostBtnVisible = true;
+  bool _isPostBtnVisible = true, isLoading = true;
 
   final _postFormKey = GlobalKey<FormState>();
 
   String postCaptionText;
+
+  String name = '',
+      location = '',
+      userPhoneNumber = '',
+      userWhatsappNumber = '',
+      businessBio = '',
+      businessProfilePhoto = '',
+      userEmailAddress = '';
 
   // #######################
   // images selection .start
@@ -43,7 +52,7 @@ class _MyAccountState extends State<MyAccount>
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
+        maxImages: 10,
         enableCamera: true,
         selectedAssets: _images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
@@ -137,22 +146,24 @@ class _MyAccountState extends State<MyAccount>
         children: <Widget>[
           _topAccountSection(),
           _accountDetails(),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 5.0),
-            child: Text(
-              'daniellyatuu@gmail.com',
-              style: TextStyle(fontWeight: FontWeight.bold),
+          if (userEmailAddress != null)
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Text(
+                userEmailAddress,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 5.0),
-            child: Text(
-              'account bio in here',
-              textAlign: TextAlign.justify,
+          if (businessBio != null)
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Text(
+                businessBio,
+                textAlign: TextAlign.justify,
+              ),
             ),
-          ),
 //          Text('$file'),
           _editProfileBtn(),
         ],
@@ -163,16 +174,22 @@ class _MyAccountState extends State<MyAccount>
   Widget _topAccountSection() {
     return Row(
       children: <Widget>[
-        CircleAvatar(
-          radius: 35.0,
-          backgroundColor: Colors.grey,
-          backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
-        ),
+        businessProfilePhoto == ''
+            ? CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                child: Icon(Icons.store, size: 30),
+              )
+            : CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
+              ),
         Expanded(
           child: ListTile(
-            title: Text('business name'),
-            subtitle: Text('business location'),
+            title: Text(name),
+            subtitle: Text(location),
             trailing: Column(
               children: <Widget>[
                 _buildStatColumn('POST', 12),
@@ -196,30 +213,31 @@ class _MyAccountState extends State<MyAccount>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Expanded(
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  radius: 15.0,
-                  child: FaIcon(
-                    FontAwesomeIcons.phone,
-                    size: 15.0,
-                    color: Colors.white,
+          if (userPhoneNumber != null)
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundColor: Colors.blue,
+                    radius: 15.0,
+                    child: FaIcon(
+                      FontAwesomeIcons.phone,
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 8.0,
-                ),
-                Expanded(
-                  child: Text(
-                    '+255653900085',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  SizedBox(
+                    width: 8.0,
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Text(
+                      userPhoneNumber,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           Expanded(
             child: Row(
               children: <Widget>[
@@ -235,12 +253,19 @@ class _MyAccountState extends State<MyAccount>
                 SizedBox(
                   width: 8.0,
                 ),
-                Expanded(
-                  child: Text(
-                    '+255653900085',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
+                userWhatsappNumber != null
+                    ? Expanded(
+                        child: Text(
+                          userWhatsappNumber,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    : Expanded(
+                        child: Text(
+                          'not specified',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -413,16 +438,42 @@ class _MyAccountState extends State<MyAccount>
     );
   }
 
+  void _getUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var _businessName = localStorage.getString(businessName);
+    var _businessLocation = localStorage.getString(businessLocation);
+    var _bio = localStorage.getString(bio);
+    var _whatsapp = localStorage.getString(whatsapp);
+    var _callNumber = localStorage.getString(callNumber);
+    var _profileImage = localStorage.getString(profileImage);
+    var _userEmailAddress = localStorage.getString(userMail);
+
+    setState(() {
+      name = _businessName;
+      location = _businessLocation;
+      userPhoneNumber = _callNumber;
+      userWhatsappNumber = _whatsapp;
+      businessBio = _bio;
+      businessProfilePhoto = _profileImage;
+      userEmailAddress = _userEmailAddress;
+      isLoading = false;
+    });
+  }
+
   @override
   void initState() {
-//    print(_images);
-//    if (_images.length == 0) {
-//      print('no images selected');
-//    } else {
-//      print('images selected');
-//    }
+    print(_images);
+    if (_images.length == 0) {
+      print('no images selected');
+    } else {
+      print('images selected');
+    }
     super.initState();
-    print('load data to my account');
+    _getUserData();
   }
 
   @override
@@ -459,15 +510,23 @@ class _MyAccountState extends State<MyAccount>
                 ],
               ),
             ),
-            body: ListView(
-              children: <Widget>[
-                _accountHeader(),
-                Divider(height: 0.0),
-                _buildImageViewButtonBar(),
-                Divider(height: 0.0),
-                _buildUserPosts(),
-              ],
-            ),
+            body: isLoading
+                ? Center(
+                    child: SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2.0),
+                    ),
+                  )
+                : ListView(
+                    children: <Widget>[
+                      _accountHeader(),
+                      Divider(height: 0.0),
+                      _buildImageViewButtonBar(),
+                      Divider(height: 0.0),
+                      _buildUserPosts(),
+                    ],
+                  ),
             floatingActionButton: FloatingActionButton(
               backgroundColor: Colors.red,
               onPressed: loadAssets,
@@ -491,6 +550,7 @@ class _MyAccountState extends State<MyAccount>
                       onTap: () {
                         if (_postFormKey.currentState.validate()) {
                           _postFormKey.currentState.save();
+                          print('start posting');
                           print(postCaptionText);
                           print(_images);
                         }
