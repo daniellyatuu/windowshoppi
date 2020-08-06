@@ -7,6 +7,7 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:windowshoppi/models/category_model.dart';
 import 'package:windowshoppi/models/country.dart';
 import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/utilities/constants.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -32,6 +33,8 @@ class _RegisterPageState extends State<RegisterPage> {
   final dbHelper = DatabaseHelper.instance;
 
   var country = new List<Country>();
+
+  bool _isSubmitting = false;
 
   // validate username
   bool _isUsernameLoading = false;
@@ -495,69 +498,73 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildRegisterBtn() {
     return Container(
       width: double.infinity,
-      child: RaisedButton(
-        onPressed: () async {
-          if (_registerFormKey.currentState.validate()) {
-            _registerFormKey.currentState.save();
+      child: AbsorbPointer(
+        absorbing: _isSubmitting ? true : false,
+        child: RaisedButton(
+          onPressed: () async {
+            if (_registerFormKey.currentState.validate()) {
+              _registerFormKey.currentState.save();
 
-            if (isLocationSelected) {
-              var userInfo = {
-                'username': _userName,
-                'password': _passWord,
-                'group': 3,
-                'name': _businessName,
-                'category': _activeCategoryId,
-                'country': _activeCountryId,
-                'location_name': _activeLocation,
-                'lattitude': latitude,
-                'longitude': longitude,
-                'call': _phoneNumber,
-              };
+              if (isLocationSelected) {
+                var userInfo = {
+                  'username': _userName,
+                  'password': _passWord,
+                  'group': 3,
+                  'name': _businessName,
+                  'category': _activeCategoryId,
+                  'country': _activeCountryId,
+                  'location_name': _activeLocation,
+                  'lattitude': latitude,
+                  'longitude': longitude,
+                  'call': _phoneNumber,
+                };
 
-              showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (context) {
-                  var res = _createUser(userInfo);
-                  res.then(
-                    (value) async {
-                      Navigator.of(context).pop(true);
-                    },
-                  );
-                  return AlertDialog(
-                    content: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(
-                          height: 20.0,
-                          width: 20.0,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.0,
-                          ),
-                        ),
-                        SizedBox(width: 10.0),
-                        Text('please wait..'),
-                      ],
-                    ),
-                  );
-                },
-              );
-            } else {
-              setState(() {
-                _showLocationError = true;
-              });
+                setState(() {
+                  _isSubmitting = true;
+                });
+
+                await _createUser(userInfo);
+
+                setState(() {
+                  _isSubmitting = false;
+                });
+              } else {
+                setState(() {
+                  _showLocationError = true;
+                });
+              }
             }
-          }
-        },
-        color: Colors.white,
-        child: Text(
-          'REGISTER',
-          style: TextStyle(
-            color: Colors.teal,
-            letterSpacing: 1.5,
-            fontWeight: FontWeight.bold,
-            fontSize: 14.0,
-          ),
+          },
+          color: _isSubmitting ? Colors.grey[200] : Colors.white,
+          child: _isSubmitting
+              ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 15,
+                      width: 15,
+                      child: CircularProgressIndicator(strokeWidth: 1.0),
+                    ),
+                    SizedBox(width: 8.0),
+                    Text(
+                      'please wait...',
+                      style: TextStyle(
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                      ),
+                    ),
+                  ],
+                )
+              : Text(
+                  'REGISTER',
+                  style: TextStyle(
+                    color: Colors.teal,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14.0,
+                  ),
+                ),
         ),
       ),
     );
@@ -591,24 +598,32 @@ class _RegisterPageState extends State<RegisterPage> {
 
     var _user = json.decode(response.body);
 
-    if (_user['username'][0] == 'user with this username already exists.') {
-      setState(() {
-        _isUserExists = true;
-      });
-      return null;
+    if (_user['username'] != null) {
+      if (_user['username'][0] == 'user with this username already exists.') {
+        setState(() {
+          _isUserExists = true;
+        });
+      }
     } else if (response.statusCode == 201) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       if (_user['response'] == 'success') {
-        print('save data to shared preference');
-        localStorage.setString('token', _user['token']);
-        localStorage.setBool('isRegistered', true);
+        localStorage.setBool(isRegistered, true);
+        localStorage.setString(userToken, _user['token']);
+        localStorage.setString(businessId, _user['business_id']);
+        localStorage.setString(businessName, _user['business_name']);
+        localStorage.setString(businessLocation, _user['business_location']);
+        localStorage.setString(bio, _user['bio']);
+        localStorage.setString(whatsapp, _user['whatsapp']);
+        localStorage.setString(callNumber, _user['call']);
+        localStorage.setString(profileImage, _user['profile_image']);
+        localStorage.setString(userMail, _user['email']);
+        widget.isLoginStatus(true);
       }
-
-      widget.isLoginStatus(true);
-      return _user;
     } else {
-//      throw Exception('Failed to register user.');
-      return 'failed to register user';
+      setState(() {
+        _isSubmitting = false;
+      });
+      throw Exception('Failed to register user.');
     }
   }
 

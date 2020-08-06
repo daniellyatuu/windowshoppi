@@ -1,7 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:windowshoppi/account/account_top_section.dart';
@@ -12,21 +19,36 @@ import 'my_account_bottom_section.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class MyAccount extends StatefulWidget {
+  final bool fromLogging;
   final Function(bool) isLoginStatus;
-  MyAccount({@required this.isLoginStatus});
+  final Function(bool) userLogoutSuccessFully;
+  MyAccount(
+      {@required this.isLoginStatus,
+      @required this.userLogoutSuccessFully,
+      this.fromLogging});
   @override
   _MyAccountState createState() => _MyAccountState();
 }
 
 class _MyAccountState extends State<MyAccount>
     with AutomaticKeepAliveClientMixin<MyAccount> {
-  bool _isPostBtnVisible = true;
+  bool _isPostBtnVisible = true, isLoading = true;
 
   final _postFormKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   String postCaptionText;
+
+  String name = '',
+      location = '',
+      userPhoneNumber = '',
+      userWhatsappNumber = '',
+      businessBio = '',
+      businessProfilePhoto = '',
+      userEmailAddress = '';
 
   // #######################
   // images selection .start
@@ -41,7 +63,7 @@ class _MyAccountState extends State<MyAccount>
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 300,
+        maxImages: 10,
         enableCamera: true,
         selectedAssets: _images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
@@ -109,6 +131,8 @@ class _MyAccountState extends State<MyAccount>
         SizedBox(width: 10.0),
         Expanded(
           child: TextFormField(
+            maxLines: null,
+            keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
               hintText: 'Write Caption...',
               border: InputBorder.none,
@@ -133,22 +157,24 @@ class _MyAccountState extends State<MyAccount>
         children: <Widget>[
           _topAccountSection(),
           _accountDetails(),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 5.0),
-            child: Text(
-              'daniellyatuu@gmail.com',
-              style: TextStyle(fontWeight: FontWeight.bold),
+          if (userEmailAddress != null)
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Text(
+                userEmailAddress,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 5.0),
-            child: Text(
-              'account bio in here',
-              textAlign: TextAlign.justify,
+          if (businessBio != null)
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Text(
+                businessBio,
+                textAlign: TextAlign.justify,
+              ),
             ),
-          ),
 //          Text('$file'),
           _editProfileBtn(),
         ],
@@ -159,16 +185,22 @@ class _MyAccountState extends State<MyAccount>
   Widget _topAccountSection() {
     return Row(
       children: <Widget>[
-        CircleAvatar(
-          radius: 35.0,
-          backgroundColor: Colors.grey,
-          backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
-        ),
+        businessProfilePhoto == ''
+            ? CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                child: Icon(Icons.store, size: 30),
+              )
+            : CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
+              ),
         Expanded(
           child: ListTile(
-            title: Text('business name'),
-            subtitle: Text('business location'),
+            title: Text(name),
+            subtitle: Text(location),
             trailing: Column(
               children: <Widget>[
                 _buildStatColumn('POST', 12),
@@ -192,30 +224,31 @@ class _MyAccountState extends State<MyAccount>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Expanded(
-            child: Row(
-              children: <Widget>[
-                CircleAvatar(
-                  backgroundColor: Colors.blue,
-                  radius: 15.0,
-                  child: FaIcon(
-                    FontAwesomeIcons.phone,
-                    size: 15.0,
-                    color: Colors.white,
+          if (userPhoneNumber != null)
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundColor: Colors.blue,
+                    radius: 15.0,
+                    child: FaIcon(
+                      FontAwesomeIcons.phone,
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 8.0,
-                ),
-                Expanded(
-                  child: Text(
-                    '+255653900085',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  SizedBox(
+                    width: 8.0,
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: Text(
+                      userPhoneNumber,
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
           Expanded(
             child: Row(
               children: <Widget>[
@@ -231,12 +264,19 @@ class _MyAccountState extends State<MyAccount>
                 SizedBox(
                   width: 8.0,
                 ),
-                Expanded(
-                  child: Text(
-                    '+255653900085',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
+                userWhatsappNumber != null
+                    ? Expanded(
+                        child: Text(
+                          userWhatsappNumber,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    : Expanded(
+                        child: Text(
+                          'not specified',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
               ],
             ),
           ),
@@ -409,17 +449,136 @@ class _MyAccountState extends State<MyAccount>
     );
   }
 
+  void _getUserData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var _businessName = localStorage.getString(businessName);
+    var _businessLocation = localStorage.getString(businessLocation);
+    var _bio = localStorage.getString(bio);
+    var _whatsapp = localStorage.getString(whatsapp);
+    var _callNumber = localStorage.getString(callNumber);
+    var _profileImage = localStorage.getString(profileImage);
+    var _userEmailAddress = localStorage.getString(userMail);
+
+    setState(() {
+      name = _businessName;
+      location = _businessLocation;
+      userPhoneNumber = _callNumber;
+      userWhatsappNumber = _whatsapp;
+      businessBio = _bio;
+      businessProfilePhoto = _profileImage;
+      userEmailAddress = _userEmailAddress;
+      isLoading = false;
+    });
+  }
+
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    });
+  }
+
   @override
   void initState() {
-//    print(_images);
-//    if (_images.length == 0) {
-//      print('no images selected');
-//    } else {
-//      print('images selected');
-//    }
     super.initState();
-    print('load data to my account');
+    _getUserData();
+
+    if (widget.fromLogging == true) {
+      _notification('Welcome to windowshoppi', Colors.black, Colors.red);
+    }
   }
+
+  Future _uploadPost(caption, receiveImages) async {
+    String _newCaption;
+    if (caption == '') {
+      // if caption is empty insert "__empty__.null_2020" as default text
+      _newCaption = '__empty__.null_2020';
+    } else {
+      _newCaption = caption;
+    }
+    Uri uri = Uri.parse(CREATE_POST);
+    print(uri);
+// create multipart request
+    MultipartRequest request = http.MultipartRequest("POST", uri);
+
+    var i = 0;
+    for (var imageFile in receiveImages) {
+      i += 1;
+      String fileName = 'image_' +
+          i.toString() +
+          '_' +
+          DateTime.now().millisecondsSinceEpoch.toString() +
+          '.jpg';
+
+      ByteData byteData = await imageFile.getByteData(quality: 60);
+
+      List<int> imageData = byteData.buffer.asUint8List();
+
+      MultipartFile multipartFile = MultipartFile.fromBytes(
+        'filename',
+        imageData,
+        filename: fileName,
+        // contentType: MediaType("image", "jpg"),
+      );
+      request.files.add(multipartFile);
+    }
+
+    // add file to multipart
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var token = localStorage.getString(userToken);
+    var businessAccountId = localStorage.getString(businessId);
+
+    Map<String, String> headers = {
+      "Accept": "application/json",
+      "Authorization": "Token $token",
+    };
+
+    //add headers
+    request.headers.addAll(headers);
+
+    request.fields['bussiness'] = businessAccountId;
+    request.fields['caption'] = _newCaption;
+
+    // send
+    var response = await request.send();
+
+    // listen for response
+    response.stream.transform(utf8.decoder).listen((result) {
+      print(result);
+      if (result == '"success"') {
+        clearImage(); // remove images
+        _notification('Post created successfully', Colors.black, Colors.red);
+      }
+    });
+  }
+
+//  void _notification(String txt, Color color) {
+//    final snackBar = SnackBar(
+//      content: Text(txt),
+//      backgroundColor: color,
+//      action: SnackBarAction(
+//        label: 'Hide',
+//        onPressed: () {
+//          Scaffold.of(context).hideCurrentSnackBar();
+//        },
+//      ),
+//    );
+//    Scaffold.of(context).showSnackBar(snackBar);
+//  }
 
   @override
   Widget build(BuildContext context) {
@@ -427,6 +586,7 @@ class _MyAccountState extends State<MyAccount>
 
     return _images.length == 0
         ? Scaffold(
+            key: _scaffoldKey,
             appBar: AppBar(
               title: Text('my account'),
             ),
@@ -437,8 +597,17 @@ class _MyAccountState extends State<MyAccount>
                     onTap: () async {
                       SharedPreferences localStorage =
                           await SharedPreferences.getInstance();
-                      localStorage.remove('token'); // remove auth token
+                      localStorage.remove(userToken);
+                      localStorage.remove(businessId);
+                      localStorage.remove(businessName);
+                      localStorage.remove(businessLocation);
+                      localStorage.remove(bio);
+                      localStorage.remove(whatsapp);
+                      localStorage.remove(callNumber);
+                      localStorage.remove(profileImage);
+                      localStorage.remove(userMail);
                       widget.isLoginStatus(false);
+                      widget.userLogoutSuccessFully(true);
                     },
                     child: Card(
                       color: Colors.teal,
@@ -453,17 +622,25 @@ class _MyAccountState extends State<MyAccount>
                 ],
               ),
             ),
-            body: ListView(
-              children: <Widget>[
-                _accountHeader(),
-                Divider(height: 0.0),
-                _buildImageViewButtonBar(),
-                Divider(height: 0.0),
-                _buildUserPosts(),
-              ],
-            ),
+            body: isLoading
+                ? Center(
+                    child: SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2.0),
+                    ),
+                  )
+                : ListView(
+                    children: <Widget>[
+                      _accountHeader(),
+                      Divider(height: 0.0),
+                      _buildImageViewButtonBar(),
+                      Divider(height: 0.0),
+                      _buildUserPosts(),
+                    ],
+                  ),
             floatingActionButton: FloatingActionButton(
-              backgroundColor: Colors.black,
+              backgroundColor: Colors.red,
               onPressed: loadAssets,
               tooltip: 'post a photo',
               child: Icon(Icons.add_box),
@@ -482,11 +659,47 @@ class _MyAccountState extends State<MyAccount>
                   child: Padding(
                     padding: const EdgeInsets.only(right: 10.0),
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         if (_postFormKey.currentState.validate()) {
                           _postFormKey.currentState.save();
-                          print(postCaptionText);
-                          print(_images);
+
+                          print('start');
+                          await showDialog(
+                            barrierDismissible: true,
+                            context: context,
+                            builder: (context) {
+                              var res = _uploadPost(postCaptionText, _images);
+                              res.then(
+                                (value) => {
+                                  print(value),
+                                  Navigator.of(context).pop(),
+                                },
+                              );
+                              return AlertDialog(
+                                content: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height: 15,
+                                      width: 15,
+                                      child: CircularProgressIndicator(
+                                          strokeWidth: 1.0),
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Text(
+                                      'please wait...',
+                                      style: TextStyle(
+                                        letterSpacing: 1.5,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14.0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                          print('finish');
                         }
                       },
                       child: Row(
@@ -508,35 +721,37 @@ class _MyAccountState extends State<MyAccount>
                       key: _postFormKey,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: ListView(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             _postCaption(),
                             Divider(),
-                            GridView.count(
-                              physics: ScrollPhysics(),
-                              shrinkWrap: true,
-                              crossAxisCount: 3,
-                              children: List.generate(
-                                _images.length,
-                                (index) {
-                                  Asset asset = _images[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.all(2.0),
-                                    child: AssetThumb(
-                                      asset: asset,
-                                      width: 300,
-                                      height: 300,
-                                      spinner: Center(
-                                        child: SizedBox(
-                                          width: 22,
-                                          height: 22,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2),
+                            Expanded(
+                              child: GridView.count(
+                                physics: BouncingScrollPhysics(),
+                                crossAxisCount: 3,
+                                children: List.generate(
+                                  _images.length,
+                                  (index) {
+                                    Asset asset = _images[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.all(2.0),
+                                      child: AssetThumb(
+                                        asset: asset,
+                                        width: 300,
+                                        height: 300,
+                                        spinner: Center(
+                                          child: SizedBox(
+                                            width: 22,
+                                            height: 22,
+                                            child: CircularProgressIndicator(
+                                                strokeWidth: 2),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  );
-                                },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                             Padding(

@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 import 'register.dart';
 import 'package:windowshoppi/account/my_account.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 
 class UserAuth extends StatefulWidget {
   @override
@@ -13,7 +14,7 @@ class UserAuth extends StatefulWidget {
 class _UserAuthState extends State<UserAuth> {
   Color primaryColor = Colors.red;
   bool _isLoggedIn, _isRegistered;
-  bool isLoading = true;
+  bool isLoading = true, _isLoggedOut = false, _fromLogging = false;
 
   Widget _loginRegisterPage() {
     return DefaultTabController(
@@ -50,7 +51,9 @@ class _UserAuthState extends State<UserAuth> {
         body: TabBarView(
           children: <Widget>[
             RegisterPage(isLoginStatus: (value) => _changeStatus(value)),
-            LoginPage(),
+            LoginPage(
+                isLoginStatus: (value) => _changeStatus(value),
+                isLoggedOut: _isLoggedOut),
           ],
         ),
       ),
@@ -59,7 +62,11 @@ class _UserAuthState extends State<UserAuth> {
 
   _changeStatus(value) async {
     print(value);
-    print('up here check');
+    if (value == true) {
+      setState(() {
+        _fromLogging = true;
+      });
+    }
     setState(() {
       _isLoggedIn = value;
       _isRegistered = true;
@@ -67,14 +74,12 @@ class _UserAuthState extends State<UserAuth> {
   }
 
   void _checkUserLogin() async {
-    print('start');
     setState(() {
       isLoading = true;
     });
 
     SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var token = localStorage.getString('token');
-    print(token);
+    var token = localStorage.getString(userToken);
     if (token != '' && token != null) {
       setState(() {
         _isLoggedIn = true;
@@ -95,7 +100,6 @@ class _UserAuthState extends State<UserAuth> {
       }
     }
 
-    print('stop');
     setState(() {
       isLoading = false;
     });
@@ -111,15 +115,31 @@ class _UserAuthState extends State<UserAuth> {
   @override
   Widget build(BuildContext context) {
     return isLoading
-        ? Center(
-            child: SizedBox(
-              height: 22,
-              width: 22,
-              child: CircularProgressIndicator(strokeWidth: 2.0),
+        ? Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'windowshoppi',
+                style: TextStyle(fontFamily: 'Itim'),
+              ),
+            ),
+            body: Center(
+              child: SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(strokeWidth: 2.0),
+              ),
             ),
           )
         : _isLoggedIn
-            ? MyAccount(isLoginStatus: (value) => _changeStatus(value))
+            ? MyAccount(
+                fromLogging: _fromLogging,
+                isLoginStatus: (value) => _changeStatus(value),
+                userLogoutSuccessFully: (value) {
+                  setState(() {
+                    _isLoggedOut = true;
+                  });
+                },
+              )
             : _loginRegisterPage();
   }
 }
