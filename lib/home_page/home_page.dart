@@ -1,14 +1,16 @@
 import 'dart:convert';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:windowshoppi/horizontal_list/horizontal_list.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:windowshoppi/models/country.dart';
 import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/products/products.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/product_category/product_category.dart';
 import 'package:http/http.dart' as http;
 
 class HomePage extends StatefulWidget {
@@ -19,97 +21,122 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final dbHelper = DatabaseHelper.instance;
 
-//  var country = new List<Country>();
+  ScrollController _scrollController = ScrollController();
 
-//  void _insert() async {
-//    Map<String, dynamic> row = {
-//      DatabaseHelper.table_2ColumnCountryId: 1,
-//      DatabaseHelper.table_2ColumnCountryName: 'country name',
-//      DatabaseHelper.table_2ColumnCountryFlag: 'flag.png',
-//      DatabaseHelper.table_2ColumnCountryIos2: 'ios2',
-//      DatabaseHelper.table_2ColumnCountryLanguage: 'language',
-//      DatabaseHelper.table_2ColumnCountryCode: 'country code',
-//      DatabaseHelper.table_2ColumnCountryTimezone: 'timezone',
-//    };
-//
-//    final id = await dbHelper.insertCountryData(row);
-//    print('saved id = $id');
-//  }
+  var data = new List<Product>();
+  String newUrl, nextUrl;
+  bool removeListData, _isGettingServerData, firstLoading;
+  bool _isInitialLoading = true, _isLoadingMoreData = true;
+  int activeCategory = 0;
 
-//  void _insert() async {
-//    List<Map<String, String>> row = [
-//      {"name": "one"},
-//      {"name": "two"},
-//    ];
-//
-//    final id = await dbHelper.insertCountryData(row);
-////    print('saved id = $id');
-//  }
-
-  void _insert(data) async {
-    await dbHelper.insertCountryData(data);
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _scrollController.dispose();
   }
 
-  void _getAllCountry() async {
-    final allRows = await dbHelper.queryAllRows();
-    allRows.forEach(
-      (row) => print(row),
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
+        activeCategory);
+
+    _scrollController.addListener(
+      () {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          if (nextUrl != null && _isGettingServerData == false) {
+            fetchProduct(nextUrl, removeListData = false, firstLoading = false,
+                activeCategory);
+          }
+
+          if (nextUrl == null) {
+            setState(() {
+              _isLoadingMoreData = false;
+            });
+          }
+        }
+      },
     );
   }
 
-  void _cleanDatabase() async {
-    await dbHelper.cleanDatabase();
-    print('successfully');
+  Future fetchProduct(url, removeListData, firstLoading, activeCategory) async {
+    setState(() {
+      _isInitialLoading = firstLoading ? true : false;
+      _isGettingServerData = true;
+    });
+
+    if (_isInitialLoading) {
+      var country = await _activeCountry();
+      newUrl = url +
+          '?category=' +
+          activeCategory.toString() +
+          '&country=' +
+          country['id'].toString();
+    } else {
+      newUrl = url;
+    }
+
+    print(newUrl);
+
+    final response = await http.get(newUrl);
+//    print(response.statusCode);
+
+    if (response.statusCode == 200) {
+      var productData = json.decode(response.body);
+      nextUrl = productData['next'];
+
+      setState(() {
+        Iterable list = productData['results'];
+        if (removeListData) {
+          data = list.map((model) => Product.fromJson(model)).toList();
+        } else {
+          data.addAll(list.map((model) => Product.fromJson(model)).toList());
+        }
+      });
+//      print(data);
+    } else {
+      throw Exception('failed to load data from internet');
+    }
+
+    setState(() {
+      _isInitialLoading = false;
+      _isGettingServerData = false;
+    });
   }
 
-  void _countCountry() async {
-    int x = await dbHelper.countCountry();
-    print(x);
+  _activeCountry() async {
+    var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
+    return activeCountryData;
   }
 
-  void _getUser() async {
-    final allUsers = await dbHelper.getUser();
-    allUsers.forEach(
-      (row) => print(row),
-    );
+  Future<void> refresh() async {
+    await Future.delayed(Duration(milliseconds: 700));
+
+    setState(() {
+      _isLoadingMoreData = true;
+    });
+    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
+        activeCategory);
   }
 
-//  @override
-//  void initState() {
-//    // TODO: implement initState
-//    super.initState();
-////    var listOfCountry = fetchCountry();
-//    _fetchCountry();
-//  }
-//
-//  Future _fetchCountry() async {
-//    /// check if country data available on local
-//    final allRows = await dbHelper.queryAllRows();
-////  print(allRows.length);
-//    if (allRows.length == 0) {
-//      final response = await http.get(ALL_COUNTRY_URL);
-//      if (response.statusCode == 200) {
-//        var countryData = json.decode(response.body);
-//        print(countryData);
-//
-//        /// save data locally
-//        _insert(countryData);
-//        setState(() {
-//          Iterable list = countryData;
-//          country = list.map((model) => Country.fromJson(model)).toList();
-//        });
-//      } else {
-//        throw Exception('failed to load data from internet');
-//      }
-//    } else {
-//      setState(() {
-//        Iterable list = allRows;
-//        country = list.map((model) => Country.fromJson(model)).toList();
-//      });
-//    }
-//
-//    print(country);
-//  }
+  Future<void> refreshOnChangeCountry() async {
+    setState(() {
+      _isLoadingMoreData = true;
+    });
+    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
+        activeCategory);
+  }
+
+  Future<void> filterProductByCategory(id) async {
+    setState(() {
+      _isLoadingMoreData = true;
+    });
+    fetchProduct(
+        ALL_PRODUCT_URL, removeListData = true, firstLoading = true, id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,46 +147,105 @@ class _HomePageState extends State<HomePage> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(onCountryChanged: () => null),
+          SelectCountry(onCountryChanged: () => refreshOnChangeCountry()),
         ],
       ),
       drawer: AppDrawer(),
-      body: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          RaisedButton(
-            onPressed: () {
-//              _insert();
-            },
-            child: Text('save country data'),
-          ),
-          RaisedButton(
-            onPressed: () {
-              _getAllCountry();
-            },
-            child: Text('get country data'),
-          ),
-          RaisedButton(
-            onPressed: () {
-              _cleanDatabase();
-            },
-            child: Text('clean database'),
-          ),
-          RaisedButton(
-            onPressed: () {
-              _countCountry();
-            },
-            child: Text('count country'),
-          ),
-          RaisedButton(
-            onPressed: () {
-              _getUser();
-            },
-            child: Text('get user data'),
-          ),
-          AppCategory(),
-//          Products(),
-        ],
+      body: RefreshIndicator(
+        onRefresh: refresh,
+        child: _isGettingServerData == false && data.length == 0
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    GestureDetector(
+                      onTap: () {
+                        fetchProduct(ALL_PRODUCT_URL, removeListData = true,
+                            firstLoading = true, activeCategory);
+                      },
+                      child: Icon(
+                        Icons.refresh,
+                        size: 45,
+                        color: Colors.grey[500],
+                      ),
+                    ),
+                    Text(
+                      'No post',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              )
+            : _isInitialLoading
+                ? Center(
+                    child: CircularProgressIndicator(strokeWidth: 2.0),
+                  )
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ProductCategory(
+                          onFetchingData: (categoryId) =>
+                              filterProductByCategory(categoryId)),
+//                    Products(products: data),
+                      Expanded(
+                        child: Container(
+                          child: StaggeredGridView.countBuilder(
+                              physics: BouncingScrollPhysics(),
+                              controller: _scrollController,
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 1,
+                              mainAxisSpacing: 1,
+                              itemCount: data == null ? 0 : data.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index < data.length) {
+                                  return InkWell(
+                                    onTap: () {
+//                  Navigator.push(
+//                    context,
+//                    FadeRoute(
+//                      widget: Details(imageUrl: imageList[imageUrl]),
+//                    ),
+//                  );
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0)),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(6.0)),
+                                        child: CachedNetworkImage(
+                                          fit: BoxFit.cover,
+                                          imageUrl: data[index]
+                                              .productPhoto[0]
+                                              .filename,
+                                          progressIndicatorBuilder: (context,
+                                                  url, downloadProgress) =>
+                                              CupertinoActivityIndicator(),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
+                                        ),
+//
+                                      ),
+                                    ),
+                                  );
+                                } else if (_isLoadingMoreData &&
+                                    data.length >= 15) {
+                                  return CupertinoActivityIndicator();
+                                } else {
+                                  return null;
+                                }
+                              },
+                              staggeredTileBuilder: (index) {
+                                return StaggeredTile.count(
+                                    1, index.isEven ? 1.0 : 1.3);
+                              }),
+                        ),
+                      ),
+                    ],
+                  ),
       ),
     );
   }

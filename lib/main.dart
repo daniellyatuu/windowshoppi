@@ -14,11 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => SplashScreen(),
-        '/entry': (context) => AppNavigation(),
-      },
+      home: AppNavigation(),
     );
   }
 }

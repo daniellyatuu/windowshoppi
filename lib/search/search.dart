@@ -30,31 +30,31 @@ class _SearchState extends State<Search> {
 
   final _categories = [
     CategoryList(
-      id: '1',
+      id: 1,
       title: 'all',
     ),
     CategoryList(
-      id: '2',
+      id: 2,
       title: 'Stores',
     ),
     CategoryList(
-      id: '3',
+      id: 3,
       title: 'Restaurants',
     ),
     CategoryList(
-      id: '4',
+      id: 4,
       title: 'Hotels',
     ),
     CategoryList(
-      id: '5',
+      id: 5,
       title: 'NightLife',
     ),
     CategoryList(
-      id: '6',
+      id: 6,
       title: 'Game Center',
     ),
     CategoryList(
-      id: '7',
+      id: 7,
       title: 'Lodge',
     ),
   ];

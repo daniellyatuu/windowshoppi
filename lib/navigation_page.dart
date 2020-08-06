@@ -64,7 +64,7 @@ class _AppNavigationState extends State<AppNavigation> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
-            title: Text(isLoggedIn ? 'My Account' : 'Login/Register'),
+            title: Text(isLoggedIn ? 'My Account' : 'Account'),
             backgroundColor: Colors.red,
           ),
         ],
