@@ -27,8 +27,9 @@ class _ExploreState extends State<Explore> {
   var data = new List<Product>();
   String newUrl, nextUrl;
   bool removeListData, _isGettingServerData, firstLoading;
-  bool _isInitialLoading = true, _isLoadingMoreData = true;
+  bool _isInitialLoading = true;
   int activeCategory = 0;
+  int allProducts = 0;
 
   dispose() {
     super.dispose();
@@ -49,12 +50,6 @@ class _ExploreState extends State<Explore> {
           if (nextUrl != null && _isGettingServerData == false) {
             fetchProduct(nextUrl, removeListData = false, firstLoading = false,
                 activeCategory);
-          }
-
-          if (nextUrl == null) {
-            setState(() {
-              _isLoadingMoreData = false;
-            });
           }
         }
       },
@@ -87,6 +82,7 @@ class _ExploreState extends State<Explore> {
 
       setState(() {
         Iterable list = productData['results'];
+        allProducts = productData['count'];
         if (removeListData) {
           data = list.map((model) => Product.fromJson(model)).toList();
         } else {
@@ -112,17 +108,11 @@ class _ExploreState extends State<Explore> {
   Future<void> refresh() async {
     await Future.delayed(Duration(milliseconds: 700));
 
-    setState(() {
-      _isLoadingMoreData = true;
-    });
     fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
         activeCategory);
   }
 
   Future<void> refreshOnChangeCountry() async {
-    setState(() {
-      _isLoadingMoreData = true;
-    });
     fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
         activeCategory);
   }
@@ -136,7 +126,10 @@ class _ExploreState extends State<Explore> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(onCountryChanged: () => refreshOnChangeCountry()),
+          SelectCountry(
+            onCountryChanged: () => refreshOnChangeCountry(),
+            countryIos2: (value) => null,
+          ),
         ],
       ),
       drawer: AppDrawer(),
@@ -154,7 +147,7 @@ class _ExploreState extends State<Explore> {
                       },
                       child: Icon(
                         Icons.refresh,
-                        size: 45,
+                        size: 40,
                         color: Colors.grey[500],
                       ),
                     ),
@@ -167,7 +160,11 @@ class _ExploreState extends State<Explore> {
               )
             : _isInitialLoading
                 ? Center(
-                    child: CircularProgressIndicator(strokeWidth: 2.0),
+                    child: SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(strokeWidth: 2.0),
+                    ),
                   )
                 : ListView.builder(
                     physics: BouncingScrollPhysics(),
@@ -195,7 +192,7 @@ class _ExploreState extends State<Explore> {
                             ],
                           ),
                         );
-                      } else if (_isLoadingMoreData && data.length >= 15) {
+                      } else if (allProducts - data.length > 0) {
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 30.0),
                           child: Row(

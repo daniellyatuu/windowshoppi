@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:windowshoppi/account/account_top_section.dart';
@@ -13,6 +14,8 @@ import 'dart:async';
 import 'package:multi_image_picker/multi_image_picker.dart';
 
 class MyAccount extends StatefulWidget {
+  final Function(bool) isLoginStatus;
+  MyAccount({@required this.isLoginStatus});
   @override
   _MyAccountState createState() => _MyAccountState();
 }
@@ -406,16 +409,17 @@ class _MyAccountState extends State<MyAccount>
     );
   }
 
-//  @override
-//  void initState() {
+  @override
+  void initState() {
 //    print(_images);
 //    if (_images.length == 0) {
 //      print('no images selected');
 //    } else {
 //      print('images selected');
 //    }
-//    super.initState();
-//  }
+    super.initState();
+    print('load data to my account');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -425,6 +429,29 @@ class _MyAccountState extends State<MyAccount>
         ? Scaffold(
             appBar: AppBar(
               title: Text('my account'),
+            ),
+            endDrawer: Drawer(
+              child: ListView(
+                children: <Widget>[
+                  GestureDetector(
+                    onTap: () async {
+                      SharedPreferences localStorage =
+                          await SharedPreferences.getInstance();
+                      localStorage.remove('token'); // remove auth token
+                      widget.isLoginStatus(false);
+                    },
+                    child: Card(
+                      color: Colors.teal,
+                      child: ListTile(
+                        title: Text(
+                          'LOGOUT',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
             body: ListView(
               children: <Widget>[

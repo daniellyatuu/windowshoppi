@@ -1,11 +1,11 @@
-class CategoryList {
+class Category {
   int id;
   String title;
 
-  CategoryList({this.id, this.title});
+  Category({this.id, this.title});
 
-  factory CategoryList.fromJson(Map<String, dynamic> json) {
-    return CategoryList(
+  factory Category.fromJson(Map<String, dynamic> json) {
+    return Category(
       id: json['id'],
       title: json['name'],
     );

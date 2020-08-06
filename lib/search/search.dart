@@ -1,9 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:windowshoppi/models/category_model.dart';
+import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/location/flutter_google_places.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'dart:async';
+import 'package:windowshoppi/models/global.dart';
+import 'package:http/http.dart' as http;
+import 'package:windowshoppi/products/details/details.dart';
+import 'package:windowshoppi/routes/fade_transition.dart';
+import 'dart:convert';
+import 'package:windowshoppi/utilities/database_helper.dart';
+import 'category_product.dart';
 
 const kGoogleApiKey = "AIzaSyAQSCSiJMsoMca0n65p0vPv5Em8Uk8FjLQ";
 
@@ -18,9 +29,43 @@ class Search extends StatefulWidget {
 final searchScaffoldKey = GlobalKey<ScaffoldState>();
 
 class _SearchState extends State<Search> {
+  final dbHelper = DatabaseHelper.instance;
+
+  final _searchField = TextEditingController();
+
+  bool removeListData, _isGettingServerData, firstLoading;
+  bool _isInitialLoading = true,
+      _searchOnProgress = false,
+      _isLoadingMoreData = true;
+  String newUrl, nextUrl;
+  var categories = new List<Category>();
+
+  // for search .start
+  // ################
+  // ################
+
+  String searchNewUrl, searchNextUrl;
+  bool searchRemoveList, _searchGettingServerData, searchFirstLoading;
+  bool _isTypingOnSearchField = false;
+  bool _searchIsInitialLoading = false, _searchIsLoadingMoreData = true;
+  var products = new List<Product>();
+
+  // ################
+  // ################
+  // for search .end
+
+  ScrollController _scrollController = ScrollController();
+  ScrollController _productScrollController = ScrollController();
+
+  dispose() {
+    super.dispose();
+    _scrollController.dispose();
+    _productScrollController.dispose();
+    _searchField.dispose();
+  }
+
   // for country
-  String _activeCountry = "Tanzania";
-  String _countryIOS2 = 'tz';
+  String _countryIOS2;
   String _countryLanguage = 'en';
 
   // for location
@@ -28,36 +73,163 @@ class _SearchState extends State<Search> {
   bool isLocationSelected = false;
   String latitude, longitude;
 
-  final _categories = [
-    CategoryList(
-      id: 1,
-      title: 'all',
-    ),
-    CategoryList(
-      id: 2,
-      title: 'Stores',
-    ),
-    CategoryList(
-      id: 3,
-      title: 'Restaurants',
-    ),
-    CategoryList(
-      id: 4,
-      title: 'Hotels',
-    ),
-    CategoryList(
-      id: 5,
-      title: 'NightLife',
-    ),
-    CategoryList(
-      id: 6,
-      title: 'Game Center',
-    ),
-    CategoryList(
-      id: 7,
-      title: 'Lodge',
-    ),
-  ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+//    print('search');
+
+    fetchAllCategory(ALL_CATEGORY, removeListData = true, firstLoading = true);
+
+    _scrollController.addListener(
+      () {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          if (nextUrl != null && _isGettingServerData == false) {
+            fetchAllCategory(
+                nextUrl, removeListData = false, firstLoading = false);
+          }
+
+          if (nextUrl == null) {
+            setState(() {
+              _isLoadingMoreData = false;
+            });
+          }
+        }
+      },
+    );
+
+    // product scroll
+    _productScrollController.addListener(
+      () {
+        if (_productScrollController.position.pixels ==
+            _productScrollController.position.maxScrollExtent) {
+//
+          if (searchNextUrl != null && _searchGettingServerData == false) {
+            searchPost('next_request', searchNextUrl, searchRemoveList = false,
+                searchFirstLoading = false);
+          }
+//          if (nextUrl != null && _isGettingServerData == false) {
+//            fetchAllCategory(
+//                nextUrl, removeListData = false, firstLoading = false);
+//          }
+//
+//          if (nextUrl == null) {
+//            setState(() {
+//              _isLoadingMoreData = false;
+//            });
+//          }
+        }
+      },
+    );
+  }
+
+  Future fetchAllCategory(url, removeListData, firstLoading) async {
+    setState(() {
+      _isInitialLoading = firstLoading ? true : false;
+      _isGettingServerData = true;
+    });
+
+    newUrl = url;
+
+    final response = await http.get(newUrl);
+//    print(response.statusCode);
+//
+    if (response.statusCode == 200) {
+      var categoryData = json.decode(response.body);
+      nextUrl = categoryData['next'];
+
+      setState(() {
+        Iterable list = categoryData['results'];
+
+        if (removeListData) {
+          categories = list.map((model) => Category.fromJson(model)).toList();
+        } else {
+          categories
+              .addAll(list.map((model) => Category.fromJson(model)).toList());
+        }
+      });
+//      print(categories);
+    } else {
+      throw Exception('failed to load data from internet');
+    }
+
+    setState(() {
+      _isInitialLoading = false;
+      _isGettingServerData = false;
+    });
+  }
+
+  Future searchPost(keyword, url, searchRemoveList, searchFirstLoading) async {
+    keyword = keyword.trim(); // remove white space from keyword
+    if (keyword != '') {
+      setState(() {
+        _searchOnProgress = true;
+        _searchIsInitialLoading = searchFirstLoading ? true : false;
+        _searchGettingServerData = true;
+      });
+
+      if (keyword == 'next_request') {
+        searchNewUrl = url;
+      } else {
+        var country = await _activeCountry();
+
+        searchNewUrl = url +
+            '?country=' +
+            country['id'].toString() +
+            '&keyword=' +
+            keyword.toString();
+      }
+
+      print(searchNewUrl);
+
+      final response = await http.get(searchNewUrl);
+//      print(response.body);
+
+      if (response.statusCode == 200) {
+        var productData = json.decode(response.body);
+        searchNextUrl = productData['next'];
+        print(searchNextUrl);
+
+        Iterable productList = productData['results'];
+
+        setState(() {
+          if (searchRemoveList) {
+            products =
+                productList.map((model) => Product.fromJson(model)).toList();
+          } else {
+            products.addAll(
+                productList.map((model) => Product.fromJson(model)).toList());
+          }
+        });
+        print(products);
+      } else {
+        throw Exception('failed to load data from internet');
+      }
+    } else {
+      setState(() {
+        _searchOnProgress = false;
+        _searchIsInitialLoading = false;
+        _searchGettingServerData = false;
+      });
+    }
+
+    setState(() {
+      _searchIsInitialLoading = false;
+      _searchGettingServerData = false;
+    });
+  }
+
+  _activeCountry() async {
+    var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
+    return activeCountryData;
+  }
+
+  Future<void> setActiveIos2(value) async {
+    setState(() {
+      _countryIOS2 = value;
+    });
+  }
 
   Widget _locationFT() {
     return Container(
@@ -104,6 +276,15 @@ class _SearchState extends State<Search> {
         ],
       ),
     );
+  }
+
+  _clearSearchAndLocation() {
+    setState(() {
+      _searchOnProgress = false;
+      isLocationSelected = false;
+      _activeLocation = 'filter by location';
+      _searchField.clear();
+    });
   }
 
   _clearLocation() {
@@ -157,32 +338,87 @@ class _SearchState extends State<Search> {
 
   // LOCATION .END
 
-  Widget _buildCategories() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 8.0),
-      child: Column(
-        children: <Widget>[
-          Container(
+  Widget _popularText() {
+    return _isInitialLoading == false
+        ? Container(
+            padding: EdgeInsets.only(top: 10, left: 8.0, bottom: 10.0),
             alignment: Alignment.centerLeft,
             child: Text(
               'Popular on windowshoppi',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
             ),
+          )
+        : Text('');
+  }
+
+  Widget _allCategory() {
+    return _isInitialLoading
+        ? Padding(
+            padding: const EdgeInsets.only(top: 40.0),
+            child: Center(
+              child: SizedBox(
+                height: 22,
+                width: 22,
+                child: CircularProgressIndicator(strokeWidth: 2.0),
+              ),
+            ),
+          )
+        : _buildCategories();
+  }
+
+  Widget _buildCategories() {
+    return Expanded(
+      child: ListView(
+        controller: _scrollController,
+        physics: BouncingScrollPhysics(),
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(8.0, 20.0, 8.0, 0),
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              spacing: 5.0,
+              children: categories
+                  .map(
+                    (item) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          FadeRoute(
+                            widget: CategoryProduct(categoryData: item),
+                          ),
+                        );
+                      },
+                      child: Chip(
+                        label: Text(item.title),
+                      ),
+                    ),
+                  )
+                  .toList()
+                  .cast<Widget>(),
+            ),
           ),
-          SizedBox(
-            height: 10.0,
-          ),
-          Wrap(
-            spacing: 10.0,
-            children: _categories
-                .map(
-                  (item) => Chip(
-                    label: Text(item.title),
+          if (_isLoadingMoreData && categories.length >= 40)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  SizedBox(
+                    height: 18.0,
+                    width: 18.0,
+                    child: CircularProgressIndicator(strokeWidth: 1.0),
                   ),
-                )
-                .toList()
-                .cast<Widget>(),
-          ),
+                  Text(
+                    '  please wait..',
+                    style: TextStyle(
+                      color: Colors.teal,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -197,19 +433,136 @@ class _SearchState extends State<Search> {
           style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
-          SelectCountry(onCountryChanged: () => null),
+          SelectCountry(
+            onCountryChanged: () => _clearSearchAndLocation(),
+            countryIos2: (value) => setActiveIos2(value),
+          ),
         ],
       ),
-      body: ListView(
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          TextFormField(
+          TextField(
+            controller: _searchField,
+            onChanged: (keyword) => searchPost(keyword, SEARCH_POST,
+                searchRemoveList = true, searchFirstLoading = true),
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.search),
               hintText: 'search',
             ),
           ),
-          _locationFT(),
-          _buildCategories(),
+//          _locationFT(),
+          if (_searchOnProgress == false)
+            _popularText(),
+          _searchOnProgress
+              ? _searchIsInitialLoading
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 40.0),
+                      child: Center(
+                        child: SizedBox(
+                          height: 22,
+                          width: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2.0),
+                        ),
+                      ),
+                    )
+                  : products.length == 0 && _searchOnProgress == true
+                      ? Container(
+                          padding: EdgeInsets.symmetric(vertical: 40.0),
+                          width: MediaQuery.of(context).size.width,
+                          child: Center(
+                            child: Text(
+                              'No Post',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        )
+                      : Expanded(
+                          child: Container(
+                            child: StaggeredGridView.countBuilder(
+                                physics: BouncingScrollPhysics(),
+                                controller: _productScrollController,
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 1,
+                                mainAxisSpacing: 1,
+                                itemCount:
+                                    products == null ? 0 : products.length,
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    padding: EdgeInsets.all(5),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0)),
+                                    ),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(6.0)),
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            FadeRoute(
+                                              widget: Details(
+                                                  singlePost: products[index]),
+                                            ),
+                                          );
+                                        },
+                                        child: Stack(
+                                          fit: StackFit.expand,
+                                          children: <Widget>[
+                                            CachedNetworkImage(
+                                              fit: BoxFit.cover,
+                                              imageUrl: products[index]
+                                                  .productPhoto[0]
+                                                  .filename,
+                                              progressIndicatorBuilder: (context,
+                                                      url, downloadProgress) =>
+                                                  CupertinoActivityIndicator(),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
+                                            ),
+                                            if (products[index]
+                                                    .productPhoto
+                                                    .toList()
+                                                    .length !=
+                                                1)
+                                              Positioned(
+                                                top: 6.0,
+                                                right: 6.0,
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            5.0),
+                                                    color: Colors.black
+                                                        .withOpacity(0.5),
+                                                  ),
+                                                  padding: EdgeInsets.all(5.0),
+                                                  child: Text(
+                                                    '${products[index].productPhoto.toList().length - 1}+',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 10.0),
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+//
+                                    ),
+                                  );
+                                },
+                                staggeredTileBuilder: (index) {
+                                  return StaggeredTile.count(
+                                      1, index.isEven ? 1.0 : 1.3);
+                                }),
+                          ),
+                        )
+              : _allCategory(),
         ],
       ),
     );

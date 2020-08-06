@@ -10,7 +10,8 @@ import 'package:windowshoppi/utilities/database_helper.dart';
 
 class SelectCountry extends StatefulWidget {
   final VoidCallback onCountryChanged;
-  SelectCountry({@required this.onCountryChanged});
+  final Function(String) countryIos2;
+  SelectCountry({@required this.onCountryChanged, @required this.countryIos2});
 
   @override
   _SelectCountryState createState() => _SelectCountryState();
@@ -22,6 +23,7 @@ class _SelectCountryState extends State<SelectCountry> {
   var country = new List<Country>();
   var activeCountry = '';
   var activeFlag = '';
+  var activeIos2 = '';
   bool _activeCountryLoading = false;
   @override
   void initState() {
@@ -99,9 +101,12 @@ class _SelectCountryState extends State<SelectCountry> {
       if (activeCountryData != null) {
         activeCountry = activeCountryData['name'];
         activeFlag = activeCountryData['flag'];
+        activeIos2 = activeCountryData['ios2'];
       }
       _activeCountryLoading = false;
     });
+
+    widget.countryIos2(activeIos2);
   }
 
   _changeCountry(id) async {
@@ -149,6 +154,7 @@ class _SelectCountryState extends State<SelectCountry> {
                                       : {
                                           'id': country[index].id,
                                           'name': country[index].countryName,
+                                          'iso2': country[index].ios2,
                                           'flag': country[index].flag,
                                         },
                                 );
@@ -206,11 +212,14 @@ class _SelectCountryState extends State<SelectCountry> {
               if (res == true) {
                 activeCountry = selectedCountry['name'];
                 activeFlag = selectedCountry['flag'];
+                activeIos2 = selectedCountry['iso2'];
               }
             });
 
             // return notification to reload active page
+
             widget.onCountryChanged();
+            widget.countryIos2(activeIos2);
 //            print('after finish change country');
 //            print(res);
           }

@@ -15,18 +15,18 @@ class ProductCategory extends StatefulWidget {
 
 class _ProductCategoryState extends State<ProductCategory> {
   bool _isLoading = true;
-  var _categories = new List<CategoryList>();
+  var _categories = new List<Category>();
 
   int _activeId = 0;
 
   final _allCategory = [
-    CategoryList(
+    Category(
       id: 0,
       title: 'all',
     ),
   ];
 
-  Widget category(CategoryList category) {
+  Widget category(Category category) {
     return GestureDetector(
       onTap: () {
         changeCategory(category.id);
@@ -77,8 +77,7 @@ class _ProductCategoryState extends State<ProductCategory> {
 
       setState(() {
         Iterable list = categoryData;
-        _categories =
-            list.map((model) => CategoryList.fromJson(model)).toList();
+        _categories = list.map((model) => Category.fromJson(model)).toList();
 
         // append category with title "ALL"
         _categories = _allCategory + _categories;
