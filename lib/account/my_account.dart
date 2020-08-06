@@ -137,6 +137,12 @@ class _MyAccountState extends State<MyAccount>
               hintText: 'Write Caption...',
               border: InputBorder.none,
             ),
+            validator: (value) {
+              if (value.isEmpty) {
+                return 'caption is required';
+              }
+              return null;
+            },
             onSaved: (value) => postCaptionText = value,
           ),
         ),
@@ -503,15 +509,8 @@ class _MyAccountState extends State<MyAccount>
   }
 
   Future _uploadPost(caption, receiveImages) async {
-    String _newCaption;
-    if (caption == '') {
-      // if caption is empty insert "__empty__.null_2020" as default text
-      _newCaption = '__empty__.null_2020';
-    } else {
-      _newCaption = caption;
-    }
     Uri uri = Uri.parse(CREATE_POST);
-    print(uri);
+
 // create multipart request
     MultipartRequest request = http.MultipartRequest("POST", uri);
 
@@ -551,7 +550,7 @@ class _MyAccountState extends State<MyAccount>
     request.headers.addAll(headers);
 
     request.fields['bussiness'] = businessAccountId;
-    request.fields['caption'] = _newCaption;
+    request.fields['caption'] = caption;
 
     // send
     var response = await request.send();
