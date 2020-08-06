@@ -20,10 +20,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _loginFormKey = GlobalKey<FormState>();
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  bool _isNotificationVisible = false,
-      _isLogoutVisible = false,
-      _isLogin = false;
+  bool _isLogin = false;
 
   // Initially password is obscure
   bool _obscureText = true;
@@ -155,10 +154,10 @@ class _LoginPageState extends State<LoginPage> {
           onPressed: () async {
             if (_loginFormKey.currentState.validate()) {
               _loginFormKey.currentState.save();
-              setState(() {
-                _isNotificationVisible = false;
-                _isLogoutVisible = false;
-              });
+//              setState(() {
+////                _isNotificationVisible = false;
+//                _isLogoutVisible = false;
+//              });
               var loginInfo = {
                 'username': _userName,
                 'password': _passWord,
@@ -270,65 +269,65 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildNotificationWidget() {
-    return Visibility(
-      visible: _isNotificationVisible ? true : false,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 15.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.red[400],
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          width: MediaQuery.of(context).size.width,
-          child: ListTile(
-            contentPadding: EdgeInsets.only(left: 10.0),
-            dense: true,
-            title: Text('wrong username or password'),
-            trailing: IconButton(
-              onPressed: () {
-                setState(() {
-                  _isNotificationVisible = false;
-                });
-              },
-              icon: Icon(Icons.clear),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+//  Widget _buildNotificationWidget() {
+//    return Visibility(
+//      visible: _isNotificationVisible ? true : false,
+//      child: Padding(
+//        padding: const EdgeInsets.only(bottom: 15.0),
+//        child: Container(
+//          decoration: BoxDecoration(
+//            color: Colors.red[400],
+//            borderRadius: BorderRadius.circular(5.0),
+//          ),
+//          width: MediaQuery.of(context).size.width,
+//          child: ListTile(
+//            contentPadding: EdgeInsets.only(left: 10.0),
+//            dense: true,
+//            title: Text('wrong username or password'),
+//            trailing: IconButton(
+//              onPressed: () {
+//                setState(() {
+//                  _isNotificationVisible = false;
+//                });
+//              },
+//              icon: Icon(Icons.clear),
+//            ),
+//          ),
+//        ),
+//      ),
+//    );
+//  }
 
-  Widget _buildLogoutAlertWidget() {
-    return Visibility(
-      visible: _isLogoutVisible ? true : false,
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 15.0),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.teal,
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          width: MediaQuery.of(context).size.width,
-          child: ListTile(
-            contentPadding: EdgeInsets.only(left: 10.0),
-            dense: true,
-            leading: Icon(Icons.check, color: Colors.white),
-            title: Text('logout successfully',
-                style: TextStyle(color: Colors.white)),
-            trailing: IconButton(
-              onPressed: () {
-                setState(() {
-                  _isLogoutVisible = false;
-                });
-              },
-              icon: Icon(Icons.clear),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+//  Widget _buildLogoutAlertWidget() {
+//    return Visibility(
+//      visible: _isLogoutVisible ? true : false,
+//      child: Padding(
+//        padding: const EdgeInsets.only(bottom: 15.0),
+//        child: Container(
+//          decoration: BoxDecoration(
+//            color: Colors.teal,
+//            borderRadius: BorderRadius.circular(5.0),
+//          ),
+//          width: MediaQuery.of(context).size.width,
+//          child: ListTile(
+//            contentPadding: EdgeInsets.only(left: 10.0),
+//            dense: true,
+//            leading: Icon(Icons.check, color: Colors.white),
+//            title: Text('logout successfully',
+//                style: TextStyle(color: Colors.white)),
+//            trailing: IconButton(
+//              onPressed: () {
+//                setState(() {
+//                  _isLogoutVisible = false;
+//                });
+//              },
+//              icon: Icon(Icons.clear),
+//            ),
+//          ),
+//        ),
+//      ),
+//    );
+//  }
 
   Future _loginUser(loginInfo) async {
     await Future.delayed(Duration(milliseconds: 300));
@@ -344,10 +343,11 @@ class _LoginPageState extends State<LoginPage> {
 
     if (_user['non_field_errors'] != null) {
       if (_user['non_field_errors'][0] == 'invalid_account') {
-        setState(() {
-          _isNotificationVisible = true;
-        });
-        dismissNotification();
+//        setState(() {
+//          _isNotificationVisible = true;
+//        });
+//        dismissNotification();
+        _notification('wrong username or password', Colors.black, Colors.red);
       }
       return null;
     }
@@ -356,6 +356,7 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setBool(isRegistered, true);
       localStorage.setString(userToken, _user['token']);
+      localStorage.setString(businessId, _user['business_id']);
       localStorage.setString(businessName, _user['business_name']);
       localStorage.setString(businessLocation, _user['business_location']);
       localStorage.setString(bio, _user['bio']);
@@ -371,28 +372,59 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void dismissNotification() {
-    if (_isNotificationVisible) {
-      Future.delayed(const Duration(seconds: 8), () {
-        if (this.mounted) {
-          setState(() {
-            _isNotificationVisible = false;
-          });
-        }
-      });
-    }
-  }
+//  void dismissNotification() {
+//    if (_isNotificationVisible) {
+//      Future.delayed(const Duration(seconds: 8), () {
+//        if (this.mounted) {
+//          setState(() {
+//            _isNotificationVisible = false;
+//          });
+//        }
+//      });
+//    }
+//  }
 
-  void dismissLogoutNotification() {
-    if (_isLogoutVisible) {
-      Future.delayed(const Duration(seconds: 2), () {
-        if (this.mounted) {
-          setState(() {
-            _isLogoutVisible = false;
-          });
-        }
-      });
-    }
+//  void dismissLogoutNotification() {
+//    if (_isLogoutVisible) {
+//      Future.delayed(const Duration(seconds: 2), () {
+//        if (this.mounted) {
+//          setState(() {
+//            _isLogoutVisible = false;
+//          });
+//        }
+//      });
+//    }
+//  }
+
+//  void _notification(String txt, Color color) {
+//    final snackBar = SnackBar(
+//      content: Text(txt),
+//      backgroundColor: color,
+//      action: SnackBarAction(
+//        label: 'Hide',
+//        onPressed: () {
+//          Scaffold.of(context).hideCurrentSnackBar();
+//        },
+//      ),
+//    );
+//    Scaffold.of(context).showSnackBar(snackBar);
+//  }
+
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    });
   }
 
   @override
@@ -400,14 +432,16 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: implement initState
     super.initState();
     if (widget.isLoggedOut == true) {
-      _isLogoutVisible = widget.isLoggedOut;
-      dismissLogoutNotification();
+//      _isLogoutVisible = widget.isLoggedOut;
+//      dismissLogoutNotification();
+      _notification('logout successfully', Colors.teal, Colors.black);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
@@ -431,8 +465,8 @@ class _LoginPageState extends State<LoginPage> {
                             SizedBox(
                               height: 25.0,
                             ),
-                            _buildLogoutAlertWidget(),
-                            _buildNotificationWidget(),
+//                            _buildLogoutAlertWidget(),
+//                            _buildNotificationWidget(),
                             _buildUsernameTF(),
                             SizedBox(
                               height: 25.0,

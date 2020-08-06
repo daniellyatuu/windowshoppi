@@ -14,7 +14,7 @@ class UserAuth extends StatefulWidget {
 class _UserAuthState extends State<UserAuth> {
   Color primaryColor = Colors.red;
   bool _isLoggedIn, _isRegistered;
-  bool isLoading = true, _isLoggedOut = false;
+  bool isLoading = true, _isLoggedOut = false, _fromLogging = false;
 
   Widget _loginRegisterPage() {
     return DefaultTabController(
@@ -61,6 +61,12 @@ class _UserAuthState extends State<UserAuth> {
   }
 
   _changeStatus(value) async {
+    print(value);
+    if (value == true) {
+      setState(() {
+        _fromLogging = true;
+      });
+    }
     setState(() {
       _isLoggedIn = value;
       _isRegistered = true;
@@ -126,6 +132,7 @@ class _UserAuthState extends State<UserAuth> {
           )
         : _isLoggedIn
             ? MyAccount(
+                fromLogging: _fromLogging,
                 isLoginStatus: (value) => _changeStatus(value),
                 userLogoutSuccessFully: (value) {
                   setState(() {
