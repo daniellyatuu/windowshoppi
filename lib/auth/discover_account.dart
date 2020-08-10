@@ -67,7 +67,6 @@ class _DiscoverAccountState extends State<DiscoverAccount> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Login Help'),
-        backgroundColor: Colors.teal[700],
       ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -78,6 +77,7 @@ class _DiscoverAccountState extends State<DiscoverAccount> {
               Center(
                 child: ListView(
                   shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
                   children: <Widget>[
                     Container(
                       padding: EdgeInsets.symmetric(
@@ -85,13 +85,32 @@ class _DiscoverAccountState extends State<DiscoverAccount> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          _buildUsernameTF(),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          _buildNextBtn(),
+//                          _buildUsernameTF(),
+//                          SizedBox(
+//                            height: 10.0,
+//                          ),
+//                          _buildNextBtn(),
 //                          _buildSignWithText(),
 //                          _buildSocialBtnRow(),
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.account_circle, size: 80),
+                          ),
+                          Text('To recover your password please call.',
+                              style: TextStyle(fontSize: 18.0)),
+                          Divider(),
+                          ListTile(
+                            leading: CircleAvatar(
+                              radius: 18,
+                              child: Icon(Icons.call),
+                            ),
+                            title: Text(
+                              '+(255)710 003 901',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
                         ],
                       ),
                     ),

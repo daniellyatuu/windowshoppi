@@ -1,6 +1,16 @@
 import 'package:flutter/material.dart';
 
-class AccountTopSection extends StatelessWidget {
+class AccountTopSection extends StatefulWidget {
+  final String profilePic, businessName, businessLocation;
+  AccountTopSection(
+      {Key key, this.profilePic, this.businessName, this.businessLocation})
+      : super(key: key);
+
+  @override
+  _AccountTopSectionState createState() => _AccountTopSectionState();
+}
+
+class _AccountTopSectionState extends State<AccountTopSection> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -10,19 +20,29 @@ class AccountTopSection extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey,
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                        'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80'),
-                  ),
-                ),
-              ),
+              widget.profilePic == ''
+                  ? Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.store, size: 18.0, color: Colors.red),
+                    )
+                  : Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                          fit: BoxFit.cover,
+                          image: NetworkImage(
+                              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80'),
+                        ),
+                      ),
+                    ),
               SizedBox(
                 width: 10.0,
               ),
@@ -32,7 +52,7 @@ class AccountTopSection extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     child: Text(
-                      'Account name',
+                      widget.businessName,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -43,7 +63,7 @@ class AccountTopSection extends StatelessWidget {
                   SizedBox(
                     width: MediaQuery.of(context).size.width / 2,
                     child: Text(
-                      'Location',
+                      widget.businessLocation,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 13.0),
                     ),

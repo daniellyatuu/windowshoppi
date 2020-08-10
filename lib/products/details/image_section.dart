@@ -5,8 +5,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 
 class ImageSection extends StatefulWidget {
+  final Function(int) activeImage;
   final postImage;
-  ImageSection({Key key, this.postImage}) : super(key: key);
+  ImageSection({Key key, this.postImage, this.activeImage}) : super(key: key);
 
   @override
   _ImageSectionState createState() => _ImageSectionState();
@@ -41,6 +42,7 @@ class _ImageSectionState extends State<ImageSection> {
             indicatorBgPadding: 8.0,
             onImageChange: (int, activeImage) {
               setState(() {
+                widget.activeImage(activeImage);
                 _activePhoto = activeImage + 1;
               });
             },

@@ -609,7 +609,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (_user['response'] == 'success') {
         localStorage.setBool(isRegistered, true);
         localStorage.setString(userToken, _user['token']);
-        localStorage.setString(businessId, _user['business_id']);
+        localStorage.setInt(businessId, _user['business_id']);
         localStorage.setString(businessName, _user['business_name']);
         localStorage.setString(businessLocation, _user['business_location']);
         localStorage.setString(bio, _user['bio']);

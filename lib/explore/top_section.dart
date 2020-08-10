@@ -4,7 +4,14 @@ import 'package:windowshoppi/account/account.dart';
 
 class TopSection extends StatelessWidget {
   final String account, location;
-  TopSection({Key key, this.account, this.location}) : super(key: key);
+  final int loggedInBussinessId, bussinessId;
+  TopSection(
+      {Key key,
+      this.account,
+      this.location,
+      this.loggedInBussinessId,
+      this.bussinessId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -57,30 +64,35 @@ class TopSection extends StatelessWidget {
               ),
             ],
           ),
-          OutlineButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                FadeRoute(
-                  widget: ProfilePage(),
+          bussinessId != loggedInBussinessId
+              ? OutlineButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      FadeRoute(
+                        widget: ProfilePage(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "visit",
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  borderSide: BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                    side: BorderSide(
+                      color: Colors.red,
+                    ),
+                  ),
+                )
+              : IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.more_vert),
                 ),
-              );
-            },
-            child: Text(
-              "visit",
-              style: TextStyle(
-                color: Colors.red,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            borderSide: BorderSide(color: Colors.red),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.0),
-              side: BorderSide(
-                color: Colors.red,
-              ),
-            ),
-          ),
         ],
       ),
     );

@@ -356,7 +356,7 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setBool(isRegistered, true);
       localStorage.setString(userToken, _user['token']);
-      localStorage.setString(businessId, _user['business_id']);
+      localStorage.setInt(businessId, _user['business_id']);
       localStorage.setString(businessName, _user['business_name']);
       localStorage.setString(businessLocation, _user['business_location']);
       localStorage.setString(bio, _user['bio']);

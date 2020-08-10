@@ -7,8 +7,10 @@ import 'package:transparent_image/transparent_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class PostSection extends StatefulWidget {
+  final Function(int) activeImage;
   final postImage;
-  PostSection({Key key, this.postImage}) : super(key: key);
+  PostSection({Key key, this.postImage, @required this.activeImage})
+      : super(key: key);
 
   @override
   _PostSectionState createState() => _PostSectionState();
@@ -49,6 +51,7 @@ class _PostSectionState extends State<PostSection> {
             indicatorBgPadding: 8.0,
             onImageChange: (int, activeImage) {
               setState(() {
+                widget.activeImage(activeImage);
                 _activePhoto = activeImage + 1;
               });
             },

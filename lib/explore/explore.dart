@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/widgets/loader.dart';
 import 'top_section.dart';
 import 'post_section.dart';
 import 'post_details.dart';
@@ -30,6 +33,8 @@ class _ExploreState extends State<Explore> {
   bool _isInitialLoading = true;
   int activeCategory = 0;
   int allProducts = 0;
+  int activePhoto = 0;
+  int loggedInBussinessId = 0;
 
   dispose() {
     super.dispose();
@@ -80,6 +85,15 @@ class _ExploreState extends State<Explore> {
       var productData = json.decode(response.body);
       nextUrl = productData['next'];
 
+      // get bussiness_id if user loggedIn
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var _businessId = localStorage.getInt(businessId);
+      if (_businessId != null) {
+        setState(() {
+          loggedInBussinessId = _businessId;
+        });
+      }
+
       setState(() {
         Iterable list = productData['results'];
         allProducts = productData['count'];
@@ -115,6 +129,12 @@ class _ExploreState extends State<Explore> {
   Future<void> refreshOnChangeCountry() async {
     fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
         activeCategory);
+  }
+
+  _changeActivePhoto(value) async {
+    setState(() {
+      activePhoto = value;
+    });
   }
 
   @override
@@ -159,13 +179,7 @@ class _ExploreState extends State<Explore> {
                 ),
               )
             : _isInitialLoading
-                ? Center(
-                    child: SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.0),
-                    ),
-                  )
+                ? InitLoader()
                 : ListView.builder(
                     physics: BouncingScrollPhysics(),
                     controller: _scrollController,
@@ -181,11 +195,21 @@ class _ExploreState extends State<Explore> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: <Widget>[
                               TopSection(
+                                loggedInBussinessId: loggedInBussinessId,
+                                bussinessId: data[index].bussiness,
                                 account: data[index].accountName,
                                 location: data[index].businessLocation,
                               ),
-                              PostSection(postImage: data[index].productPhoto),
+                              PostSection(
+                                postImage: data[index].productPhoto,
+                                activeImage: (value) =>
+                                    _changeActivePhoto(value),
+                              ),
                               BottomSection(
+                                  loggedInBussinessId: loggedInBussinessId,
+                                  bussinessId: data[index].bussiness,
+                                  postImage: data[index].productPhoto,
+                                  activePhoto: activePhoto,
                                   callNo: data[index].callNumber,
                                   whatsapp: data[index].whatsappNumber),
                               PostDetails(caption: data[index].caption),
@@ -193,28 +217,7 @@ class _ExploreState extends State<Explore> {
                           ),
                         );
                       } else if (allProducts - data.length > 0) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 30.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              SizedBox(
-                                height: 18.0,
-                                width: 18.0,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 1.0),
-                              ),
-                              Text(
-                                '  please wait..',
-                                style: TextStyle(
-                                  color: Colors.teal,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                        return Loader2();
                       } else {
                         return Padding(
                           padding: EdgeInsets.symmetric(vertical: 10.0),

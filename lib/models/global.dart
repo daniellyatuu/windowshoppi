@@ -8,6 +8,7 @@ const TOP30_CATEGORY = "$SERVER_NAME/master_data/top30category/";
 const ALL_CATEGORY = "$SERVER_NAME/master_data/allCategory/";
 const CREATE_POST = "$SERVER_NAME/post/create/";
 const SEARCH_POST = "$SERVER_NAME/post/search/";
+const VENDOR_POST = "$SERVER_NAME/post/vendor/";
 const VALIDATE_USERNAME = "$SERVER_NAME/validate/";
 const REGISTER_USER = "$SERVER_NAME/register/";
 const LOGIN_USER = "$SERVER_NAME/login/";

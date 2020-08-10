@@ -54,22 +54,22 @@ class _AppNavigationState extends State<AppNavigation> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            title: Text('home'),
+            title: Text('Home'),
             backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
-            title: Text('discover'),
+            title: Text('Explore'),
             backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.search),
-            title: Text('search'),
+            title: Text('Search'),
             backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
-            title: Text(isLoggedIn ? 'My Account' : 'Account'),
+            title: Text('Account'),
             backgroundColor: Colors.red,
           ),
         ],
