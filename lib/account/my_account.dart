@@ -207,7 +207,7 @@ class _MyAccountState extends State<MyAccount>
             ? CircleAvatar(
                 radius: 35.0,
                 backgroundColor: Colors.grey[300],
-                child: Icon(Icons.store, size: 30),
+                child: Icon(Icons.store, size: 30, color: Colors.grey),
               )
             : CircleAvatar(
                 radius: 35.0,
@@ -407,132 +407,160 @@ class _MyAccountState extends State<MyAccount>
               padding: const EdgeInsets.only(top: 20.0),
               child: InitLoader(),
             )
-          : GridView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-              ),
-              itemCount: data == null
-                  ? 0
-                  : allProducts - data.length > 0
-                      ? data.length + 3
-                      : data.length,
-              itemBuilder: (context, index) {
-                if (index < data.length) {
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        FadeRoute(
-                          widget: Details(
-                              loggedInBussinessId: loggedInBussinessId,
-                              singlePost: data[index]),
+          : _isGettingServerData == false && data.length == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 30.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'No Post',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                )
+              : GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                  ),
+                  itemCount: data == null
+                      ? 0
+                      : allProducts - data.length > 0
+                          ? data.length + 3
+                          : data.length,
+                  itemBuilder: (context, index) {
+                    if (index < data.length) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            FadeRoute(
+                              widget: Details(
+                                  loggedInBussinessId: loggedInBussinessId,
+                                  singlePost: data[index]),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: data[index].productPhoto[0].filename,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CupertinoActivityIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            ),
+                            if (data[index].productPhoto.toList().length != 1)
+                              Positioned(
+                                top: 6.0,
+                                right: 6.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    color: Colors.black.withOpacity(0.5),
+                                  ),
+                                  padding: EdgeInsets.all(5.0),
+                                  child: Text(
+                                    '${data[index].productPhoto.toList().length - 1}+',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10.0),
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                       );
-                    },
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: <Widget>[
-                        CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl: data[index].productPhoto[0].filename,
-                          progressIndicatorBuilder:
-                              (context, url, downloadProgress) =>
-                                  CupertinoActivityIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
-                        ),
-                        if (data[index].productPhoto.toList().length != 1)
-                          Positioned(
-                            top: 6.0,
-                            right: 6.0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: Colors.black.withOpacity(0.5),
-                              ),
-                              padding: EdgeInsets.all(5.0),
-                              child: Text(
-                                '${data[index].productPhoto.toList().length - 1}+',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10.0),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  );
-                } else if (allProducts - data.length > 0) {
-                  return Loader3();
-                } else {
-                  return null;
-                }
-              },
-            );
+                    } else if (allProducts - data.length > 0) {
+                      return Loader3();
+                    } else {
+                      return null;
+                    }
+                  },
+                );
     } else if (view == 'feed') {
       return _isInitialLoading
           ? Padding(
               padding: const EdgeInsets.only(top: 20.0),
               child: InitLoader(),
             )
-          : ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: data == null
-                  ? 0
-                  : allProducts - data.length > 0
-                      ? data.length + 1
-                      : data.length,
-              itemBuilder: (context, index) {
-                if (index < data.length) {
-                  return Card(
-                    margin:
-                        EdgeInsets.symmetric(horizontal: 0.0, vertical: 4.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        AccountTopSection(
-                          profilePic: businessProfilePhoto,
-                          businessName: name,
-                          businessLocation: location,
+          : _isGettingServerData == false && data.length == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 30.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'No Post',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: data == null
+                      ? 0
+                      : allProducts - data.length > 0
+                          ? data.length + 1
+                          : data.length,
+                  itemBuilder: (context, index) {
+                    if (index < data.length) {
+                      return Card(
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 0.0, vertical: 4.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            AccountTopSection(
+                              profilePic: businessProfilePhoto,
+                              businessName: name,
+                              businessLocation: location,
+                            ),
+                            PostSection(
+                              postImage: data[index].productPhoto,
+                              activeImage: (value) => _changeActivePhoto(value),
+                            ),
+                            BottomSection(
+                                loggedInBussinessId: loggedInBussinessId,
+                                bussinessId: data[index].bussiness,
+                                postImage: data[index].productPhoto,
+                                activePhoto: activePhoto,
+                                callNo: data[index].callNumber,
+                                whatsapp: data[index].whatsappNumber),
+                            PostDetails(caption: data[index].caption),
+                          ],
                         ),
-                        PostSection(
-                          postImage: data[index].productPhoto,
-                          activeImage: (value) => _changeActivePhoto(value),
+                      );
+                    } else if (allProducts - data.length > 0) {
+                      return Loader4();
+                    } else {
+                      return Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10.0),
+                        child: Center(
+                          child: data.length > 15
+                              ? Text(
+                                  'no more data',
+                                  style: TextStyle(color: Colors.teal),
+                                )
+                              : Text(''),
                         ),
-                        BottomSection(
-                            loggedInBussinessId: loggedInBussinessId,
-                            bussinessId: data[index].bussiness,
-                            postImage: data[index].productPhoto,
-                            activePhoto: activePhoto,
-                            callNo: data[index].callNumber,
-                            whatsapp: data[index].whatsappNumber),
-                        PostDetails(caption: data[index].caption),
-                      ],
-                    ),
-                  );
-                } else if (allProducts - data.length > 0) {
-                  return Loader4();
-                } else {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Center(
-                      child: data.length > 15
-                          ? Text(
-                              'no more data',
-                              style: TextStyle(color: Colors.teal),
-                            )
-                          : Text(''),
-                    ),
-                  );
-                }
-              },
-            );
+                      );
+                    }
+                  },
+                );
     }
     return null;
   }

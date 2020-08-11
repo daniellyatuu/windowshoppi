@@ -323,3 +323,125 @@ class _Loader4State extends State<Loader4> {
     );
   }
 }
+
+class Loader5 extends StatefulWidget {
+  @override
+  _Loader5State createState() => _Loader5State();
+}
+
+class _Loader5State extends State<Loader5> {
+  Color _baseColor = Colors.grey[300];
+  Color _highlightColor = Colors.grey[200];
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Shimmer.fromColors(
+        baseColor: _baseColor,
+        highlightColor: _highlightColor,
+        child: Column(
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                CircleAvatar(radius: 35.0),
+                Expanded(
+                  child: ListTile(
+                    title: Container(
+                      color: Colors.red,
+                      height: 15.0,
+                    ),
+                    subtitle: Container(
+                      color: Colors.red,
+                      height: 10.0,
+                    ),
+                    trailing: Column(
+                      children: <Widget>[
+                        Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              '0',
+                              style: TextStyle(
+                                  fontSize: 22.0, fontWeight: FontWeight.bold),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                'POST',
+                                style: TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 15.0,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: RaisedButton(
+                      color: Colors.blue,
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            '',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: RaisedButton(
+                      color: Color(0xFF06B862),
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Text(
+                            '',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Text(
+                'email',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(top: 5.0),
+              child: Text(
+                'account bio',
+                textAlign: TextAlign.justify,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

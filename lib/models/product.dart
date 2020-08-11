@@ -1,11 +1,17 @@
 class Product {
   int id, bussiness;
-  final accountName, callNumber, whatsappNumber, businessLocation, caption;
+  final accountName,
+      accountPic,
+      callNumber,
+      whatsappNumber,
+      businessLocation,
+      caption;
   final List<Images> productPhoto;
 
   Product({
     this.id,
     this.bussiness,
+    this.accountPic,
     this.accountName,
     this.callNumber,
     this.whatsappNumber,
@@ -18,6 +24,7 @@ class Product {
     return Product(
       id: json['id'],
       bussiness: json['bussiness'],
+      accountPic: json['account_profile'],
       accountName: json['account_name'],
       callNumber: json['call_number'],
       whatsappNumber:
