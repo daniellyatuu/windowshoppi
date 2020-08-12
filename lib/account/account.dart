@@ -1,63 +1,103 @@
+import 'dart:convert';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:windowshoppi/explore/post_details.dart';
 import 'package:windowshoppi/explore/post_section.dart';
+import 'package:windowshoppi/explore/top_section.dart';
+import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
+import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
+import 'package:windowshoppi/widgets/loader.dart';
 import 'account_top_section.dart';
+import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
-  _ProfilePage createState() => _ProfilePage();
+  final int bussinessId;
+  ProfilePage({this.bussinessId});
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _ProfilePage extends State<ProfilePage>
-    with AutomaticKeepAliveClientMixin<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage> {
+  ScrollController _scrollController = ScrollController();
+
+  int loggedInBussinessId = 0;
+
+  // business info
+  bool _isFetchingBusinessInfo = true;
+  var _businessData;
+
+  // fetch product
+  bool removeListData, _isGettingServerData, firstLoading;
+  bool _isInitialLoading = true;
+  int activePhoto = 0;
+  var data = new List<Product>();
+  String newUrl, nextUrl;
+  int allProducts = 0;
+
   String view = "grid"; // default view
 
   Widget _accountHeader() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: <Widget>[
-          _topAccountSection(),
-          _accountCommunication(),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 8.0),
-            child: Text(
-              'daniellyatuu@gmail.com',
-              style: TextStyle(fontWeight: FontWeight.bold),
+    return _isFetchingBusinessInfo
+        ? Loader5()
+        : Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                _topAccountSection(),
+                _accountCommunication(),
+                if (_businessData['email'] != null)
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Text(
+                      _businessData['email'],
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                if (_businessData['bio'] != null)
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.only(top: 5.0),
+                    child: Text(
+                      _businessData['bio'],
+                      textAlign: TextAlign.justify,
+                    ),
+                  ),
+              ],
             ),
-          ),
-          Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.only(top: 5.0),
-            child: Text(
-              'account bio in here',
-              textAlign: TextAlign.justify,
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   Widget _topAccountSection() {
     return Row(
       children: <Widget>[
-        CircleAvatar(
-          radius: 35.0,
-          backgroundColor: Colors.grey,
-          backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
-        ),
+        _businessData['profile_image'] == null
+            ? CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                child: Icon(Icons.store, size: 30, color: Colors.grey),
+              )
+            : CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
+              ),
         Expanded(
           child: ListTile(
-            title: Text('business name'),
-            subtitle: Text('business location'),
+            title: Text(_businessData['name']),
+            subtitle: Text(_businessData['location_name']),
             trailing: Column(
               children: <Widget>[
                 _buildStatColumn('POST', 12),
@@ -77,7 +117,9 @@ class _ProfilePage extends State<ProfilePage>
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: RaisedButton(
               color: Colors.blue,
-              onPressed: () {},
+              onPressed: () {
+                call(_businessData['call_number']);
+              },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -179,6 +221,12 @@ class _ProfilePage extends State<ProfilePage>
     );
   }
 
+  changeView(String viewName) {
+    setState(() {
+      view = viewName;
+    });
+  }
+
   Widget _buildProfileFollowButton() {
     return Container(
       padding: EdgeInsets.only(top: 4.0),
@@ -216,72 +264,281 @@ class _ProfilePage extends State<ProfilePage>
 
   Widget _buildUserPosts() {
     if (view == 'grid') {
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-        ),
-        itemCount: _posts.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
-            onTap: () {
-//              Navigator.push(
-//                context,
-//                FadeRoute(
-//                  widget: Details(imageUrl: _posts[index]),
-//                ),
-//              );
-            },
-            child: FadeInImage.memoryNetwork(
-              placeholder: kTransparentImage,
-              image: _posts[index],
-              fit: BoxFit.cover,
-            ),
-          );
-        },
-      );
+      return _isInitialLoading
+          ? Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: InitLoader(),
+            )
+          : _isGettingServerData == false && data.length == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 30.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'No Post',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                )
+              : GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                  ),
+                  itemCount: data == null
+                      ? 0
+                      : allProducts - data.length > 0
+                          ? data.length + 3
+                          : data.length,
+                  itemBuilder: (context, index) {
+                    if (index < data.length) {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            FadeRoute(
+                              widget: Details(
+                                  loggedInBussinessId: loggedInBussinessId,
+                                  singlePost: data[index]),
+                            ),
+                          );
+                        },
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: <Widget>[
+                            CachedNetworkImage(
+                              fit: BoxFit.cover,
+                              imageUrl: data[index].productPhoto[0].filename,
+                              progressIndicatorBuilder:
+                                  (context, url, downloadProgress) =>
+                                      CupertinoActivityIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            ),
+                            if (data[index].productPhoto.toList().length != 1)
+                              Positioned(
+                                top: 6.0,
+                                right: 6.0,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                    color: Colors.black.withOpacity(0.5),
+                                  ),
+                                  padding: EdgeInsets.all(5.0),
+                                  child: Text(
+                                    '${data[index].productPhoto.toList().length - 1}+',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10.0),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+                    } else if (allProducts - data.length > 0) {
+                      return Loader3();
+                    } else {
+                      return null;
+                    }
+                  },
+                );
     } else if (view == 'feed') {
-      return ListView.builder(
-        shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
-        itemCount: _posts.length,
-        itemBuilder: (context, index) {
-          return listPost(_posts[index]);
-        },
-      );
+      return _isInitialLoading || _isFetchingBusinessInfo
+          ? Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: InitLoader(),
+            )
+          : _isGettingServerData == false && data.length == 0
+              ? Container(
+                  padding: EdgeInsets.only(top: 30.0),
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'No Post',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: data == null
+                      ? 0
+                      : allProducts - data.length > 0
+                          ? data.length + 1
+                          : data.length,
+                  itemBuilder: (context, index) {
+                    if (index < data.length) {
+                      return Card(
+                        margin: EdgeInsets.symmetric(
+                            horizontal: 0.0, vertical: 4.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            TopSection(
+                              loggedInBussinessId: loggedInBussinessId,
+                              bussinessId: 2,
+                              account: data[index].accountName,
+                              location: data[index].businessLocation,
+                            ),
+                            PostSection(
+                              postImage: data[index].productPhoto,
+                              activeImage: (value) => _changeActivePhoto(value),
+                            ),
+                            BottomSection(
+                                loggedInBussinessId: loggedInBussinessId,
+                                bussinessId: data[index].bussiness,
+                                postImage: data[index].productPhoto,
+                                activePhoto: activePhoto,
+                                callNo: data[index].callNumber,
+                                whatsapp: data[index].whatsappNumber),
+                            PostDetails(caption: data[index].caption),
+                          ],
+                        ),
+                      );
+                    } else if (allProducts - data.length > 0) {
+                      return Loader2();
+                    } else {
+                      return null;
+                    }
+                  },
+                );
     }
     return null;
   }
 
-  Widget listPost(String imgUrl) {
-    return Card(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          AccountTopSection(),
-//          PostSection(imageUrl: imgUrl),
-          BottomSection(),
-          PostDetails(),
-        ],
-      ),
+  Future _fetchBusinessInfo(id) async {
+    setState(() {
+      _isFetchingBusinessInfo = true;
+    });
+
+    var url = BUSINESS_INFO + id.toString() + '/';
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      var businessData = json.decode(response.body);
+
+      setState(() {
+        var data = businessData;
+        _businessData = data;
+
+//        if (removeListData) {
+//          data = list.map((model) => Product.fromJson(model)).toList();
+//        } else {
+//          data.addAll(list.map((model) => Product.fromJson(model)).toList());
+//        }
+      });
+    } else {
+      throw Exception('failed to load data from internet');
+    }
+
+    setState(() {
+      _isFetchingBusinessInfo = false;
+    });
+  }
+
+  Future fetchProduct(url, removeListData, firstLoading) async {
+    setState(() {
+      _isInitialLoading = firstLoading ? true : false;
+      _isGettingServerData = true;
+    });
+
+    if (_isInitialLoading) {
+      newUrl = url + widget.bussinessId.toString() + '/';
+    } else {
+      newUrl = url;
+    }
+
+    final response = await http.get(newUrl);
+
+    if (response.statusCode == 200) {
+      var productData = json.decode(response.body);
+      nextUrl = productData['next'];
+
+      // get bussiness_id if user loggedIn
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var _businessId = localStorage.getInt(businessId);
+      if (_businessId != null) {
+        setState(() {
+          loggedInBussinessId = _businessId;
+        });
+      }
+
+      setState(() {
+        Iterable list = productData['results'];
+        allProducts = productData['count'];
+        if (removeListData) {
+          data = list.map((model) => Product.fromJson(model)).toList();
+        } else {
+          data.addAll(list.map((model) => Product.fromJson(model)).toList());
+        }
+      });
+//      print(data);
+    } else {
+      throw Exception('failed to load data from internet');
+    }
+
+    setState(() {
+      _isInitialLoading = false;
+      _isGettingServerData = false;
+    });
+  }
+
+  _changeActivePhoto(value) async {
+    setState(() {
+      activePhoto = value;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBusinessInfo(widget.bussinessId);
+    fetchProduct(VENDOR_POST, removeListData = true, firstLoading = true);
+
+    _scrollController.addListener(
+      () {
+        if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent) {
+          if (nextUrl != null && _isGettingServerData == false) {
+            fetchProduct(nextUrl, removeListData = false, firstLoading = false);
+          }
+        }
+      },
     );
   }
 
   @override
-  Widget build(BuildContext context) {
-    super.build(context); // reloads state when opened again
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _scrollController.dispose();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'windowshoppi ',
+          _isFetchingBusinessInfo ? 'windowshoppi' : _businessData['name'],
           style: TextStyle(fontFamily: 'Itim'),
         ),
       ),
       body: ListView(
+        controller: _scrollController,
+        physics: BouncingScrollPhysics(),
         children: <Widget>[
           _accountHeader(),
           Divider(height: 5),
@@ -292,14 +549,4 @@ class _ProfilePage extends State<ProfilePage>
       ),
     );
   }
-
-  changeView(String viewName) {
-    setState(() {
-      view = viewName;
-    });
-  }
-
-  // ensures state is kept when switching pages
-  @override
-  bool get wantKeepAlive => true;
 }

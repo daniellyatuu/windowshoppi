@@ -11,6 +11,7 @@ import 'package:windowshoppi/utilities/database_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/products/details/details.dart';
+import 'package:windowshoppi/widgets/loader.dart';
 
 class CategoryProduct extends StatefulWidget {
   final Category categoryData;
@@ -41,7 +42,6 @@ class _CategoryProductState extends State<CategoryProduct> {
       () {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
-          print('load more');
           if (nextUrl != null && _isGettingServerData == false) {
             fetchProduct(nextUrl, removeListData = false, firstLoading = false,
                 widget.categoryData.id);
@@ -225,7 +225,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                               itemCount: data == null
                                   ? 0
                                   : allProducts - data.length > 0
-                                      ? data.length + 1
+                                      ? data.length + 3
                                       : data.length,
                               itemBuilder: (context, index) {
                                 if (index < data.length) {
@@ -297,7 +297,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                                     ),
                                   );
                                 } else if (allProducts - data.length > 0) {
-                                  return CupertinoActivityIndicator();
+                                  return Loader1();
                                 } else {
                                   return null;
                                 }

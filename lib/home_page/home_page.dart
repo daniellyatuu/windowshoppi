@@ -3,8 +3,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/country.dart';
 import 'package:windowshoppi/models/global.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/products/products.dart';
@@ -14,6 +16,7 @@ import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
 import 'package:windowshoppi/product_category/product_category.dart';
 import 'package:http/http.dart' as http;
+import 'package:windowshoppi/widgets/loader.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -31,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   bool _isInitialLoading = true;
   int activeCategory = 0;
   int allProducts = 0;
+  int loggedInBussinessId = 0;
 
   @override
   void dispose() {
@@ -83,6 +87,15 @@ class _HomePageState extends State<HomePage> {
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
       nextUrl = productData['next'];
+
+      // get bussiness_id if user loggedIn
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var _businessId = localStorage.getInt(businessId);
+      if (_businessId != null) {
+        setState(() {
+          loggedInBussinessId = _businessId;
+        });
+      }
 
       setState(() {
         Iterable list = productData['results'];
@@ -152,6 +165,8 @@ class _HomePageState extends State<HomePage> {
 //    );
 //  }
 
+  // get active bussiness id for loggedInUser
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -183,44 +198,11 @@ class _HomePageState extends State<HomePage> {
                 ? Expanded(
                     child: Container(
                       width: MediaQuery.of(context).size.width,
-                      child: Center(
-                        child: SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.0),
-                        ),
-                      ),
+                      child: InitLoader(),
                     ),
                   )
                 : _isGettingServerData == false && data.length == 0
-                    ?
-//            Padding(
-//                        padding: const EdgeInsets.only(top: 40.0),
-//                        child: Column(
-//                          mainAxisAlignment: MainAxisAlignment.center,
-//                          children: <Widget>[
-//                            GestureDetector(
-//                              onTap: () {
-//                                fetchProduct(
-//                                    ALL_PRODUCT_URL,
-//                                    removeListData = true,
-//                                    firstLoading = true,
-//                                    activeCategory);
-//                              },
-//                              child: Icon(
-//                                Icons.refresh,
-//                                size: 40,
-//                                color: Colors.grey[500],
-//                              ),
-//                            ),
-//                            Text(
-//                              'No post',
-//                              style: TextStyle(fontSize: 12),
-//                            ),
-//                          ],
-//                        ),
-//                      )
-                    Expanded(
+                    ? Expanded(
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           child: Column(
@@ -259,7 +241,7 @@ class _HomePageState extends State<HomePage> {
                               itemCount: data == null
                                   ? 0
                                   : allProducts - data.length > 0
-                                      ? data.length + 1
+                                      ? data.length + 3
                                       : data.length,
                               itemBuilder: (context, index) {
                                 if (index < data.length) {
@@ -278,6 +260,8 @@ class _HomePageState extends State<HomePage> {
                                             context,
                                             FadeRoute(
                                               widget: Details(
+                                                  loggedInBussinessId:
+                                                      loggedInBussinessId,
                                                   singlePost: data[index]),
                                             ),
                                           );
@@ -327,11 +311,10 @@ class _HomePageState extends State<HomePage> {
                                           ],
                                         ),
                                       ),
-//
                                     ),
                                   );
                                 } else if (allProducts - data.length > 0) {
-                                  return CupertinoActivityIndicator();
+                                  return Loader1();
                                 } else {
                                   return null;
                                 }
@@ -348,15 +331,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-//CachedNetworkImage(
-//fit: BoxFit.cover,
-//imageUrl: data[index]
-//.productPhoto[0]
-//.filename,
-//progressIndicatorBuilder: (context,
-//url, downloadProgress) =>
-//CupertinoActivityIndicator(),
-//errorWidget: (context, url, error) =>
-//Icon(Icons.error),
-//),

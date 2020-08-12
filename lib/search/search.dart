@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/category_model.dart';
+import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/location/flutter_google_places.dart';
@@ -14,6 +16,7 @@ import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'dart:convert';
 import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/widgets/loader.dart';
 import 'category_product.dart';
 
 const kGoogleApiKey = "AIzaSyAQSCSiJMsoMca0n65p0vPv5Em8Uk8FjLQ";
@@ -38,7 +41,10 @@ class _SearchState extends State<Search> {
       _searchOnProgress = false,
       _isLoadingMoreData = true;
   String newUrl, nextUrl;
+  int loggedInBussinessId = 0;
   var categories = new List<Category>();
+
+  int allProducts = 0;
 
   // for search .start
   // ################
@@ -109,16 +115,6 @@ class _SearchState extends State<Search> {
             searchPost('next_request', searchNextUrl, searchRemoveList = false,
                 searchFirstLoading = false);
           }
-//          if (nextUrl != null && _isGettingServerData == false) {
-//            fetchAllCategory(
-//                nextUrl, removeListData = false, firstLoading = false);
-//          }
-//
-//          if (nextUrl == null) {
-//            setState(() {
-//              _isLoadingMoreData = false;
-//            });
-//          }
         }
       },
     );
@@ -181,15 +177,21 @@ class _SearchState extends State<Search> {
             keyword.toString();
       }
 
-      print(searchNewUrl);
-
       final response = await http.get(searchNewUrl);
-//      print(response.body);
 
       if (response.statusCode == 200) {
         var productData = json.decode(response.body);
         searchNextUrl = productData['next'];
-        print(searchNextUrl);
+        allProducts = productData['count'];
+
+        // get bussiness_id if user loggedIn
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
+        var _businessId = localStorage.getInt(businessId);
+        if (_businessId != null) {
+          setState(() {
+            loggedInBussinessId = _businessId;
+          });
+        }
 
         Iterable productList = productData['results'];
 
@@ -202,7 +204,6 @@ class _SearchState extends State<Search> {
                 productList.map((model) => Product.fromJson(model)).toList());
           }
         });
-        print(products);
       } else {
         throw Exception('failed to load data from internet');
       }
@@ -485,76 +486,91 @@ class _SearchState extends State<Search> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 1,
                                 mainAxisSpacing: 1,
-                                itemCount:
-                                    products == null ? 0 : products.length,
+                                itemCount: products == null
+                                    ? 0
+                                    : allProducts - products.length > 0
+                                        ? products.length + 3
+                                        : products.length,
                                 itemBuilder: (context, index) {
-                                  return Container(
-                                    padding: EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(6.0)),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            FadeRoute(
-                                              widget: Details(
-                                                  singlePost: products[index]),
-                                            ),
-                                          );
-                                        },
-                                        child: Stack(
-                                          fit: StackFit.expand,
-                                          children: <Widget>[
-                                            CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: products[index]
-                                                  .productPhoto[0]
-                                                  .filename,
-                                              progressIndicatorBuilder: (context,
-                                                      url, downloadProgress) =>
-                                                  CupertinoActivityIndicator(),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            ),
-                                            if (products[index]
-                                                    .productPhoto
-                                                    .toList()
-                                                    .length !=
-                                                1)
-                                              Positioned(
-                                                top: 6.0,
-                                                right: 6.0,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5.0),
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                  ),
-                                                  padding: EdgeInsets.all(5.0),
-                                                  child: Text(
-                                                    '${products[index].productPhoto.toList().length - 1}+',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 10.0),
+                                  if (index < products.length) {
+                                    return Container(
+                                      padding: EdgeInsets.all(5),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0)),
+                                      ),
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(6.0)),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              FadeRoute(
+                                                widget: Details(
+                                                    loggedInBussinessId:
+                                                        loggedInBussinessId,
+                                                    singlePost:
+                                                        products[index]),
+                                              ),
+                                            );
+                                          },
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            children: <Widget>[
+                                              CachedNetworkImage(
+                                                fit: BoxFit.cover,
+                                                imageUrl: products[index]
+                                                    .productPhoto[0]
+                                                    .filename,
+                                                progressIndicatorBuilder: (context,
+                                                        url,
+                                                        downloadProgress) =>
+                                                    CupertinoActivityIndicator(),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        Icon(Icons.error),
+                                              ),
+                                              if (products[index]
+                                                      .productPhoto
+                                                      .toList()
+                                                      .length !=
+                                                  1)
+                                                Positioned(
+                                                  top: 6.0,
+                                                  right: 6.0,
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              5.0),
+                                                      color: Colors.black
+                                                          .withOpacity(0.5),
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.all(5.0),
+                                                    child: Text(
+                                                      '${products[index].productPhoto.toList().length - 1}+',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 10.0),
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
-                                      ),
 //
-                                    ),
-                                  );
+                                      ),
+                                    );
+                                  } else if (allProducts - products.length >
+                                      0) {
+                                    return Loader1();
+                                  } else {
+                                    return null;
+                                  }
                                 },
                                 staggeredTileBuilder: (index) {
                                   return StaggeredTile.count(
