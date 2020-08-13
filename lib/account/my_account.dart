@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/edit_profile/edit_profile.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -332,7 +333,20 @@ class _MyAccountState extends State<MyAccount>
     return Container(
       width: double.infinity,
       child: OutlineButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+            context,
+            FadeRoute(
+              widget: EditProfile(
+                isUpdated: (value) {
+                  if (value == true) {
+                    _getUserData();
+                  }
+                },
+              ),
+            ),
+          );
+        },
 //      padding: EdgeIn,
         child: Text('edit profile'),
       ),
@@ -793,13 +807,7 @@ class _MyAccountState extends State<MyAccount>
               ),
             ),
             body: isLoading
-                ? Center(
-                    child: SizedBox(
-                      height: 22,
-                      width: 22,
-                      child: CircularProgressIndicator(strokeWidth: 2.0),
-                    ),
-                  )
+                ? InitLoader()
                 : ListView(
                     controller: _scrollController,
                     physics: BouncingScrollPhysics(),

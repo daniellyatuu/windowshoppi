@@ -587,7 +587,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Future _createUser(userData) async {
-    await Future.delayed(Duration(milliseconds: 300));
+//    await Future.delayed(Duration(milliseconds: 300));
     final response = await http.post(
       REGISTER_USER,
       headers: {
@@ -823,18 +823,3 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 }
-
-//Row(
-//mainAxisAlignment: MainAxisAlignment.center,
-//children: <Widget>[
-//SizedBox(
-//height: 20.0,
-//width: 20.0,
-//child: CircularProgressIndicator(
-//strokeWidth: 2.0,
-//),
-//),
-//SizedBox(width: 10.0),
-//Text('please wait..'),
-//],
-//)
