@@ -17,6 +17,7 @@ import 'package:windowshoppi/utilities/database_helper.dart';
 import 'package:windowshoppi/product_category/product_category.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/widgets/loader.dart';
+import 'package:windowshoppi/services/product_service.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -24,17 +25,60 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final dbHelper = DatabaseHelper.instance;
+//  final dbHelper = DatabaseHelper.instance;
 
   ScrollController _scrollController = ScrollController();
 
   var data = new List<Product>();
-  String newUrl, nextUrl;
+  String nextUrl;
   bool removeListData, _isGettingServerData, firstLoading;
   bool _isInitialLoading = true;
   int activeCategory = 0;
   int allProducts = 0;
   int loggedInBussinessId = 0;
+
+  Future _getProduct(url, removeListData, category, firstLoading) async {
+    setState(() {
+      _isInitialLoading = firstLoading ? true : false;
+      _isGettingServerData = true;
+    });
+
+    print('start');
+    var res = await fetchProduct(url, category, firstLoading);
+    print('inside the class');
+    print(res);
+
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var countProduct = localStorage.getInt('countResult');
+    var nextLink = localStorage.getString('nextUrl');
+
+    allProducts = countProduct;
+    nextUrl = nextLink;
+
+    /// add new data to list
+
+    if (removeListData) {
+      data = res;
+    } else {
+      data = data + res;
+    }
+
+    setState(() {
+      _isInitialLoading = false;
+      _isGettingServerData = false;
+    });
+  }
+
+  _isUserLoggedIn() async {
+    // get bussiness_id if user loggedIn
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var _businessId = localStorage.getInt(businessId);
+    if (_businessId != null) {
+      setState(() {
+        loggedInBussinessId = _businessId;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -48,124 +92,44 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
+    _isUserLoggedIn();
 
     _scrollController.addListener(
       () {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
+          print(nextUrl);
           if (nextUrl != null && _isGettingServerData == false) {
-            fetchProduct(nextUrl, removeListData = false, firstLoading = false,
-                activeCategory);
+            _getProduct(nextUrl, removeListData = false, activeCategory,
+                firstLoading = false);
           }
         }
       },
     );
   }
 
-  Future fetchProduct(url, removeListData, firstLoading, activeCategory) async {
-    setState(() {
-      _isInitialLoading = firstLoading ? true : false;
-      _isGettingServerData = true;
-    });
-
-    if (_isInitialLoading) {
-      var country = await _activeCountry();
-
-      newUrl = url +
-          '?category=' +
-          activeCategory.toString() +
-          '&country=' +
-          country['id'].toString();
-    } else {
-      newUrl = url;
-    }
-
-    final response = await http.get(newUrl);
-
-    if (response.statusCode == 200) {
-      var productData = json.decode(response.body);
-      nextUrl = productData['next'];
-
-      // get bussiness_id if user loggedIn
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      var _businessId = localStorage.getInt(businessId);
-      if (_businessId != null) {
-        setState(() {
-          loggedInBussinessId = _businessId;
-        });
-      }
-
-      setState(() {
-        Iterable list = productData['results'];
-        allProducts = productData['count'];
-        if (removeListData) {
-          data = list.map((model) => Product.fromJson(model)).toList();
-        } else {
-          data.addAll(list.map((model) => Product.fromJson(model)).toList());
-        }
-      });
-//      print(data.length);
-    } else {
-      throw Exception('failed to load data from internet');
-    }
-
-    setState(() {
-      _isInitialLoading = false;
-      _isGettingServerData = false;
-    });
-  }
-
-  _activeCountry() async {
-    var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
-    if (activeCountryData == null) {
-      var _country = await _fetchCountry();
-      return _country;
-    } else {
-      return activeCountryData;
-    }
-  }
-
-  Future _fetchCountry() async {
-    final response = await http.get(ALL_COUNTRY_URL);
-
-    if (response.statusCode == 200) {
-      var countryData = json.decode(response.body);
-      return countryData[0];
-    } else {
-      throw Exception('failed to load data from internet');
-    }
-  }
-
   Future<void> refresh() async {
+    print('get data');
     await Future.delayed(Duration(milliseconds: 700));
 
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
   }
 
   Future<void> refreshOnChangeCountry() async {
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
   }
 
   Future<void> filterProductByCategory(id) async {
     setState(() {
       activeCategory = id;
     });
-    fetchProduct(
-        ALL_PRODUCT_URL, removeListData = true, firstLoading = true, id);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
   }
-
-//  void _getAllCountry() async {
-//    final allRows = await dbHelper.queryAllRows();
-//    allRows.forEach(
-//      (row) => print(row),
-//    );
-//  }
-
-  // get active bussiness id for loggedInUser
 
   @override
   Widget build(BuildContext context) {
@@ -210,11 +174,11 @@ class _HomePageState extends State<HomePage> {
                             children: <Widget>[
                               GestureDetector(
                                 onTap: () {
-                                  fetchProduct(
+                                  _getProduct(
                                       ALL_PRODUCT_URL,
                                       removeListData = true,
-                                      firstLoading = true,
-                                      activeCategory);
+                                      activeCategory,
+                                      firstLoading = true);
                                 },
                                 child: Icon(
                                   Icons.refresh,

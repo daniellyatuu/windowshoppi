@@ -3,15 +3,16 @@ import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/account/account.dart';
 
 class TopSection extends StatelessWidget {
-  final String account, location;
+  final String account, location, profilePic;
   final int loggedInBussinessId, bussinessId;
-  TopSection(
-      {Key key,
-      this.account,
-      this.location,
-      this.loggedInBussinessId,
-      this.bussinessId})
-      : super(key: key);
+  TopSection({
+    Key key,
+    this.account,
+    this.location,
+    this.loggedInBussinessId,
+    this.bussinessId,
+    this.profilePic,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +33,34 @@ class TopSection extends StatelessWidget {
             },
             child: Row(
               children: <Widget>[
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.grey,
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image: NetworkImage(
-                          'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80'),
-                    ),
-                  ),
-                ),
+//                CircleAvatar(
+//                  radius: 35.0,
+//                  backgroundColor: Colors.grey[300],
+//                  child: Icon(Icons.store, size: 30, color: Colors.grey),
+//                ),
+                profilePic == ''
+                    ? Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.store, size: 20, color: Colors.grey),
+                      )
+                    : Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(
+                                'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1000&q=80'),
+                          ),
+                        ),
+                      ),
                 SizedBox(
                   width: 10.0,
                 ),

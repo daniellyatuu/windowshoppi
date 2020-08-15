@@ -36,6 +36,7 @@ class _DetailsState extends State<Details> {
           TopSection(
             loggedInBussinessId: widget.loggedInBussinessId,
             bussinessId: widget.singlePost.bussiness,
+            profilePic: widget.singlePost.accountPic,
             account: widget.singlePost.accountName,
             location: widget.singlePost.businessLocation,
           ),

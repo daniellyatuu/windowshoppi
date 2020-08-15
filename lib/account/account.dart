@@ -91,8 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
             : CircleAvatar(
                 radius: 35.0,
                 backgroundColor: Colors.grey[300],
-                backgroundImage: NetworkImage(
-                    'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
+                backgroundImage: NetworkImage('online-image'),
               ),
         Expanded(
           child: ListTile(
@@ -137,29 +136,33 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: RaisedButton(
-              color: Color(0xFF06B862),
-              onPressed: () {},
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  FaIcon(
-                    FontAwesomeIcons.whatsapp,
-                    size: 15.0,
-                    color: Colors.white,
-                  ),
-                  Text(
-                    ' CHAT',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
-                  ),
-                ],
+        if (_businessData['whatsapp_number'] != null)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: RaisedButton(
+                color: Color(0xFF06B862),
+                onPressed: () {
+                  chat(_businessData['whatsapp_number'],
+                      "Hi there! I have seen your post on windowshoppi");
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    FaIcon(
+                      FontAwesomeIcons.whatsapp,
+                      size: 15.0,
+                      color: Colors.white,
+                    ),
+                    Text(
+                      ' CHAT',
+                      style: TextStyle(fontSize: 18, color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -433,13 +436,8 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         var data = businessData;
         _businessData = data;
-
-//        if (removeListData) {
-//          data = list.map((model) => Product.fromJson(model)).toList();
-//        } else {
-//          data.addAll(list.map((model) => Product.fromJson(model)).toList());
-//        }
       });
+      print(_businessData);
     } else {
       throw Exception('failed to load data from internet');
     }

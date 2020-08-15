@@ -197,6 +197,7 @@ class _ExploreState extends State<Explore> {
                               TopSection(
                                 loggedInBussinessId: loggedInBussinessId,
                                 bussinessId: data[index].bussiness,
+                                profilePic: data[index].accountPic,
                                 account: data[index].accountName,
                                 location: data[index].businessLocation,
                               ),
