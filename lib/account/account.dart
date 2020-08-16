@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transparent_image/transparent_image.dart';
+import 'package:windowshoppi/explore/ExpandableText.dart';
 import 'package:windowshoppi/explore/post_details.dart';
 import 'package:windowshoppi/explore/post_section.dart';
 import 'package:windowshoppi/explore/top_section.dart';
@@ -69,9 +70,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   Container(
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(top: 5.0),
-                    child: Text(
-                      _businessData['bio'],
-                      textAlign: TextAlign.justify,
+                    child: ExpandableText(
+                      text: _businessData['bio'],
+                      trimLines: 4,
+                      readLess: true,
                     ),
                   ),
               ],
@@ -371,9 +373,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     ],
                   ),
                 )
-              : ListView.builder(
+              : ListView.separated(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
+                  separatorBuilder: (context, index) => Divider(),
                   itemCount: data == null
                       ? 0
                       : allProducts - data.length > 0
@@ -381,34 +384,31 @@ class _ProfilePageState extends State<ProfilePage> {
                           : data.length,
                   itemBuilder: (context, index) {
                     if (index < data.length) {
-                      return Card(
-                        margin: EdgeInsets.symmetric(
-                            horizontal: 0.0, vertical: 4.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            TopSection(
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          TopSection(
+                            loggedInBussinessId: loggedInBussinessId,
+                            bussinessId: data[index].bussiness,
+                            profilePic: data[index].accountPic,
+                            account: data[index].accountName,
+                            location: data[index].businessLocation,
+                          ),
+                          PostSection(
+                            postImage: data[index].productPhoto,
+                            activeImage: (value) => _changeActivePhoto(value),
+                          ),
+                          BottomSection(
                               loggedInBussinessId: loggedInBussinessId,
-                              bussinessId: 2,
-                              account: data[index].accountName,
-                              location: data[index].businessLocation,
-                            ),
-                            PostSection(
+                              bussinessId: data[index].bussiness,
                               postImage: data[index].productPhoto,
-                              activeImage: (value) => _changeActivePhoto(value),
-                            ),
-                            BottomSection(
-                                loggedInBussinessId: loggedInBussinessId,
-                                bussinessId: data[index].bussiness,
-                                postImage: data[index].productPhoto,
-                                activePhoto: activePhoto,
-                                callNo: data[index].callNumber,
-                                whatsapp: data[index].whatsappNumber),
-                            PostDetails(caption: data[index].caption),
-                          ],
-                        ),
+                              activePhoto: activePhoto,
+                              callNo: data[index].callNumber,
+                              whatsapp: data[index].whatsappNumber),
+                          PostDetails(caption: data[index].caption),
+                        ],
                       );
                     } else if (allProducts - data.length > 0) {
                       return Loader2();

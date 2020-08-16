@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'ExpandableText.dart';
+
 class PostDetails extends StatefulWidget {
   final String caption;
   PostDetails({Key key, this.caption}) : super(key: key);
@@ -12,9 +14,10 @@ class _PostDetailsState extends State<PostDetails> {
 //  String description = widget.caption;
 
   Widget _caption() {
-    return Text(
-      widget.caption,
-      textAlign: TextAlign.justify,
+    return ExpandableText(
+      text: widget.caption,
+      trimLines: 5,
+      readLess: false,
     );
   }
 
