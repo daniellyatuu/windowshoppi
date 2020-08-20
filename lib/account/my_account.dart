@@ -8,6 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/edit_profile/edit_profile.dart';
+import 'package:windowshoppi/explore/ExpandableText.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -118,29 +119,21 @@ class _MyAccountState extends State<MyAccount>
     });
   }
 
-//  Widget buildGridView() {
-//    return GridView.count(
-//      crossAxisCount: 3,
-//      children: List.generate(_images.length, (index) {
-//        Asset asset = _images[index];
-//        return AssetThumb(
-//          asset: asset,
-//          width: 300,
-//          height: 300,
-//        );
-//      }),
-//    );
-//  }
-
   Widget _postCaption() {
     return Row(
       children: <Widget>[
-        CircleAvatar(
-          radius: 20.0,
-          backgroundColor: Colors.grey,
-          backgroundImage: NetworkImage(
-              'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
-        ),
+        businessProfilePhoto == ''
+            ? CircleAvatar(
+                radius: 20.0,
+                backgroundColor: Colors.grey[300],
+                child: Icon(Icons.store, size: 20, color: Colors.grey),
+              )
+            : CircleAvatar(
+                radius: 35.0,
+                backgroundColor: Colors.grey[300],
+                backgroundImage: NetworkImage(
+                    'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
+              ),
         SizedBox(width: 10.0),
         Expanded(
           child: TextFormField(
@@ -188,10 +181,11 @@ class _MyAccountState extends State<MyAccount>
           if (businessBio != null)
             Container(
               alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(top: 5.0),
-              child: Text(
-                businessBio,
-                textAlign: TextAlign.justify,
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: ExpandableText(
+                text: businessBio,
+                trimLines: 4,
+                readLess: true,
               ),
             ),
 //          Text('$file'),
@@ -520,9 +514,10 @@ class _MyAccountState extends State<MyAccount>
                     ],
                   ),
                 )
-              : ListView.builder(
+              : ListView.separated(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
+                  separatorBuilder: (context, index) => Divider(),
                   itemCount: data == null
                       ? 0
                       : allProducts - data.length > 0
@@ -530,33 +525,29 @@ class _MyAccountState extends State<MyAccount>
                           : data.length,
                   itemBuilder: (context, index) {
                     if (index < data.length) {
-                      return Card(
-                        margin: EdgeInsets.symmetric(
-                            horizontal: 0.0, vertical: 4.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            AccountTopSection(
-                              profilePic: businessProfilePhoto,
-                              businessName: name,
-                              businessLocation: location,
-                            ),
-                            PostSection(
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          AccountTopSection(
+                            profilePic: businessProfilePhoto,
+                            businessName: name,
+                            businessLocation: location,
+                          ),
+                          PostSection(
+                            postImage: data[index].productPhoto,
+                            activeImage: (value) => _changeActivePhoto(value),
+                          ),
+                          BottomSection(
+                              loggedInBussinessId: loggedInBussinessId,
+                              bussinessId: data[index].bussiness,
                               postImage: data[index].productPhoto,
-                              activeImage: (value) => _changeActivePhoto(value),
-                            ),
-                            BottomSection(
-                                loggedInBussinessId: loggedInBussinessId,
-                                bussinessId: data[index].bussiness,
-                                postImage: data[index].productPhoto,
-                                activePhoto: activePhoto,
-                                callNo: data[index].callNumber,
-                                whatsapp: data[index].whatsappNumber),
-                            PostDetails(caption: data[index].caption),
-                          ],
-                        ),
+                              activePhoto: activePhoto,
+                              callNo: data[index].callNumber,
+                              whatsapp: data[index].whatsappNumber),
+                          PostDetails(caption: data[index].caption),
+                        ],
                       );
                     } else if (allProducts - data.length > 0) {
                       return Loader4();
@@ -632,12 +623,14 @@ class _MyAccountState extends State<MyAccount>
     var token = localStorage.getString(userToken);
 
     Map<String, String> headers = {
-      "Authorization": "Token $token",
+//      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Token $token',
     };
+    print(headers);
 
     final response = await http.get(url, headers: headers);
-//    print(response.statusCode);
-//    print(response.body);
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
@@ -898,14 +891,14 @@ class _MyAccountState extends State<MyAccount>
                       key: _postFormKey,
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                        child: ListView(
                           children: <Widget>[
                             _postCaption(),
                             Divider(),
-                            Expanded(
+                            Container(
                               child: GridView.count(
-                                physics: BouncingScrollPhysics(),
+                                physics: ScrollPhysics(),
+                                shrinkWrap: true,
                                 crossAxisCount: 3,
                                 children: List.generate(
                                   _images.length,
@@ -931,6 +924,13 @@ class _MyAccountState extends State<MyAccount>
                                 ),
                               ),
                             ),
+//                            Expanded(
+//                              flex: 2,
+//                              child: GridView.count(
+//                                physics: BouncingScrollPhysics(),
+//                                crossAxisCount: 3,
+//                              ),
+//                            ),
                             Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: OutlineButton(

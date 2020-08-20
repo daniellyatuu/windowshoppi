@@ -506,6 +506,8 @@ class _RegisterPageState extends State<RegisterPage> {
               _registerFormKey.currentState.save();
 
               if (isLocationSelected) {
+                // default group id = 3
+                // 3 = stand for vendor
                 var userInfo = {
                   'username': _userName,
                   'password': _passWord,
@@ -597,6 +599,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
 
     var _user = json.decode(response.body);
+    print(_user);
 
     if (_user['username'] != null) {
       if (_user['username'][0] == 'user with this username already exists.') {

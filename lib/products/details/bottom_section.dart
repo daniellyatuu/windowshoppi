@@ -63,34 +63,32 @@ class _BottomSectionState extends State<BottomSection> {
                   ],
                 ),
               if (widget.bussinessId != widget.loggedInBussinessId)
-                widget.whatsapp != null
-                    ? SizedBox(
-                        width: 15.0,
-                      )
-                    : Text(''),
+                if (widget.whatsapp != null)
+                  SizedBox(
+                    width: 15.0,
+                  ),
               if (widget.bussinessId != widget.loggedInBussinessId)
-                widget.whatsapp != null
-                    ? Column(
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              chat(widget.whatsapp,
-                                  "Hi there! I have seen your post on windowshoppi");
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: Color(0xFF06B862),
-                              radius: 15.0,
-                              child: FaIcon(
-                                FontAwesomeIcons.whatsapp,
-                                size: 15.0,
-                                color: Colors.white,
-                              ),
-                            ),
+                if (widget.whatsapp != null)
+                  Column(
+                    children: <Widget>[
+                      InkWell(
+                        onTap: () {
+                          chat(widget.whatsapp,
+                              "Hi there! I have seen your post on windowshoppi");
+                        },
+                        child: CircleAvatar(
+                          backgroundColor: Color(0xFF06B862),
+                          radius: 15.0,
+                          child: FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            size: 15.0,
+                            color: Colors.white,
                           ),
-                          Text('chat'),
-                        ],
-                      )
-                    : Text(''),
+                        ),
+                      ),
+                      Text('chat'),
+                    ],
+                  ),
             ],
           ),
           AbsorbPointer(

@@ -180,41 +180,38 @@ class _ExploreState extends State<Explore> {
               )
             : _isInitialLoading
                 ? InitLoader()
-                : ListView.builder(
+                : ListView.separated(
                     physics: BouncingScrollPhysics(),
                     controller: _scrollController,
+                    separatorBuilder: (context, index) => Divider(),
                     itemCount: data == null ? 0 : data.length + 1,
                     itemBuilder: (BuildContext context, int index) {
                       if (index < data.length) {
-                        return Card(
-                          margin: EdgeInsets.symmetric(
-                              horizontal: 0.0, vertical: 4.0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              TopSection(
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            TopSection(
+                              loggedInBussinessId: loggedInBussinessId,
+                              bussinessId: data[index].bussiness,
+                              profilePic: data[index].accountPic,
+                              account: data[index].accountName,
+                              location: data[index].businessLocation,
+                            ),
+                            PostSection(
+                              postImage: data[index].productPhoto,
+                              activeImage: (value) => _changeActivePhoto(value),
+                            ),
+                            BottomSection(
                                 loggedInBussinessId: loggedInBussinessId,
                                 bussinessId: data[index].bussiness,
-                                account: data[index].accountName,
-                                location: data[index].businessLocation,
-                              ),
-                              PostSection(
                                 postImage: data[index].productPhoto,
-                                activeImage: (value) =>
-                                    _changeActivePhoto(value),
-                              ),
-                              BottomSection(
-                                  loggedInBussinessId: loggedInBussinessId,
-                                  bussinessId: data[index].bussiness,
-                                  postImage: data[index].productPhoto,
-                                  activePhoto: activePhoto,
-                                  callNo: data[index].callNumber,
-                                  whatsapp: data[index].whatsappNumber),
-                              PostDetails(caption: data[index].caption),
-                            ],
-                          ),
+                                activePhoto: activePhoto,
+                                callNo: data[index].callNumber,
+                                whatsapp: data[index].whatsappNumber),
+                            PostDetails(caption: data[index].caption),
+                          ],
                         );
                       } else if (allProducts - data.length > 0) {
                         return Loader2();

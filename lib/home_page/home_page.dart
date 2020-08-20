@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/country.dart';
@@ -13,28 +14,84 @@ import 'package:windowshoppi/products/products.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
+import 'package:windowshoppi/services/CountProductsCubit.dart';
+import 'package:windowshoppi/services/ProductNextUrlCubit.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
 import 'package:windowshoppi/product_category/product_category.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/widgets/loader.dart';
+import 'package:windowshoppi/services/product_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  Widget build(BuildContext context) {
+//    return BlocProvider(
+//      create: (_) => ProductNextUrl(),
+//      child: ProductList(),
+//    );
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductNextUrl>(
+          create: (BuildContext context) => ProductNextUrl(),
+        ),
+        BlocProvider<CountProductsCubit>(
+          create: (BuildContext context) => CountProductsCubit(),
+        ),
+      ],
+      child: ProductList(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
-  final dbHelper = DatabaseHelper.instance;
+class ProductList extends StatefulWidget {
+  @override
+  _ProductListState createState() => _ProductListState();
+}
 
+class _ProductListState extends State<ProductList> {
   ScrollController _scrollController = ScrollController();
 
   var data = new List<Product>();
-  String newUrl, nextUrl;
+  String nextUrl = '';
+  int allProducts;
   bool removeListData, _isGettingServerData, firstLoading;
   bool _isInitialLoading = true;
   int activeCategory = 0;
-  int allProducts = 0;
+
   int loggedInBussinessId = 0;
+
+  Future _getProduct(url, removeListData, category, firstLoading) async {
+    setState(() {
+      _isInitialLoading = firstLoading ? true : false;
+      _isGettingServerData = true;
+    });
+
+    var res = await fetchProduct(context, url, category, firstLoading);
+
+    /// add new data to list
+    if (removeListData) {
+      data = res;
+    } else {
+      data = data + res;
+    }
+
+    setState(() {
+      _isInitialLoading = false;
+      _isGettingServerData = false;
+    });
+  }
+
+  _isUserLoggedIn() async {
+    // get bussiness_id if user loggedIn
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var _businessId = localStorage.getInt(businessId);
+    if (_businessId != null) {
+      setState(() {
+        loggedInBussinessId = _businessId;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -48,124 +105,42 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
 
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
+    _isUserLoggedIn();
 
     _scrollController.addListener(
       () {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
-          if (nextUrl != null && _isGettingServerData == false) {
-            fetchProduct(nextUrl, removeListData = false, firstLoading = false,
-                activeCategory);
+          if (nextUrl != 'null' && _isGettingServerData == false) {
+            _getProduct(nextUrl, removeListData = false, activeCategory,
+                firstLoading = false);
           }
         }
       },
     );
   }
 
-  Future fetchProduct(url, removeListData, firstLoading, activeCategory) async {
-    setState(() {
-      _isInitialLoading = firstLoading ? true : false;
-      _isGettingServerData = true;
-    });
-
-    if (_isInitialLoading) {
-      var country = await _activeCountry();
-
-      newUrl = url +
-          '?category=' +
-          activeCategory.toString() +
-          '&country=' +
-          country['id'].toString();
-    } else {
-      newUrl = url;
-    }
-
-    final response = await http.get(newUrl);
-
-    if (response.statusCode == 200) {
-      var productData = json.decode(response.body);
-      nextUrl = productData['next'];
-
-      // get bussiness_id if user loggedIn
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      var _businessId = localStorage.getInt(businessId);
-      if (_businessId != null) {
-        setState(() {
-          loggedInBussinessId = _businessId;
-        });
-      }
-
-      setState(() {
-        Iterable list = productData['results'];
-        allProducts = productData['count'];
-        if (removeListData) {
-          data = list.map((model) => Product.fromJson(model)).toList();
-        } else {
-          data.addAll(list.map((model) => Product.fromJson(model)).toList());
-        }
-      });
-//      print(data.length);
-    } else {
-      throw Exception('failed to load data from internet');
-    }
-
-    setState(() {
-      _isInitialLoading = false;
-      _isGettingServerData = false;
-    });
-  }
-
-  _activeCountry() async {
-    var activeCountryData = await dbHelper.getActiveCountryFromUserTable();
-    if (activeCountryData == null) {
-      var _country = await _fetchCountry();
-      return _country;
-    } else {
-      return activeCountryData;
-    }
-  }
-
-  Future _fetchCountry() async {
-    final response = await http.get(ALL_COUNTRY_URL);
-
-    if (response.statusCode == 200) {
-      var countryData = json.decode(response.body);
-      return countryData[0];
-    } else {
-      throw Exception('failed to load data from internet');
-    }
-  }
-
   Future<void> refresh() async {
     await Future.delayed(Duration(milliseconds: 700));
 
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
   }
 
   Future<void> refreshOnChangeCountry() async {
-    fetchProduct(ALL_PRODUCT_URL, removeListData = true, firstLoading = true,
-        activeCategory);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
   }
 
   Future<void> filterProductByCategory(id) async {
     setState(() {
       activeCategory = id;
     });
-    fetchProduct(
-        ALL_PRODUCT_URL, removeListData = true, firstLoading = true, id);
+    _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
+        firstLoading = true);
   }
-
-//  void _getAllCountry() async {
-//    final allRows = await dbHelper.queryAllRows();
-//    allRows.forEach(
-//      (row) => print(row),
-//    );
-//  }
-
-  // get active bussiness id for loggedInUser
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +164,32 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            BlocBuilder<ProductNextUrl, String>(
+              builder: (context, state) {
+                if (state != 'no_more_product') {
+                  nextUrl = state;
+                } else {
+                  nextUrl = 'null';
+                }
+
+                return Visibility(
+                  visible: false,
+                  child: Center(
+                    child: Text(''),
+                  ),
+                );
+              },
+            ),
+            BlocBuilder<CountProductsCubit, int>(
+              builder: (context, state) {
+                allProducts = state;
+                return Visibility(
+                  visible: false,
+                  child: Center(child: Text('')),
+                );
+              },
+            ),
+
             ProductCategory(
                 onFetchingData: (categoryId) =>
                     filterProductByCategory(categoryId)),
@@ -210,11 +211,11 @@ class _HomePageState extends State<HomePage> {
                             children: <Widget>[
                               GestureDetector(
                                 onTap: () {
-                                  fetchProduct(
+                                  _getProduct(
                                       ALL_PRODUCT_URL,
                                       removeListData = true,
-                                      firstLoading = true,
-                                      activeCategory);
+                                      activeCategory,
+                                      firstLoading = true);
                                 },
                                 child: Icon(
                                   Icons.refresh,
