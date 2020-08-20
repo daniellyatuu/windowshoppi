@@ -1,14 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/product.dart';
+import 'package:windowshoppi/services/ProductNextUrlCubit.dart';
+import 'package:windowshoppi/services/CountProductsCubit.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
 
-Future<List<Product>> fetchProduct(url, activeCategory, firstLoading) async {
+Future<List<Product>> fetchProduct(
+    context, url, activeCategory, firstLoading) async {
   String newUrl;
-  print('start get data from server');
+
   if (firstLoading) {
     var country = await _activeCountry();
 
@@ -27,22 +31,19 @@ Future<List<Product>> fetchProduct(url, activeCategory, firstLoading) async {
   var countResult = result['count'];
   var nextUrl = result['next'];
 
-  SharedPreferences localStorage = await SharedPreferences.getInstance();
+  if (nextUrl != null) {
+    BlocProvider.of<ProductNextUrl>(context).nextUrl(nextUrl);
+  } else {
+    BlocProvider.of<ProductNextUrl>(context).nextUrl('no_more_product');
+  }
 
-  /// remove countResult and nextUrl from sharedPreferences
-  localStorage.remove('countResult');
-  localStorage.remove('nextUrl');
-
-  /// save countResult and nextUrl from sharedPreferences
-  localStorage.setInt('countResult', countResult);
-  localStorage.setString('nextUrl', nextUrl);
+  BlocProvider.of<CountProductsCubit>(context).countProduct(countResult);
 
   return compute(parseProducts, response.body);
 }
 
 List<Product> parseProducts(String responseBody) {
   final parsed = jsonDecode(responseBody);
-  print(parsed);
 
   final parsed1 = parsed['results'].cast<Map<String, dynamic>>();
 

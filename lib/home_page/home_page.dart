@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/country.dart';
@@ -13,28 +14,51 @@ import 'package:windowshoppi/products/products.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
+import 'package:windowshoppi/services/CountProductsCubit.dart';
+import 'package:windowshoppi/services/ProductNextUrlCubit.dart';
 import 'package:windowshoppi/utilities/database_helper.dart';
 import 'package:windowshoppi/product_category/product_category.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/widgets/loader.dart';
 import 'package:windowshoppi/services/product_service.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   @override
-  _HomePageState createState() => _HomePageState();
+  Widget build(BuildContext context) {
+//    return BlocProvider(
+//      create: (_) => ProductNextUrl(),
+//      child: ProductList(),
+//    );
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductNextUrl>(
+          create: (BuildContext context) => ProductNextUrl(),
+        ),
+        BlocProvider<CountProductsCubit>(
+          create: (BuildContext context) => CountProductsCubit(),
+        ),
+      ],
+      child: ProductList(),
+    );
+  }
 }
 
-class _HomePageState extends State<HomePage> {
-//  final dbHelper = DatabaseHelper.instance;
+class ProductList extends StatefulWidget {
+  @override
+  _ProductListState createState() => _ProductListState();
+}
 
+class _ProductListState extends State<ProductList> {
   ScrollController _scrollController = ScrollController();
 
   var data = new List<Product>();
-  String nextUrl;
+  String nextUrl = '';
+  int allProducts;
   bool removeListData, _isGettingServerData, firstLoading;
   bool _isInitialLoading = true;
   int activeCategory = 0;
-  int allProducts = 0;
+
   int loggedInBussinessId = 0;
 
   Future _getProduct(url, removeListData, category, firstLoading) async {
@@ -43,20 +67,9 @@ class _HomePageState extends State<HomePage> {
       _isGettingServerData = true;
     });
 
-    print('start');
-    var res = await fetchProduct(url, category, firstLoading);
-    print('inside the class');
-    print(res);
-
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var countProduct = localStorage.getInt('countResult');
-    var nextLink = localStorage.getString('nextUrl');
-
-    allProducts = countProduct;
-    nextUrl = nextLink;
+    var res = await fetchProduct(context, url, category, firstLoading);
 
     /// add new data to list
-
     if (removeListData) {
       data = res;
     } else {
@@ -100,8 +113,7 @@ class _HomePageState extends State<HomePage> {
       () {
         if (_scrollController.position.pixels ==
             _scrollController.position.maxScrollExtent) {
-          print(nextUrl);
-          if (nextUrl != null && _isGettingServerData == false) {
+          if (nextUrl != 'null' && _isGettingServerData == false) {
             _getProduct(nextUrl, removeListData = false, activeCategory,
                 firstLoading = false);
           }
@@ -111,7 +123,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> refresh() async {
-    print('get data');
     await Future.delayed(Duration(milliseconds: 700));
 
     _getProduct(ALL_PRODUCT_URL, removeListData = true, activeCategory,
@@ -153,6 +164,32 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            BlocBuilder<ProductNextUrl, String>(
+              builder: (context, state) {
+                if (state != 'no_more_product') {
+                  nextUrl = state;
+                } else {
+                  nextUrl = 'null';
+                }
+
+                return Visibility(
+                  visible: false,
+                  child: Center(
+                    child: Text(''),
+                  ),
+                );
+              },
+            ),
+            BlocBuilder<CountProductsCubit, int>(
+              builder: (context, state) {
+                allProducts = state;
+                return Visibility(
+                  visible: false,
+                  child: Center(child: Text('')),
+                );
+              },
+            ),
+
             ProductCategory(
                 onFetchingData: (categoryId) =>
                     filterProductByCategory(categoryId)),

@@ -623,12 +623,14 @@ class _MyAccountState extends State<MyAccount>
     var token = localStorage.getString(userToken);
 
     Map<String, String> headers = {
-      "Authorization": "Token $token",
+//      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Token $token',
     };
+    print(headers);
 
     final response = await http.get(url, headers: headers);
-//    print(response.statusCode);
-//    print(response.body);
+    print(response.statusCode);
+    print(response.body);
 
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
