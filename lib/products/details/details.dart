@@ -17,7 +17,10 @@ class Details extends StatefulWidget {
 }
 
 class _DetailsState extends State<Details> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   int activePhoto = 0;
+  String newCaption;
+  bool edited = false;
 
   _changeActivePhoto(value) async {
     setState(() {
@@ -25,20 +28,56 @@ class _DetailsState extends State<Details> {
     });
   }
 
+  // _closeActivePage(value) async {
+  //   if (value == true) {
+  //     Navigator.of(context).pop(value);
+  //   }
+  // }
+
+  // _updateCaption(value) async {
+  //   print(value);
+  //   if (value != null) {
+  //     setState(() {
+  //       edited = true;
+  //       newCaption = value['caption'];
+  //     });
+  //     _notification('post updated successfully', Colors.black, Colors.red);
+  //   }
+  // }
+
+  // void _notification(String txt, Color bgColor, Color btnColor) {
+  //   final snackBar = SnackBar(
+  //     content: Text(txt),
+  //     backgroundColor: bgColor,
+  //     action: SnackBarAction(
+  //       label: 'Hide',
+  //       textColor: btnColor,
+  //       onPressed: () {
+  //         Scaffold.of(context).hideCurrentSnackBar();
+  //       },
+  //     ),
+  //   );
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     _scaffoldKey.currentState.showSnackBar(snackBar);
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
-//        title: Text(singlePost.caption),
-          ),
+        title: Text('Post details'),
+      ),
       body: ListView(
         children: <Widget>[
           TopSection(
+            post: widget.singlePost,
             loggedInBussinessId: widget.loggedInBussinessId,
-            bussinessId: widget.singlePost.bussiness,
-            profilePic: widget.singlePost.accountPic,
-            account: widget.singlePost.accountName,
-            location: widget.singlePost.businessLocation,
+            onDeletePost: (value) =>
+                value ? Navigator.of(context).pop('deleted') : null,
+            isDataUpdated: (value) =>
+                value ? Navigator.of(context).pop('updated') : null,
           ),
           ImageSection(
             postImage: widget.singlePost.productPhoto,
@@ -52,7 +91,7 @@ class _DetailsState extends State<Details> {
             callNo: widget.singlePost.callNumber,
             whatsapp: widget.singlePost.whatsappNumber,
           ),
-          PostDetails(caption: widget.singlePost.caption),
+          PostDetails(caption: edited ? newCaption : widget.singlePost.caption),
         ],
       ),
     );

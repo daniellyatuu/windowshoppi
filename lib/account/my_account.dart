@@ -9,6 +9,7 @@ import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/edit_profile/edit_profile.dart';
 import 'package:windowshoppi/explore/ExpandableText.dart';
+import 'package:windowshoppi/explore/top_section.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -77,7 +78,7 @@ class _MyAccountState extends State<MyAccount>
 
     try {
       resultList = await MultiImagePicker.pickImages(
-        maxImages: 10,
+        maxImages: 5,
         enableCamera: true,
         selectedAssets: _images,
         cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
@@ -129,7 +130,7 @@ class _MyAccountState extends State<MyAccount>
                 child: Icon(Icons.store, size: 20, color: Colors.grey),
               )
             : CircleAvatar(
-                radius: 35.0,
+                radius: 20.0,
                 backgroundColor: Colors.grey[300],
                 backgroundImage: NetworkImage(
                     'https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80'),
@@ -335,6 +336,8 @@ class _MyAccountState extends State<MyAccount>
                 isUpdated: (value) {
                   if (value == true) {
                     _getUserData();
+                    _notification('profile updated successfully', Colors.black,
+                        Colors.red);
                   }
                 },
               ),
@@ -345,27 +348,6 @@ class _MyAccountState extends State<MyAccount>
         child: Text('edit profile'),
       ),
     );
-//    return Container(
-//      width: double.infinity,
-//      child: FlatButton(
-//        padding: EdgeInsets.all(0.0),
-//        onPressed: () {
-//          print('edit profile');
-//        },
-//        child: Container(
-//          padding: EdgeInsets.symmetric(vertical: 5.0),
-//          decoration: BoxDecoration(
-//            border: Border.all(color: Colors.grey),
-//            borderRadius: BorderRadius.circular(5.0),
-//          ),
-//          alignment: Alignment.center,
-//          child: Text(
-//            'edit profile',
-//            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-//          ),
-//        ),
-//      ),
-//    );
   }
 
   Widget _buildImageViewButtonBar() {
@@ -443,15 +425,27 @@ class _MyAccountState extends State<MyAccount>
                   itemBuilder: (context, index) {
                     if (index < data.length) {
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
+                        onTap: () async {
+                          var res = await Navigator.push(
                             context,
                             FadeRoute(
                               widget: Details(
-                                  loggedInBussinessId: loggedInBussinessId,
-                                  singlePost: data[index]),
+                                loggedInBussinessId: loggedInBussinessId,
+                                singlePost: data[index],
+                              ),
                             ),
                           );
+
+                          if (res == 'deleted') {
+                            setState(() {
+                              allProducts = allProducts - 1;
+                              data.remove(data[index]);
+                            });
+                            _notification('post deleted successfully',
+                                Colors.black, Colors.red);
+                          } else if (res == 'updated') {
+                            _updateCaption();
+                          }
                         },
                         child: Stack(
                           fit: StackFit.expand,
@@ -530,11 +524,28 @@ class _MyAccountState extends State<MyAccount>
                         mainAxisSize: MainAxisSize.min,
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          AccountTopSection(
-                            profilePic: businessProfilePhoto,
-                            businessName: name,
-                            businessLocation: location,
+                          TopSection(
+                            post: data[index],
+                            loggedInBussinessId: loggedInBussinessId,
+                            onDeletePost: (value) => _removePost(data[index]),
+                            isDataUpdated: (value) => _updateCaption(),
                           ),
+                          // TopSection(
+                          //   post: data[index],
+                          //   loggedInBussinessId: loggedInBussinessId,
+                          //   onDeletePost: (value) => _removePost(data[index]),
+                          //   isDataUpdated: (value) => value
+                          //       ? fetchProduct(VENDOR_POST,
+                          //       removeListData = true, firstLoading = true)
+                          //       : null,
+                          // ),
+                          // TopSection(
+                          //   post: data[index],
+                          //   loggedInBussinessId: loggedInBussinessId,
+                          //   onDeletePost: (value) => _removePost(data[index]),
+                          //   isDataUpdated: (value) =>
+                          //   value ? refresh() : null,
+                          // ),
                           PostSection(
                             postImage: data[index].productPhoto,
                             activeImage: (value) => _changeActivePhoto(value),
@@ -596,6 +607,10 @@ class _MyAccountState extends State<MyAccount>
     });
   }
 
+  _updateCaption() async {
+    fetchProduct(VENDOR_POST, removeListData = true, firstLoading = true);
+  }
+
   void _notification(String txt, Color bgColor, Color btnColor) {
     final snackBar = SnackBar(
       content: Text(txt),
@@ -623,14 +638,11 @@ class _MyAccountState extends State<MyAccount>
     var token = localStorage.getString(userToken);
 
     Map<String, String> headers = {
-//      'Content-Type': 'application/json; charset=UTF-8',
+      'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Token $token',
     };
-    print(headers);
 
     final response = await http.get(url, headers: headers);
-    print(response.statusCode);
-    print(response.body);
 
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
@@ -654,7 +666,6 @@ class _MyAccountState extends State<MyAccount>
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
         }
       });
-//      print(data);
     } else {
       throw Exception('failed to load data from internet');
     }
@@ -663,6 +674,14 @@ class _MyAccountState extends State<MyAccount>
       _isInitialLoading = false;
       _isGettingServerData = false;
     });
+  }
+
+  _removePost(value) async {
+    setState(() {
+      allProducts = allProducts - 1;
+      data.remove(value);
+    });
+    _notification('post deleted successfully', Colors.black, Colors.red);
   }
 
   @override
@@ -924,13 +943,6 @@ class _MyAccountState extends State<MyAccount>
                                 ),
                               ),
                             ),
-//                            Expanded(
-//                              flex: 2,
-//                              child: GridView.count(
-//                                physics: BouncingScrollPhysics(),
-//                                crossAxisCount: 3,
-//                              ),
-//                            ),
                             Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: OutlineButton(

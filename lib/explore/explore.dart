@@ -24,6 +24,7 @@ class Explore extends StatefulWidget {
 }
 
 class _ExploreState extends State<Explore> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   final dbHelper = DatabaseHelper.instance;
 
   ScrollController _scrollController = ScrollController();
@@ -36,10 +37,9 @@ class _ExploreState extends State<Explore> {
   int activePhoto = 0;
   int loggedInBussinessId = 0;
 
-  dispose() {
-    super.dispose();
-    _scrollController.dispose();
-  }
+  // String newCaption;
+  //   // bool edited = false;
+  //   // int editedId = 0;
 
   @override
   void initState() {
@@ -79,7 +79,6 @@ class _ExploreState extends State<Explore> {
     }
 
     final response = await http.get(newUrl);
-//    print(response.statusCode);
 
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);
@@ -103,7 +102,6 @@ class _ExploreState extends State<Explore> {
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
         }
       });
-//      print(data);
     } else {
       throw Exception('failed to load data from internet');
     }
@@ -137,9 +135,51 @@ class _ExploreState extends State<Explore> {
     });
   }
 
+  _removePost(value) async {
+    setState(() {
+      allProducts = allProducts - 1;
+      data.remove(value);
+    });
+    _notification('post deleted successfully', Colors.black, Colors.red);
+  }
+
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    });
+  }
+
+  // _updateCaption(value) async {
+  //   if (value != null) {
+  //     setState(() {
+  //       editedId = value['id'];
+  //       edited = true;
+  //       newCaption = value['caption'];
+  //     });
+  //     _notification('post updated successfully', Colors.black, Colors.red);
+  //   }
+  // }
+
+  dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'windowshoppi',
@@ -193,11 +233,11 @@ class _ExploreState extends State<Explore> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
                             TopSection(
+                              post: data[index],
                               loggedInBussinessId: loggedInBussinessId,
-                              bussinessId: data[index].bussiness,
-                              profilePic: data[index].accountPic,
-                              account: data[index].accountName,
-                              location: data[index].businessLocation,
+                              onDeletePost: (value) => _removePost(data[index]),
+                              isDataUpdated: (value) =>
+                                  value ? refresh() : null,
                             ),
                             PostSection(
                               postImage: data[index].productPhoto,
@@ -216,17 +256,18 @@ class _ExploreState extends State<Explore> {
                       } else if (allProducts - data.length > 0) {
                         return Loader2();
                       } else {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(vertical: 10.0),
-                          child: Center(
-                            child: data.length > 15
-                                ? Text(
-                                    'no more data',
-                                    style: TextStyle(color: Colors.teal),
-                                  )
-                                : Text(''),
-                          ),
-                        );
+                        return null;
+                        // return Padding(
+                        //   padding: EdgeInsets.symmetric(vertical: 10.0),
+                        //   child: Center(
+                        //     child: data.length > 15
+                        //         ? Text(
+                        //             'no more data',
+                        //             style: TextStyle(color: Colors.teal),
+                        //           )
+                        //         : Text(''),
+                        //   ),
+                        // );
                       }
                     },
                   ),

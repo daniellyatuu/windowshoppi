@@ -128,31 +128,33 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
                   ),
                 ],
               ),
-              GestureDetector(
-                onTap: () {
-                  print('detect my location');
-                },
-                child: Container(
-                  color: Colors.black,
-                  padding: EdgeInsets.all(10.0),
-                  width: double.infinity,
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        Icons.my_location,
-                        color: Colors.white,
-                      ),
-                      SizedBox(width: 10.0),
-                      Text(
-                        'detect my location',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+//              GestureDetector(
+//                onTap: () {
+//                  print('detect my location');
+//                },
+//                child: Container(
+//                  color: Colors.black,
+//                  padding: EdgeInsets.all(10.0),
+//                  width: double.infinity,
+//                  child: Row(
+//                    children: <Widget>[
+//                      Icon(
+//                        Icons.my_location,
+//                        color: Colors.white,
+//                      ),
+//                      SizedBox(width: 10.0),
+//                      Expanded(
+//                        child: Text(
+//                          'detect my location',
+//                          style: TextStyle(
+//                            color: Colors.white,
+//                          ),
+//                        ),
+//                      ),
+//                    ],
+//                  ),
+//                ),
+//              ),
             ],
           ),
         ),

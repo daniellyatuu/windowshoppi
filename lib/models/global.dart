@@ -1,7 +1,5 @@
-//const SERVER_NAME = "http://192.168.1.110:8000";
-const SERVER_NAME = "http://192.168.1.62:8000";
-//const SERVER_NAME = "http://192.168.43.155:8000";
-//const SERVER_NAME = "http://3.16.156.245";
+// const SERVER_NAME = "http://192.168.1.124:8000";
+const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
 const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/";
 const ALL_COUNTRY_URL = "$SERVER_NAME/master_data/country/";
@@ -15,3 +13,4 @@ const VALIDATE_USERNAME = "$SERVER_NAME/validate/";
 const REGISTER_USER = "$SERVER_NAME/register/";
 const LOGIN_USER = "$SERVER_NAME/login/";
 const UPDATE_PROFILE = "$SERVER_NAME/update/";
+const UPDATE_POST = "$SERVER_NAME/post/update-post/";
