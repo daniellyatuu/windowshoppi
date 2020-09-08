@@ -1,11 +1,8 @@
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:windowshoppi/explore/ExpandableText.dart';
 import 'package:windowshoppi/explore/post_details.dart';
 import 'package:windowshoppi/explore/post_section.dart';
@@ -18,7 +15,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/widgets/loader.dart';
-import 'account_top_section.dart';
 import 'package:http/http.dart' as http;
 
 class ProfilePage extends StatefulWidget {
@@ -101,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
             subtitle: Text(_businessData['location_name']),
             trailing: Column(
               children: <Widget>[
-                _buildStatColumn('POST', 12),
+                _buildStatColumn('POST', data.length),
               ],
             ),
           ),
@@ -232,41 +228,6 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
-  Widget _buildProfileFollowButton() {
-    return Container(
-      padding: EdgeInsets.only(top: 4.0),
-      child: FlatButton(
-        onPressed: () {},
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(5.0),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            'edit profile',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          width: 200.0,
-          height: 27.0,
-        ),
-      ),
-    );
-  }
-
-  List<String> _posts = [
-    'https://lh5.googleusercontent.com/proxy/XuQ0Dc8ews6V2G3iQqp8oYWupJdK3s1WxJ_n1cXFaDGmpMzIbceiEgo7i1GqFoz_Ppf4MCe4uWQSXX431u3MgHzlpdUMRoU',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQUTcsi010F5zBOmMN24rnbstMgM3rh8u_dWrWQXPLu_UXuUB1E&s',
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQIbNH5TdL5-CyiwdqglmGeKdHgIl8-BcFFTHMWUIVis5-q0I2T&s',
-    'https://api.time.com/wp-content/uploads/2018/11/sweetfoam-sustainable-product.jpg?quality=85',
-    'https://lh3.googleusercontent.com/kcuyhFJT68FzCgfH-Ow8DdUiL1xgUp6rdAHpSDqF3Eg8j4HQ3O9ANxsyy_EpiTBvhXnLvNvOmI1ygIONDgIV_4xHYyxyd5y5f0EHAQ=w262-l90-sg-rj',
-    'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone11-red-select-2019?wid=940&hei=1112&fmt=png-alpha&qlt=80&.v=1566956144763',
-    'https://static.livebooks.com/abc61dbc6e9c403b917975eb48d2d97d/i/f2c81f819c994f5eb2312f9948520c2a/1/4SoifmQp7LJ6yDtMuFY2x/Swan-Optic-22089.jpg',
-    'https://www.apple.com/v/product-red/o/images/meta/og__dbjwy50zuc02.png?202005090509',
-    'https://api.time.com/wp-content/uploads/2018/11/sweetfoam-sustainable-product.jpg?quality=85',
-    'https://in.canon/media/image/2018/05/03/642e7bbeae5741e3b872e082626c0151_eos6d-mkii-ef-24-70m-l.png',
-  ];
-
   Widget _buildUserPosts() {
     if (view == 'grid') {
       return _isInitialLoading
@@ -390,11 +351,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
                           TopSection(
+                            post: data[index],
                             loggedInBussinessId: loggedInBussinessId,
-                            bussinessId: data[index].bussiness,
-                            profilePic: data[index].accountPic,
-                            account: data[index].accountName,
-                            location: data[index].businessLocation,
+                            onDeletePost: (value) => null,
+                            isDataUpdated: (value) => null,
                           ),
                           PostSection(
                             postImage: data[index].productPhoto,
@@ -437,7 +397,6 @@ class _ProfilePageState extends State<ProfilePage> {
         var data = businessData;
         _businessData = data;
       });
-      print(_businessData);
     } else {
       throw Exception('failed to load data from internet');
     }
@@ -483,7 +442,6 @@ class _ProfilePageState extends State<ProfilePage> {
           data.addAll(list.map((model) => Product.fromJson(model)).toList());
         }
       });
-//      print(data);
     } else {
       throw Exception('failed to load data from internet');
     }

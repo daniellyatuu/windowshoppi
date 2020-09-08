@@ -147,39 +147,37 @@ class _SelectCountryState extends State<SelectCountry> {
                           shrinkWrap: true,
                           itemCount: country.length,
                           itemBuilder: (BuildContext context, int index) {
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pop(
-                                  activeCountry == country[index].countryName
-                                      ? null
-                                      : {
-                                          'id': country[index].id,
-                                          'name': country[index].countryName,
-                                          'iso2': country[index].ios2,
-                                          'flag': country[index].flag,
-                                        },
-                                );
-                              },
-                              child: Card(
-                                color: Colors.grey[100],
-                                child: ListTile(
-                                  dense: true,
-                                  leading: CircleAvatar(
-                                    backgroundImage: NetworkImage(
-                                        '$SERVER_NAME${country[index].flag}'),
-                                  ),
-                                  title: Text(
-                                    country[index].countryName,
-                                    style: activeCountry ==
-                                            country[index].countryName
-                                        ? TextStyle(fontWeight: FontWeight.bold)
-                                        : null,
-                                  ),
-                                  trailing: activeCountry ==
-                                          country[index].countryName
-                                      ? Icon(Icons.check)
-                                      : Text(''),
+                            return Card(
+                              color: Colors.grey[100],
+                              child: ListTile(
+                                onTap: () {
+                                  Navigator.of(context).pop(
+                                    activeCountry == country[index].countryName
+                                        ? null
+                                        : {
+                                            'id': country[index].id,
+                                            'name': country[index].countryName,
+                                            'iso2': country[index].ios2,
+                                            'flag': country[index].flag,
+                                          },
+                                  );
+                                },
+                                dense: true,
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      '$SERVER_NAME${country[index].flag}'),
                                 ),
+                                title: Text(
+                                  country[index].countryName,
+                                  style: activeCountry ==
+                                          country[index].countryName
+                                      ? TextStyle(fontWeight: FontWeight.bold)
+                                      : null,
+                                ),
+                                trailing:
+                                    activeCountry == country[index].countryName
+                                        ? Icon(Icons.check)
+                                        : Text(''),
                               ),
                             );
                           },

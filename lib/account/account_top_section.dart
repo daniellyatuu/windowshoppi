@@ -73,7 +73,7 @@ class _AccountTopSectionState extends State<AccountTopSection> {
             ],
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () async {},
             icon: Icon(Icons.more_vert),
           ),
         ],

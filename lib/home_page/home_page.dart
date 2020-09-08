@@ -1,35 +1,25 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:windowshoppi/models/country.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/products/details/details.dart';
-import 'package:windowshoppi/products/products.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/services/CountProductsCubit.dart';
 import 'package:windowshoppi/services/ProductNextUrlCubit.dart';
-import 'package:windowshoppi/utilities/database_helper.dart';
 import 'package:windowshoppi/product_category/product_category.dart';
-import 'package:http/http.dart' as http;
 import 'package:windowshoppi/widgets/loader.dart';
 import 'package:windowshoppi/services/product_service.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-//    return BlocProvider(
-//      create: (_) => ProductNextUrl(),
-//      child: ProductList(),
-//    );
     return MultiBlocProvider(
       providers: [
         BlocProvider<ProductNextUrl>(
@@ -50,6 +40,7 @@ class ProductList extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductList> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController _scrollController = ScrollController();
 
   var data = new List<Product>();
@@ -142,9 +133,27 @@ class _ProductListState extends State<ProductList> {
         firstLoading = true);
   }
 
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scaffoldKey.currentState.showSnackBar(snackBar);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'windowshoppi ',
@@ -256,8 +265,8 @@ class _ProductListState extends State<ProductList> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(6.0)),
                                       child: GestureDetector(
-                                        onTap: () {
-                                          Navigator.push(
+                                        onTap: () async {
+                                          var res = await Navigator.push(
                                             context,
                                             FadeRoute(
                                               widget: Details(
@@ -266,6 +275,18 @@ class _ProductListState extends State<ProductList> {
                                                   singlePost: data[index]),
                                             ),
                                           );
+                                          if (res == 'deleted') {
+                                            setState(() {
+                                              allProducts = allProducts - 1;
+                                              data.remove(data[index]);
+                                            });
+                                            _notification(
+                                                'post deleted successfully',
+                                                Colors.black,
+                                                Colors.red);
+                                          } else if (res == 'updated') {
+                                            refresh();
+                                          }
                                         },
                                         child: Stack(
                                           fit: StackFit.expand,
