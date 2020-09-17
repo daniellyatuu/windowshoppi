@@ -310,6 +310,7 @@ class _RegisterPageState extends State<RegisterPage> {
             setState(() {
               _activeCountryId = newValue;
             });
+            FocusScope.of(context).requestFocus(FocusNode());
           },
           validator: (value) {
             if (value == null) {
@@ -361,7 +362,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
   Widget _buildLocationFT() {
     return GestureDetector(
-      onTap: _searchLocation,
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+        _searchLocation();
+      },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -459,7 +463,9 @@ class _RegisterPageState extends State<RegisterPage> {
           isExpanded: true,
           isDense: true,
           hint: Text('select category'),
-          onChanged: (String newValue) {},
+          onChanged: (String newValue) {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
           validator: (value) {
             if (value == null) {
               return 'category is required';
@@ -503,6 +509,8 @@ class _RegisterPageState extends State<RegisterPage> {
         absorbing: _isSubmitting ? true : false,
         child: RaisedButton(
           onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
+
             if (_registerFormKey.currentState.validate()) {
               _registerFormKey.currentState.save();
 

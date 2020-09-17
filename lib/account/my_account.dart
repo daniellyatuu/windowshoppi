@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/Provider.dart';
 import 'package:windowshoppi/edit_profile/edit_profile.dart';
 import 'package:windowshoppi/explore/ExpandableText.dart';
 import 'package:windowshoppi/explore/top_section.dart';
+import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -776,8 +778,23 @@ class _MyAccountState extends State<MyAccount>
     });
   }
 
+  void _scrollOnTop(manager) async {
+    if (_scrollController.hasClients) {
+      await _scrollController.animateTo(0,
+          duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+      manager.changePage('');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+    manager.index$.listen((index) {
+      if (index == 'accountTop') {
+        _scrollOnTop(manager);
+      }
+    });
+
     super.build(context); // reloads state when opened again
 
     return _images.length == 0

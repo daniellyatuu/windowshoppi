@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/Provider.dart';
+import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:windowshoppi/models/category_model.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -425,13 +427,28 @@ class _SearchState extends State<Search> {
     );
   }
 
+  void _scrollOnTop(manager) async {
+    if (_productScrollController.hasClients) {
+      await _productScrollController.animateTo(0,
+          duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+      manager.changePage('');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+    manager.index$.listen((index) {
+      if (index == 'searchTop') {
+        _scrollOnTop(manager);
+      }
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           'windowshoppi',
-          style: TextStyle(fontFamily: 'Itim'),
+          // style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
           SelectCountry(
@@ -453,8 +470,7 @@ class _SearchState extends State<Search> {
             ),
           ),
 //          _locationFT(),
-          if (_searchOnProgress == false)
-            _popularText(),
+          if (_searchOnProgress == false) _popularText(),
           _searchOnProgress
               ? _searchIsInitialLoading
                   ? Padding(

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/Provider.dart';
+import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -85,13 +87,6 @@ class _ProductListState extends State<ProductList> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _scrollController.dispose();
-  }
-
-  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -150,14 +145,43 @@ class _ProductListState extends State<ProductList> {
     });
   }
 
+  // void _scrollOnTop() {
+  //   if (_scrollController.hasClients) {
+  //     _scrollController.animateTo(0,
+  //         duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+  //   }
+  // }
+
+  void _scrollOnTop(manager) async {
+    if (_scrollController.hasClients) {
+      await _scrollController.animateTo(0,
+          duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+      manager.changePage('');
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+    manager.index$.listen((index) {
+      if (index == 'homeTop') {
+        _scrollOnTop(manager);
+      }
+    });
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'windowshoppi ',
-          style: TextStyle(fontFamily: 'Itim'),
+          // style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
           SelectCountry(
