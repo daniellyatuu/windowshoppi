@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:windowshoppi/splash_screen/splash_screen.dart';
 import 'package:windowshoppi/navigation_page.dart';
+import 'package:windowshoppi/Overseer.dart';
+import 'package:windowshoppi/Provider.dart';
+import 'package:flutter/material.dart';
 import 'package:sentry/sentry.dart';
 import 'dart:async';
 import 'dsn.dart';
@@ -66,12 +66,14 @@ Future<Null> main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.red,
+    return Provider(
+      data: Overseer(),
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+        ),
+        home: AppNavigation(),
       ),
-      home: AppNavigation(),
     );
   }
 }

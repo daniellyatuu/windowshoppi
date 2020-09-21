@@ -1,13 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:transparent_image/transparent_image.dart';
 import 'package:windowshoppi/models/product.dart';
-import 'package:windowshoppi/products/details/details.dart';
-import 'package:connectivity/connectivity.dart';
-import 'dart:async';
-import 'package:windowshoppi/routes/fade_transition.dart';
 
 class Products extends StatelessWidget {
   final List<Product> products;
@@ -39,19 +34,40 @@ class Products extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.all(Radius.circular(6.0)),
-                    child: CachedNetworkImage(
-                      fit: BoxFit.cover,
-                      imageUrl: products[index].productPhoto[0].filename,
-                      progressIndicatorBuilder:
-                          (context, url, downloadProgress) =>
-                              CupertinoActivityIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    child: ExtendedImage.network(
+                      products[index].productPhoto[0].filename,
+                      cache: true,
+                      loadStateChanged: (ExtendedImageState state) {
+                        switch (state.extendedImageLoadState) {
+                          case LoadState.loading:
+                            return CupertinoActivityIndicator();
+                            break;
+
+                          ///if you don't want override completed widget
+                          ///please return null or state.completedWidget
+                          //return null;
+                          //return state.completedWidget;
+                          case LoadState.completed:
+                            return ExtendedRawImage(
+                              fit: BoxFit.cover,
+                              image: state.extendedImageInfo?.image,
+                            );
+                            break;
+                          case LoadState.failed:
+                            // _controller.reset();
+                            return GestureDetector(
+                              child: Center(
+                                child: Icon(Icons.refresh),
+                              ),
+                              onTap: () {
+                                state.reLoadImage();
+                              },
+                            );
+                            break;
+                        }
+                        return null;
+                      },
                     ),
-//                    child: FadeInImage.memoryNetwork(
-//                      placeholder: kTransparentImage,
-//                      image: products[index].productPhoto[0].filename,
-//                      fit: BoxFit.cover,
-//                    ),
                   ),
                 ),
               );

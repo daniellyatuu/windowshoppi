@@ -1,11 +1,13 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:windowshoppi/managers/NavigationManager.dart';
+import 'package:custom_navigator/custom_navigation.dart';
 import 'package:windowshoppi/home_page/home_page.dart';
 import 'package:windowshoppi/explore/explore.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:custom_navigator/custom_navigation.dart';
-import 'package:windowshoppi/search/search.dart';
 import 'package:windowshoppi/auth/user_auth.dart';
+import 'package:windowshoppi/search/search.dart';
+import 'package:windowshoppi/Provider.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class AppNavigation extends StatefulWidget {
   @override
@@ -24,11 +26,21 @@ class _AppNavigationState extends State<AppNavigation> {
   ];
 
   void _onTappedBar(int index) {
-//    print(navigatorKey.currentState.canPop());
     if (navigatorKey.currentState.canPop()) {
       navigatorKey.currentState.popUntil((route) => route.isFirst);
     } else {
-//      print('scroll to top');
+      NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+      String _top = '';
+      if (index == 0) {
+        _top = 'homeTop';
+      } else if (index == 1) {
+        _top = 'exploreTop';
+      } else if (index == 2) {
+        _top = 'searchTop';
+      } else if (index == 3) {
+        _top = 'accountTop';
+      }
+      manager.changePage(_top);
     }
 
     setState(() {
@@ -51,6 +63,7 @@ class _AppNavigationState extends State<AppNavigation> {
         selectedItemColor: Colors.black,
         onTap: _onTappedBar,
         currentIndex: _currentIndex,
+        selectedFontSize: 12.0,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

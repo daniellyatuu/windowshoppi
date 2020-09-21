@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -276,14 +276,39 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Stack(
                           fit: StackFit.expand,
                           children: <Widget>[
-                            CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: data[index].productPhoto[0].filename,
-                              progressIndicatorBuilder:
-                                  (context, url, downloadProgress) =>
-                                      CupertinoActivityIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
+                            ExtendedImage.network(
+                              data[index].productPhoto[0].filename,
+                              cache: true,
+                              loadStateChanged: (ExtendedImageState state) {
+                                switch (state.extendedImageLoadState) {
+                                  case LoadState.loading:
+                                    return CupertinoActivityIndicator();
+                                    break;
+
+                                  ///if you don't want override completed widget
+                                  ///please return null or state.completedWidget
+                                  //return null;
+                                  //return state.completedWidget;
+                                  case LoadState.completed:
+                                    return ExtendedRawImage(
+                                      fit: BoxFit.cover,
+                                      image: state.extendedImageInfo?.image,
+                                    );
+                                    break;
+                                  case LoadState.failed:
+                                    // _controller.reset();
+                                    return GestureDetector(
+                                      child: Center(
+                                        child: Icon(Icons.refresh),
+                                      ),
+                                      onTap: () {
+                                        state.reLoadImage();
+                                      },
+                                    );
+                                    break;
+                                }
+                                return null;
+                              },
                             ),
                             if (data[index].productPhoto.toList().length != 1)
                               Positioned(

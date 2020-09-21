@@ -1,9 +1,11 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/Provider.dart';
+import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
@@ -85,13 +87,6 @@ class _ProductListState extends State<ProductList> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    _scrollController.dispose();
-  }
-
-  @override
   void initState() {
     // TODO: implement initState
     super.initState();
@@ -150,14 +145,43 @@ class _ProductListState extends State<ProductList> {
     });
   }
 
+  // void _scrollOnTop() {
+  //   if (_scrollController.hasClients) {
+  //     _scrollController.animateTo(0,
+  //         duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+  //   }
+  // }
+
+  void _scrollOnTop(manager) async {
+    if (_scrollController.hasClients) {
+      await _scrollController.animateTo(0,
+          duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+      manager.changePage('');
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _scrollController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+    manager.index$.listen((index) {
+      if (index == 'homeTop') {
+        _scrollOnTop(manager);
+      }
+    });
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'windowshoppi ',
-          style: TextStyle(fontFamily: 'Itim'),
+          // style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
           SelectCountry(
@@ -243,108 +267,138 @@ class _ProductListState extends State<ProductList> {
                     : Expanded(
                         child: Container(
                           child: StaggeredGridView.countBuilder(
-                              physics: BouncingScrollPhysics(),
-                              controller: _scrollController,
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 1,
-                              mainAxisSpacing: 1,
-                              itemCount: data == null
-                                  ? 0
-                                  : allProducts - data.length > 0
-                                      ? data.length + 3
-                                      : data.length,
-                              itemBuilder: (context, index) {
-                                if (index < data.length) {
-                                  return Container(
-                                    padding: EdgeInsets.all(5),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(6.0)),
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          var res = await Navigator.push(
-                                            context,
-                                            FadeRoute(
-                                              widget: Details(
-                                                  loggedInBussinessId:
-                                                      loggedInBussinessId,
-                                                  singlePost: data[index]),
-                                            ),
-                                          );
-                                          if (res == 'deleted') {
-                                            setState(() {
-                                              allProducts = allProducts - 1;
-                                              data.remove(data[index]);
-                                            });
-                                            _notification(
-                                                'post deleted successfully',
-                                                Colors.black,
-                                                Colors.red);
-                                          } else if (res == 'updated') {
-                                            refresh();
-                                          }
-                                        },
-                                        child: Stack(
-                                          fit: StackFit.expand,
-                                          children: <Widget>[
-                                            CachedNetworkImage(
-                                              fit: BoxFit.cover,
-                                              imageUrl: data[index]
-                                                  .productPhoto[0]
-                                                  .filename,
-                                              progressIndicatorBuilder: (context,
-                                                      url, downloadProgress) =>
-                                                  CupertinoActivityIndicator(),
-                                              errorWidget:
-                                                  (context, url, error) =>
-                                                      Icon(Icons.error),
-                                            ),
-                                            if (data[index]
-                                                    .productPhoto
-                                                    .toList()
-                                                    .length !=
-                                                1)
-                                              Positioned(
-                                                top: 6.0,
-                                                right: 6.0,
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            5.0),
-                                                    color: Colors.black
-                                                        .withOpacity(0.5),
-                                                  ),
-                                                  padding: EdgeInsets.all(5.0),
-                                                  child: Text(
-                                                    '${data[index].productPhoto.toList().length - 1}+',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 10.0),
-                                                  ),
+                            physics: BouncingScrollPhysics(),
+                            controller: _scrollController,
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 1,
+                            mainAxisSpacing: 1,
+                            itemCount: data == null
+                                ? 0
+                                : allProducts - data.length > 0
+                                    ? data.length + 3
+                                    : data.length,
+                            itemBuilder: (context, index) {
+                              if (index < data.length) {
+                                return Container(
+                                  padding: EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10.0)),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(6.0)),
+                                    child: GestureDetector(
+                                      onTap: () async {
+                                        var res = await Navigator.push(
+                                          context,
+                                          FadeRoute(
+                                            widget: Details(
+                                                loggedInBussinessId:
+                                                    loggedInBussinessId,
+                                                singlePost: data[index]),
+                                          ),
+                                        );
+                                        if (res == 'deleted') {
+                                          setState(() {
+                                            allProducts = allProducts - 1;
+                                            data.remove(data[index]);
+                                          });
+                                          _notification(
+                                              'post deleted successfully',
+                                              Colors.black,
+                                              Colors.red);
+                                        } else if (res == 'updated') {
+                                          refresh();
+                                        }
+                                      },
+                                      child: Stack(
+                                        fit: StackFit.expand,
+                                        children: <Widget>[
+                                          ExtendedImage.network(
+                                            data[index]
+                                                .productPhoto[0]
+                                                .filename,
+                                            cache: true,
+                                            loadStateChanged:
+                                                (ExtendedImageState state) {
+                                              switch (state
+                                                  .extendedImageLoadState) {
+                                                case LoadState.loading:
+                                                  return CupertinoActivityIndicator();
+                                                  break;
+
+                                                ///if you don't want override completed widget
+                                                ///please return null or state.completedWidget
+                                                //return null;
+                                                //return state.completedWidget;
+                                                case LoadState.completed:
+                                                  return ExtendedRawImage(
+                                                    fit: BoxFit.cover,
+                                                    image: state
+                                                        .extendedImageInfo
+                                                        ?.image,
+                                                  );
+                                                  break;
+                                                case LoadState.failed:
+                                                  // _controller.reset();
+                                                  return GestureDetector(
+                                                    child: Center(
+                                                      child:
+                                                          Icon(Icons.refresh),
+                                                    ),
+                                                    onTap: () {
+                                                      state.reLoadImage();
+                                                    },
+                                                  );
+                                                  break;
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          if (data[index]
+                                                  .productPhoto
+                                                  .toList()
+                                                  .length !=
+                                              1)
+                                            Positioned(
+                                              top: 6.0,
+                                              right: 6.0,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          5.0),
+                                                  color: Colors.black
+                                                      .withOpacity(0.5),
+                                                ),
+                                                padding: EdgeInsets.all(5.0),
+                                                child: Text(
+                                                  '${data[index].productPhoto.toList().length - 1}+',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 10.0),
                                                 ),
                                               ),
-                                          ],
-                                        ),
+                                            ),
+                                        ],
                                       ),
                                     ),
-                                  );
-                                } else if (allProducts - data.length > 0) {
-                                  return Loader1();
-                                } else {
-                                  return null;
-                                }
-                              },
-                              staggeredTileBuilder: (index) {
-                                return StaggeredTile.count(
-                                    1, index.isEven ? 1.0 : 1.3);
-                              }),
+                                  ),
+                                );
+                              } else if (allProducts - data.length > 0) {
+                                return Loader1();
+                              } else {
+                                return null;
+                              }
+                            },
+                            staggeredTileBuilder: (index) {
+                              return StaggeredTile.count(
+                                  1, index.isEven ? 1.1 : 1.4);
+                            },
+                          ),
                         ),
                       ),
           ],

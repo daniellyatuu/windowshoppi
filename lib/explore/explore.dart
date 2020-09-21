@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:windowshoppi/Provider.dart';
+import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
@@ -14,9 +16,6 @@ import 'post_section.dart';
 import 'post_details.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:http/http.dart' as http;
-import 'package:carousel_pro/carousel_pro.dart';
-import 'package:transparent_image/transparent_image.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class Explore extends StatefulWidget {
   @override
@@ -171,6 +170,14 @@ class _ExploreState extends State<Explore> {
   //   }
   // }
 
+  void _scrollOnTop(manager) async {
+    if (_scrollController.hasClients) {
+      await _scrollController.animateTo(0,
+          duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+      manager.changePage('');
+    }
+  }
+
   dispose() {
     super.dispose();
     _scrollController.dispose();
@@ -178,12 +185,19 @@ class _ExploreState extends State<Explore> {
 
   @override
   Widget build(BuildContext context) {
+    NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+    manager.index$.listen((index) {
+      if (index == 'exploreTop') {
+        _scrollOnTop(manager);
+      }
+    });
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         title: Text(
           'windowshoppi',
-          style: TextStyle(fontFamily: 'Itim'),
+          // style: TextStyle(fontFamily: 'Itim'),
         ),
         actions: <Widget>[
           SelectCountry(

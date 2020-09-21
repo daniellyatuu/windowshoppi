@@ -44,7 +44,7 @@ class _ContactUsState extends State<ContactUs> {
             children: <Widget>[
               CircleAvatar(
                 radius: 50.0,
-                backgroundImage: AssetImage('images/logo/logo_200_200.png'),
+                backgroundImage: AssetImage('assets/logo/logo_200_200.png'),
               ),
               Text(
                 'windowshoppi',

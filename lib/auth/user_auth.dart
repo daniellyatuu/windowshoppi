@@ -119,7 +119,7 @@ class _UserAuthState extends State<UserAuth> {
             appBar: AppBar(
               title: Text(
                 'windowshoppi',
-                style: TextStyle(fontFamily: 'Itim'),
+                // style: TextStyle(fontFamily: 'Itim'),
               ),
             ),
             body: Center(

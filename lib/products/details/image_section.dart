@@ -1,7 +1,6 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:transparent_image/transparent_image.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 
 class ImageSection extends StatefulWidget {
@@ -48,12 +47,39 @@ class _ImageSectionState extends State<ImageSection> {
             },
             images: [
               for (var image in widget.postImage)
-                CachedNetworkImage(
-                  fit: _imageCover ? BoxFit.cover : BoxFit.contain,
-                  imageUrl: image.filename,
-                  progressIndicatorBuilder: (context, url, downloadProgress) =>
-                      CupertinoActivityIndicator(),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ExtendedImage.network(
+                  image.filename,
+                  cache: true,
+                  loadStateChanged: (ExtendedImageState state) {
+                    switch (state.extendedImageLoadState) {
+                      case LoadState.loading:
+                        return CupertinoActivityIndicator();
+                        break;
+
+                      ///if you don't want override completed widget
+                      ///please return null or state.completedWidget
+                      //return null;
+                      //return state.completedWidget;
+                      case LoadState.completed:
+                        return ExtendedRawImage(
+                          fit: _imageCover ? BoxFit.cover : BoxFit.contain,
+                          image: state.extendedImageInfo?.image,
+                        );
+                        break;
+                      case LoadState.failed:
+                        // _controller.reset();
+                        return GestureDetector(
+                          child: Center(
+                            child: Icon(Icons.refresh),
+                          ),
+                          onTap: () {
+                            state.reLoadImage();
+                          },
+                        );
+                        break;
+                    }
+                    return null;
+                  },
                 ),
             ],
           ),

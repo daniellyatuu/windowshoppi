@@ -67,7 +67,7 @@ class _DetailsState extends State<Details> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text('Post details'),
+        title: Text('Post'),
       ),
       body: ListView(
         children: <Widget>[
