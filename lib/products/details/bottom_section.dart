@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_appavailability/flutter_appavailability.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,6 +33,22 @@ class BottomSection extends StatefulWidget {
 
 class _BottomSectionState extends State<BottomSection> {
   bool _isSharingNow = false;
+  String _packageName = 'com.whatsapp';
+
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,6 +92,15 @@ class _BottomSectionState extends State<BottomSection> {
                         onTap: () {
                           chat(widget.whatsapp,
                               "Hi there! I have seen your post on windowshoppi");
+                          // AppAvailability.checkAvailability(_packageName)
+                          //     .then((_) async {
+                          //   await chat(widget.whatsapp,
+                          //       "Hi there! I have seen your post on windowshoppi");
+                          // }).catchError((err) {
+                          //   Scaffold.of(context).hideCurrentSnackBar();
+                          //   _notification(
+                          //       'WhatsApp not found', Colors.black, Colors.red);
+                          // });
                         },
                         child: CircleAvatar(
                           backgroundColor: Color(0xFF06B862),
@@ -102,9 +128,18 @@ class _BottomSectionState extends State<BottomSection> {
                 setState(() {
                   _isSharingNow = true;
                 });
-
                 await shareToWhatsapp(
                     widget.postImage[widget.activePhoto].filename);
+
+                // await AppAvailability.checkAvailability(_packageName)
+                //     .then((_) async {
+                //   await shareToWhatsapp(
+                //       widget.postImage[widget.activePhoto].filename);
+                // }).catchError((err) {
+                //   Scaffold.of(context).hideCurrentSnackBar();
+                //   _notification('WhatsApp not found', Colors.black, Colors.red);
+                // });
+
                 setState(() {
                   _isSharingNow = false;
                 });
@@ -176,5 +211,6 @@ Future shareToWhatsapp(image) async {
 
   FlutterShareMe().shareToWhatsApp(
       base64Image: _base64Image,
-      msg: 'From windowshoppi App, Download the App.');
+      msg:
+          'From windowshoppi App, Download the App. \n https://play.google.com/store/apps/details?id=com.windowshoppi.windowshoppi');
 }

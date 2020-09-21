@@ -69,7 +69,6 @@ class MyApp extends StatelessWidget {
     return Provider(
       data: Overseer(),
       child: MaterialApp(
-        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.red,
         ),

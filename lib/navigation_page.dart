@@ -63,6 +63,7 @@ class _AppNavigationState extends State<AppNavigation> {
         selectedItemColor: Colors.black,
         onTap: _onTappedBar,
         currentIndex: _currentIndex,
+        selectedFontSize: 12.0,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

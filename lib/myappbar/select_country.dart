@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:windowshoppi/models/country.dart';
@@ -165,7 +165,8 @@ class _SelectCountryState extends State<SelectCountry> {
                                 dense: true,
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(
-                                      '$SERVER_NAME${country[index].flag}'),
+                                    '$SERVER_NAME${country[index].flag}',
+                                  ),
                                 ),
                                 title: Text(
                                   country[index].countryName,
@@ -233,11 +234,38 @@ class _SelectCountryState extends State<SelectCountry> {
                 child: _activeCountryLoading
                     ? Text('')
                     : activeFlag != ''
-                        ? CachedNetworkImage(
-                            imageUrl: SERVER_NAME + activeFlag,
-                            progressIndicatorBuilder:
-                                (context, url, downloadProgress) =>
-                                    CupertinoActivityIndicator(),
+                        ? ExtendedImage.network(
+                            SERVER_NAME + activeFlag,
+                            cache: true,
+                            loadStateChanged: (ExtendedImageState state) {
+                              switch (state.extendedImageLoadState) {
+                                case LoadState.loading:
+                                  return CupertinoActivityIndicator();
+                                  break;
+
+                                ///if you don't want override completed widget
+                                ///please return null or state.completedWidget
+                                //return null;
+                                //return state.completedWidget;
+                                case LoadState.completed:
+                                  return ExtendedRawImage(
+                                    image: state.extendedImageInfo?.image,
+                                  );
+                                  break;
+                                case LoadState.failed:
+                                  // _controller.reset();
+                                  return GestureDetector(
+                                    child: Center(
+                                      child: Icon(Icons.refresh),
+                                    ),
+                                    onTap: () {
+                                      state.reLoadImage();
+                                    },
+                                  );
+                                  break;
+                              }
+                              return null;
+                            },
                           )
                         : Text(''),
               ),

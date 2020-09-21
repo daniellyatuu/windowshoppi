@@ -1,7 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -17,13 +16,10 @@ import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
-import 'package:transparent_image/transparent_image.dart';
-import 'package:windowshoppi/account/account_top_section.dart';
 import 'package:windowshoppi/explore/post_section.dart';
 import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/explore/post_details.dart';
 import 'package:windowshoppi/widgets/loader.dart';
-import 'my_account_bottom_section.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:async';
 import 'package:multi_image_picker/multi_image_picker.dart';
@@ -452,14 +448,39 @@ class _MyAccountState extends State<MyAccount>
                         child: Stack(
                           fit: StackFit.expand,
                           children: <Widget>[
-                            CachedNetworkImage(
-                              fit: BoxFit.cover,
-                              imageUrl: data[index].productPhoto[0].filename,
-                              progressIndicatorBuilder:
-                                  (context, url, downloadProgress) =>
-                                      CupertinoActivityIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
+                            ExtendedImage.network(
+                              data[index].productPhoto[0].filename,
+                              cache: true,
+                              loadStateChanged: (ExtendedImageState state) {
+                                switch (state.extendedImageLoadState) {
+                                  case LoadState.loading:
+                                    return CupertinoActivityIndicator();
+                                    break;
+
+                                  ///if you don't want override completed widget
+                                  ///please return null or state.completedWidget
+                                  //return null;
+                                  //return state.completedWidget;
+                                  case LoadState.completed:
+                                    return ExtendedRawImage(
+                                      fit: BoxFit.cover,
+                                      image: state.extendedImageInfo?.image,
+                                    );
+                                    break;
+                                  case LoadState.failed:
+                                    // _controller.reset();
+                                    return GestureDetector(
+                                      child: Center(
+                                        child: Icon(Icons.refresh),
+                                      ),
+                                      onTap: () {
+                                        state.reLoadImage();
+                                      },
+                                    );
+                                    break;
+                                }
+                                return null;
+                              },
                             ),
                             if (data[index].productPhoto.toList().length != 1)
                               Positioned(
