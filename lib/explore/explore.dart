@@ -195,10 +195,7 @@ class _ExploreState extends State<Explore> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(
-          'windowshoppi',
-          // style: TextStyle(fontFamily: 'Itim'),
-        ),
+        title: Text('windowshoppi'),
         actions: <Widget>[
           SelectCountry(
             onCountryChanged: () => refreshOnChangeCountry(),
