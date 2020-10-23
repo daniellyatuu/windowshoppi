@@ -14,7 +14,7 @@ class InitLoader extends StatelessWidget {
   }
 }
 
-class Loader1 extends StatelessWidget {
+class BottomLoader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(

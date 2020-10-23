@@ -261,7 +261,9 @@ class _ExploreState extends State<Explore> {
                                 activePhoto: activePhoto,
                                 callNo: data[index].callNumber,
                                 whatsapp: data[index].whatsappNumber),
-                            PostDetails(caption: data[index].caption),
+                            PostDetails(
+                                username: data[index].username,
+                                caption: data[index].caption),
                           ],
                         );
                       } else if (allProducts - data.length > 0) {

@@ -3,10 +3,12 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class ExpandableText extends StatefulWidget {
+  final String username;
   final String text;
   final int trimLines;
   final bool readLess;
-  ExpandableText({Key key, this.text, this.trimLines, this.readLess})
+  ExpandableText(
+      {Key key, this.username, this.text, this.trimLines, this.readLess})
       : assert(text != null),
         super(key: key);
 
@@ -81,7 +83,18 @@ class ExpandableTextState extends State<ExpandableText> {
         return RichText(
           softWrap: true,
           overflow: TextOverflow.clip,
-          text: textSpan,
+          text: TextSpan(children: [
+            TextSpan(
+              text: widget.username != null
+                  ? "@" + widget.username + " "
+                  : widget.username,
+              style: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            textSpan,
+          ]),
         );
       },
     );

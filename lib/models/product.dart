@@ -1,6 +1,7 @@
 class Product {
   int id, bussiness;
-  final accountName,
+  final String username,
+      accountName,
       accountPic,
       callNumber,
       whatsappNumber,
@@ -10,6 +11,7 @@ class Product {
 
   Product({
     this.id,
+    this.username,
     this.bussiness,
     this.accountPic,
     this.accountName,
@@ -23,6 +25,7 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
       id: json['id'],
+      username: json['user_name'],
       bussiness: json['bussiness'],
       accountPic: json['account_profile'],
       accountName: json['account_name'],

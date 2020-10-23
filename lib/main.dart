@@ -1,3 +1,8 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:windowshoppi/bloc/PostBloc.dart';
+import 'package:windowshoppi/bloc/PostEvent.dart';
+import 'package:windowshoppi/bloc/PostState.dart';
+import 'package:windowshoppi/models/post.dart';
 import 'package:windowshoppi/navigation_page.dart';
 import 'package:windowshoppi/Overseer.dart';
 import 'package:windowshoppi/Provider.dart';
@@ -5,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:sentry/sentry.dart';
 import 'dart:async';
 import 'dsn.dart';
+import 'package:http/http.dart' as http;
 
 final SentryClient _sentry = new SentryClient(dsn: dsn);
 
@@ -71,6 +77,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.red,
+          brightness: Brightness.light,
         ),
         home: AppNavigation(),
       ),

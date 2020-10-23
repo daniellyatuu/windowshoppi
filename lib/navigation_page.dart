@@ -1,7 +1,8 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+// import 'package:windowshoppi/home/Home.dart';
+import 'package:windowshoppi/home_page/home_page.dart';
 import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:custom_navigator/custom_navigation.dart';
-import 'package:windowshoppi/home_page/home_page.dart';
 import 'package:windowshoppi/explore/explore.dart';
 import 'package:windowshoppi/auth/user_auth.dart';
 import 'package:windowshoppi/search/search.dart';
@@ -20,6 +21,7 @@ class _AppNavigationState extends State<AppNavigation> {
 
   final List<Widget> _children = [
     HomePage(),
+    // Home(),
     Explore(),
     Search(),
     UserAuth(),
@@ -60,30 +62,27 @@ class _AppNavigationState extends State<AppNavigation> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         showUnselectedLabels: true,
-        selectedItemColor: Colors.black,
         onTap: _onTappedBar,
         currentIndex: _currentIndex,
         selectedFontSize: 12.0,
+        selectedItemColor: Colors.red,
+        unselectedItemColor: Colors.grey[600],
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             title: Text('Home'),
-            backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.explore),
             title: Text('Explore'),
-            backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.search),
             title: Text('Search'),
-            backgroundColor: Colors.red,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
             title: Text('Account'),
-            backgroundColor: Colors.red,
           ),
         ],
       ),

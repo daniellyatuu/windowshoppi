@@ -171,10 +171,16 @@ class _EditProfileState extends State<EditProfile> {
                   r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
               RegExp regExp = new RegExp(pattern);
               RegExp regex = new RegExp(pattern);
-              if (value.isEmpty) {
-                return 'email is required';
-              } else if (!regExp.hasMatch(value)) {
-                return 'please enter valid email';
+              // if (value.isEmpty) {
+              //   return 'email is required';
+              // } else if (!regExp.hasMatch(value)) {
+              //   return 'please enter valid email';
+              // }
+
+              if (value.isNotEmpty) {
+                if (!regExp.hasMatch(value)) {
+                  return 'please enter valid email';
+                }
               }
               return null;
             },
@@ -317,6 +323,7 @@ class _EditProfileState extends State<EditProfile> {
     );
 
     var res = json.decode(response.body);
+    print(res);
 
     if (response.statusCode == 200) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
@@ -331,7 +338,7 @@ class _EditProfileState extends State<EditProfile> {
         Navigator.of(context).pop(); // close page
       }
     } else {
-      throw Exception('Failed to register user.');
+      throw Exception('Failed to update user.');
     }
   }
 

@@ -42,6 +42,7 @@ class _SelectCountryState extends State<SelectCountry> {
     if (allRows.length == 0) {
 //      print('step 3: get countries from server');
       final response = await http.get(ALL_COUNTRY_URL);
+      print(response.body);
       if (response.statusCode == 200) {
         var countryData = json.decode(response.body);
 
@@ -165,7 +166,7 @@ class _SelectCountryState extends State<SelectCountry> {
                                 dense: true,
                                 leading: CircleAvatar(
                                   backgroundImage: NetworkImage(
-                                    '$SERVER_NAME${country[index].flag}',
+                                    '${country[index].flag}',
                                   ),
                                 ),
                                 title: Text(
@@ -201,6 +202,7 @@ class _SelectCountryState extends State<SelectCountry> {
               );
             },
           );
+          widget.onCountryChanged();
           if (selectedCountry != null) {
             setState(() {
               _activeCountryLoading = true;
@@ -235,7 +237,7 @@ class _SelectCountryState extends State<SelectCountry> {
                     ? Text('')
                     : activeFlag != ''
                         ? ExtendedImage.network(
-                            SERVER_NAME + activeFlag,
+                            activeFlag,
                             cache: true,
                             loadStateChanged: (ExtendedImageState state) {
                               switch (state.extendedImageLoadState) {
