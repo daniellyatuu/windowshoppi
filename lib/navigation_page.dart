@@ -5,7 +5,7 @@ import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:custom_navigator/custom_navigation.dart';
 import 'package:windowshoppi/explore/explore.dart';
 import 'package:windowshoppi/auth/user_auth.dart';
-import 'package:windowshoppi/search/search.dart';
+import 'package:windowshoppi/search/Search.dart';
 import 'package:windowshoppi/Provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
