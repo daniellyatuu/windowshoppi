@@ -389,7 +389,7 @@ class _ProductListState extends State<ProductList> {
                                   ),
                                 );
                               } else if (allProducts - data.length > 0) {
-                                return Loader1();
+                                return BottomLoader();
                               } else {
                                 return null;
                               }

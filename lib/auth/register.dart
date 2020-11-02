@@ -151,7 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
           child: TextFormField(
             decoration: InputDecoration(
               labelText: 'username',
-              prefixIcon: Icon(Icons.person_outline),
+              prefixIcon: Icon(Icons.alternate_email),
               suffixIcon: _isUsernameLoading
                   ? CupertinoActivityIndicator()
                   : _isUsernameGood
@@ -342,7 +342,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   children: <Widget>[
                     SizedBox(
                       width: 40.0,
-                      child: Image.network('${SERVER_NAME + map.flag}'),
+                      child: Image.network('${map.flag}'),
                     ),
                     SizedBox(
                       width: 15.0,
@@ -621,6 +621,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (_user['response'] == 'success') {
         localStorage.setBool(isRegistered, true);
         localStorage.setString(userToken, _user['token']);
+        localStorage.setString(username, _user['user_name']);
         localStorage.setInt(businessId, _user['business_id']);
         localStorage.setString(businessName, _user['business_name']);
         localStorage.setString(businessLocation, _user['business_location']);
@@ -781,7 +782,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           alignment: Alignment.center,
                           padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
                           child: Text(
-                            'Create a business account',
+                            'Create your account',
                             style: TextStyle(fontSize: 21),
                           ),
                         ),

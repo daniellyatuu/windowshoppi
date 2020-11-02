@@ -325,7 +325,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                                     ),
                                   );
                                 } else if (allProducts - data.length > 0) {
-                                  return Loader1();
+                                  return BottomLoader();
                                 } else {
                                   return null;
                                 }

@@ -1,3 +1,4 @@
+String username = 'user_name';
 String userToken = 'token';
 String businessId = 'business_id';
 String businessName = 'business_name';

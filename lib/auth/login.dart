@@ -51,7 +51,7 @@ class _LoginPageState extends State<LoginPage> {
           child: TextFormField(
             decoration: InputDecoration(
               labelText: 'username',
-              prefixIcon: Icon(Icons.person_outline),
+              prefixIcon: Icon(Icons.alternate_email),
               contentPadding: EdgeInsets.symmetric(
                 vertical: 0.0,
                 horizontal: 10.0,
@@ -269,66 +269,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-//  Widget _buildNotificationWidget() {
-//    return Visibility(
-//      visible: _isNotificationVisible ? true : false,
-//      child: Padding(
-//        padding: const EdgeInsets.only(bottom: 15.0),
-//        child: Container(
-//          decoration: BoxDecoration(
-//            color: Colors.red[400],
-//            borderRadius: BorderRadius.circular(5.0),
-//          ),
-//          width: MediaQuery.of(context).size.width,
-//          child: ListTile(
-//            contentPadding: EdgeInsets.only(left: 10.0),
-//            dense: true,
-//            title: Text('wrong username or password'),
-//            trailing: IconButton(
-//              onPressed: () {
-//                setState(() {
-//                  _isNotificationVisible = false;
-//                });
-//              },
-//              icon: Icon(Icons.clear),
-//            ),
-//          ),
-//        ),
-//      ),
-//    );
-//  }
-
-//  Widget _buildLogoutAlertWidget() {
-//    return Visibility(
-//      visible: _isLogoutVisible ? true : false,
-//      child: Padding(
-//        padding: const EdgeInsets.only(bottom: 15.0),
-//        child: Container(
-//          decoration: BoxDecoration(
-//            color: Colors.teal,
-//            borderRadius: BorderRadius.circular(5.0),
-//          ),
-//          width: MediaQuery.of(context).size.width,
-//          child: ListTile(
-//            contentPadding: EdgeInsets.only(left: 10.0),
-//            dense: true,
-//            leading: Icon(Icons.check, color: Colors.white),
-//            title: Text('logout successfully',
-//                style: TextStyle(color: Colors.white)),
-//            trailing: IconButton(
-//              onPressed: () {
-//                setState(() {
-//                  _isLogoutVisible = false;
-//                });
-//              },
-//              icon: Icon(Icons.clear),
-//            ),
-//          ),
-//        ),
-//      ),
-//    );
-//  }
-
   Future _loginUser(loginInfo) async {
     await Future.delayed(Duration(milliseconds: 300));
     final response = await http.post(
@@ -353,9 +293,11 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     if (response.statusCode == 200) {
+      print(response.body);
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       localStorage.setBool(isRegistered, true);
       localStorage.setString(userToken, _user['token']);
+      localStorage.setString(username, _user['user_name']);
       localStorage.setInt(businessId, _user['business_id']);
       localStorage.setString(businessName, _user['business_name']);
       localStorage.setString(businessLocation, _user['business_location']);

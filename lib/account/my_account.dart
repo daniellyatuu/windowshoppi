@@ -55,7 +55,8 @@ class _MyAccountState extends State<MyAccount>
 
   String postCaptionText;
 
-  String name = '',
+  String activeUserName = '',
+      name = '',
       location = '',
       userPhoneNumber = '',
       userWhatsappNumber = '',
@@ -610,6 +611,7 @@ class _MyAccountState extends State<MyAccount>
     });
 
     SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var _username = localStorage.getString(username);
     var _businessName = localStorage.getString(businessName);
     var _businessLocation = localStorage.getString(businessLocation);
     var _bio = localStorage.getString(bio);
@@ -619,6 +621,7 @@ class _MyAccountState extends State<MyAccount>
     var _userEmailAddress = localStorage.getString(userMail);
 
     setState(() {
+      activeUserName = _username;
       name = _businessName;
       location = _businessLocation;
       userPhoneNumber = _callNumber;
@@ -822,7 +825,8 @@ class _MyAccountState extends State<MyAccount>
         ? Scaffold(
             key: _scaffoldKey,
             appBar: AppBar(
-              title: Text('my account'),
+              title:
+                  isLoading ? Text('windowshoppi') : Text('@' + activeUserName),
             ),
             endDrawer: Drawer(
               child: ListView(

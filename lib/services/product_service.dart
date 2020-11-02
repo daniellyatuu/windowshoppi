@@ -24,7 +24,7 @@ Future<List<Product>> fetchProduct(
   } else {
     newUrl = url;
   }
-
+  print(newUrl);
   final response = await http.get(newUrl);
 
   final result = jsonDecode(response.body);

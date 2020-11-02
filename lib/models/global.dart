@@ -1,7 +1,8 @@
-// const SERVER_NAME = "http://192.168.1.124:8000";
+// const SERVER_NAME = "http://192.168.1.79:8000";
 const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
 const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/";
+const POST_API = "$SERVER_NAME/post/post-list/";
 const ALL_COUNTRY_URL = "$SERVER_NAME/master_data/country/";
 const TOP30_CATEGORY = "$SERVER_NAME/master_data/top30category/";
 const ALL_CATEGORY = "$SERVER_NAME/master_data/allCategory/";
