@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:windowshoppi/models/country.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:http/http.dart' as http;
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 
 class SelectCountry extends StatefulWidget {
   final VoidCallback onCountryChanged;

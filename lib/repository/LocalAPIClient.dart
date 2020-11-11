@@ -1,4 +1,4 @@
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 
 activeCountry() async {
   final dbHelper = DatabaseHelper.instance;

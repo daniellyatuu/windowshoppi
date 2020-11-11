@@ -2,12 +2,11 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/product.dart';
 import 'package:windowshoppi/services/ProductNextUrlCubit.dart';
 import 'package:windowshoppi/services/CountProductsCubit.dart';
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 
 Future<List<Product>> fetchProduct(
     context, url, activeCategory, firstLoading) async {

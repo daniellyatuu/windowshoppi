@@ -139,8 +139,8 @@ class PostBloc extends Bloc<PostEvents, PostStates> {
   Stream<PostStates> mapEventToState(
     PostEvents event,
   ) async* {
-    print('step 1 : bloc');
-    print(event);
+    // print('step 1 : bloc');
+    // print(event);
     if (event is FetchPosts) {
       yield PostLoading();
       try {

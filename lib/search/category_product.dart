@@ -6,7 +6,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:windowshoppi/models/category_model.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/product.dart';
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/products/details/details.dart';

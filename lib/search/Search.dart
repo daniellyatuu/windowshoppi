@@ -18,7 +18,7 @@ import 'package:windowshoppi/products/details/details.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'package:windowshoppi/search/post_search.dart';
 import 'dart:convert';
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 import 'package:windowshoppi/widgets/loader.dart';
 import 'category_product.dart';
 
@@ -635,6 +635,17 @@ class Search extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              FadeRoute(
+                widget: PostSearch(),
+              ),
+            );
+          },
+          icon: Icon(Icons.search),
+        ),
         title: Container(
           padding: EdgeInsets.only(left: 10.0),
           decoration: BoxDecoration(

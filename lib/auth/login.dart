@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
-import 'package:windowshoppi/utilities/constants.dart';
+import 'package:windowshoppi/src/utilities/constants.dart';
 import 'package:windowshoppi/routes/fade_transition.dart';
 import 'discover_account.dart';
 import 'package:http/http.dart' as http;

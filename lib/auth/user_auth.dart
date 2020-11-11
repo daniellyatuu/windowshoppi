@@ -28,10 +28,8 @@ class _UserAuthState extends State<UserAuth> {
               setState(() {
                 switch (index) {
                   case 0:
-                    primaryColor = Colors.red;
                     break;
                   case 1:
-                    primaryColor = Colors.red[600];
                     break;
                 }
               });
@@ -61,7 +59,7 @@ class _UserAuthState extends State<UserAuth> {
   }
 
   _changeStatus(value) async {
-    print(value);
+    // print(value);
     if (value == true) {
       setState(() {
         _fromLogging = true;
@@ -119,7 +117,6 @@ class _UserAuthState extends State<UserAuth> {
             appBar: AppBar(
               title: Text(
                 'windowshoppi',
-                // style: TextStyle(fontFamily: 'Itim'),
               ),
             ),
             body: Center(
