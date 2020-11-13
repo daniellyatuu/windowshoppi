@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -6,6 +8,11 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
+  final _formKey = GlobalKey<FormState>();
+
+  // form data
+  String _userName, _passWord;
+
   Widget _divider() {
     return SizedBox(
       height: 20.0,
@@ -27,15 +34,9 @@ class _LoginState extends State<Login> {
               isDense: true,
             ),
             validator: (value) {
-              if (value.isEmpty) {
+              var data = value.trim();
+              if (data.isEmpty) {
                 return 'username is required';
-              } else if (value.length < 5) {
-                return 'username must be greater than 5 character long';
-              } else {
-                var data = value.trim();
-                if (data.contains(' ')) {
-                  return 'space between username is not required';
-                }
               }
               return null;
             },
@@ -83,19 +84,9 @@ class _LoginState extends State<Login> {
 // //                });
 // //              }
 //             },
-            onSaved: (value) => print(value),
+            onSaved: (value) => _userName = value,
           ),
         ),
-        // Visibility(
-        //   visible: _isUserExists ? true : false,
-        //   child: Padding(
-        //     padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
-        //     child: Text(
-        //       'username already exists',
-        //       style: TextStyle(color: Colors.red[400], fontSize: 12.0),
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
@@ -111,7 +102,7 @@ class _LoginState extends State<Login> {
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
           child: TextFormField(
-            // obscureText: _obscureText,
+            obscureText: _obscureText,
             decoration: InputDecoration(
               labelText: 'Password*',
               prefixIcon: Icon(
@@ -137,16 +128,13 @@ class _LoginState extends State<Login> {
               border: OutlineInputBorder(),
               isDense: true,
             ),
-
             validator: (value) {
               if (value.isEmpty) {
                 return 'password is required';
-              } else if (value.length < 4) {
-                return 'password must be greater than 4 character long';
               }
               return null;
             },
-            onSaved: (value) => print(value),
+            onSaved: (value) => _passWord = value,
           ),
         ),
       ],
@@ -180,27 +168,101 @@ class _LoginState extends State<Login> {
   }
 
   Widget _buildLoginBtn() {
-    return Container(
-      width: double.infinity,
-      child: AbsorbPointer(
-        absorbing: false,
-        // absorbing: _isSubmitting ? true : false,
-        child: OutlineButton(
-          splashColor: Colors.red,
-          onPressed: () {
-            print('submit');
-          },
-          child: Text('LOGIN'),
-        ),
+    return BlocConsumer<LoginBloc, LoginStates>(
+      listener: (context, LoginStates state) async {
+        print(state);
+        if (state is LoginFormSubmitting) {
+          return showDialog(
+            useRootNavigator: false,
+            context: context,
+            builder: (dialogContext) => Material(
+              type: MaterialType.transparency,
+              child: Center(
+                // Aligns the container to center
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      'Please wait..',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        } else if (state is ValidAccount) {
+          await Future.delayed(Duration(milliseconds: 500), () {
+            Navigator.of(context).pop();
+
+            BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn());
+          });
+        } else if (state is InvalidAccount) {
+          await Future.delayed(Duration(milliseconds: 500), () {
+            Navigator.of(context).pop();
+            _notification(
+                'wrong username or password', Colors.black, Colors.red);
+          });
+        }
+      },
+      builder: (context, LoginStates state) {
+        return Container(
+          width: double.infinity,
+          child: OutlineButton(
+            splashColor: Colors.red,
+            onPressed: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+
+              if (_formKey.currentState.validate()) {
+                _formKey.currentState.save();
+                dynamic loginInfo = {
+                  'username': _userName,
+                  'password': _passWord,
+                };
+
+                BlocProvider.of<LoginBloc>(context)
+                    .add(UserLogin(data: loginInfo));
+              }
+            },
+            child: Text('LOGIN'),
+          ),
+        );
+      },
+    );
+  }
+
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
       ),
     );
+    Scaffold.of(context).showSnackBar(snackBar);
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Form(
-        // key: _loginFormKey,
+        key: _formKey,
         child: ListView(
           shrinkWrap: true,
           physics: BouncingScrollPhysics(),
@@ -228,15 +290,11 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   _divider(),
-                  // _buildLogoutAlertWidget(),
-                  // _buildNotificationWidget(),
                   _buildUsernameTF(),
                   _divider(),
                   _buildPasswordTF(),
                   _buildForgotPasswordBtn(),
                   _buildLoginBtn(),
-//                          _buildSignWithText(),
-//                          _buildSocialBtnRow(),
                 ],
               ),
             ),

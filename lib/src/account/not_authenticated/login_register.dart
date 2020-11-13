@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 
 class LoginRegister extends StatefulWidget {
+  final bool registerIsActive;
+  LoginRegister({@required this.registerIsActive});
+
   @override
   _LoginRegisterState createState() => _LoginRegisterState();
 }
@@ -14,6 +17,15 @@ class _LoginRegisterState extends State<LoginRegister> {
     setState(() {
       _registerIsActive = !_registerIsActive;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    setState(() {
+      _registerIsActive = widget.registerIsActive;
+    });
+
+    super.didChangeDependencies();
   }
 
   @override
@@ -74,7 +86,7 @@ class _LoginRegisterState extends State<LoginRegister> {
                     transitionType: SharedAxisTransitionType.horizontal,
                   );
                 },
-                child: _registerIsActive ? Register() : Login(),
+                child: _registerIsActive ? RegisterInit() : LoginInit(),
               ),
             ),
           ],

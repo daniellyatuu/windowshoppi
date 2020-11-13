@@ -9,26 +9,17 @@ class UserAccount extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('@username'),
-      ),
-      endDrawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            GestureDetector(
-              onTap: () {
-                BlocProvider.of<AuthenticationBloc>(context)
-                    .add(UserLoggedOut());
-              },
-              child: Card(
-                child: ListTile(
-                  dense: true,
-                  title: Text('LOGOUT'),
-                ),
-              ),
-            )
-          ],
+        title: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+          builder: (context, state) {
+            if (state is IsAuthenticated) {
+              return Text("@${state.user.username}");
+            } else {
+              return Container();
+            }
+          },
         ),
       ),
+      endDrawer: UserEndDrawer(),
       body: DefaultTabController(
         length: 2,
         child: NestedScrollView(
@@ -36,7 +27,7 @@ class UserAccount extends StatelessWidget {
           headerSliverBuilder: (context, isScrolled) {
             return [
               SliverAppBar(
-                backgroundColor: Colors.grey[100],
+                backgroundColor: Colors.white,
                 automaticallyImplyLeading: false,
                 collapsedHeight: MediaQuery.of(context).size.height / 4,
                 expandedHeight: MediaQuery.of(context).size.height / 4,

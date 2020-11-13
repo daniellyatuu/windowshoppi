@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
-class Register extends StatelessWidget {
+class RegisterInit extends StatelessWidget {
   final CountryRepository countryRepository = CountryRepository(
     countryAPIClient: CountryAPIClient(
       httpClient: http.Client(),

@@ -5,8 +5,10 @@ import 'package:windowshoppi/Overseer.dart';
 import 'package:windowshoppi/Provider.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry/sentry.dart';
+import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'dart:async';
 import 'dsn.dart';
+import 'package:http/http.dart' as http;
 
 final SentryClient _sentry = new SentryClient(dsn: dsn);
 
@@ -66,13 +68,23 @@ Future<Null> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final AuthenticationRepository authenticationRepository =
+      AuthenticationRepository(
+    authenticationAPIClient: AuthenticationAPIClient(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Provider(
       data: Overseer(),
-      child: BlocProvider(
-        create: (context) =>
-            AuthenticationBloc()..add(CheckUserLoggedInStatus()),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>(
+            create: (context) => AuthenticationBloc(
+                authenticationRepository: authenticationRepository)
+              ..add(CheckUserLoggedInStatus()),
+          ),
+        ],
         child: MaterialApp(
           theme: ThemeData(
             primarySwatch: Colors.red,

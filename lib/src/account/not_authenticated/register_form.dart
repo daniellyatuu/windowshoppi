@@ -321,48 +321,9 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  // void showAlert(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (dialogContext) => Material(
-  //       type: MaterialType.transparency,
-  //       child: Center(
-  //         // Aligns the container to center
-  //         child: Column(
-  //           mainAxisAlignment: MainAxisAlignment.center,
-  //           children: [
-  //             GestureDetector(
-  //               onTap: () {
-  //                 Navigator.of(dialogContext).pop();
-  //               },
-  //               child: SizedBox(
-  //                 width: 40,
-  //                 height: 40,
-  //                 child: CircularProgressIndicator(),
-  //               ),
-  //             ),
-  //             SizedBox(
-  //               height: 10.0,
-  //             ),
-  //             Text(
-  //               'Saving..',
-  //               style: TextStyle(
-  //                 color: Colors.white,
-  //                 fontSize: 16.0,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ],
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildRegisterBtn() {
     return BlocConsumer<RegistrationBloc, RegistrationStates>(
       listener: (context, RegistrationStates state) async {
-        print(state);
         if (state is FormSubmitting) {
           return showDialog(
             useRootNavigator: false,
@@ -374,15 +335,10 @@ class _RegisterFormState extends State<RegisterForm> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(dialogContext).pop();
-                      },
-                      child: SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(),
-                      ),
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(),
                     ),
                     SizedBox(
                       height: 10.0,
@@ -410,10 +366,8 @@ class _RegisterFormState extends State<RegisterForm> {
         } else if (state is FormSubmitted) {
           await Future.delayed(Duration(milliseconds: 500), () {
             Navigator.of(context).pop();
-            // BlocProvider.of<AuthenticationBloc>(context)
-            //     .add(CheckUserLoggedInStatus()),
-            BlocProvider.of<AuthenticationBloc>(context)
-                .add(CheckUserLoggedInStatus());
+
+            BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn());
           });
         }
       },

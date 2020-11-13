@@ -13,5 +13,7 @@ const BUSINESS_INFO = "$SERVER_NAME/business/";
 const VALIDATE_USERNAME = "$SERVER_NAME/validate/";
 const REGISTER_USER = "$SERVER_NAME/register/";
 const LOGIN_USER = "$SERVER_NAME/login/";
+const USER_LOGIN = "$SERVER_NAME/user-login/";
 const UPDATE_PROFILE = "$SERVER_NAME/update/";
 const UPDATE_POST = "$SERVER_NAME/post/update-post/";
+const USER_DATA = "$SERVER_NAME/user-data/";
