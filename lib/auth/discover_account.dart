@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:windowshoppi/utilities/constants.dart';
+import 'package:windowshoppi/src/utilities/constants.dart';
 
 class DiscoverAccount extends StatefulWidget {
   @override

@@ -11,13 +11,6 @@ class SearchArea extends StatefulWidget {
 class _SearchAreaState extends State<SearchArea> {
   final _controller = TextEditingController();
 
-  void _searchedKeyword(value) {
-    print('inside');
-    final bloc = Provider.of<SearchKeywordBloc>(context);
-    print('ype');
-    bloc.setKeyword(value);
-  }
-
   @override
   void dispose() {
     _controller.dispose();
@@ -44,12 +37,8 @@ class _SearchAreaState extends State<SearchArea> {
             ),
             onChanged: (value) {
               bloc.setKeyword(value);
-              // _searchedKeyword(value);
-              bloc.searchedKeyword.listen((event) {
-                print('inside onChange = ' + event);
-              });
-              // BlocProvider.of<PostBloc>(context)
-              //     .add(FetchPosts(keyword: value));
+              BlocProvider.of<PostBloc>(context)
+                  .add(FetchPosts(keyword: value));
             },
           ),
         ),
@@ -61,9 +50,7 @@ class _SearchAreaState extends State<SearchArea> {
                 onPressed: () {
                   _controller.clear();
                   bloc.setKeyword('');
-                  // BlocProvider.of<PostBloc>(context).add(ResetPosts());
-                  // BlocProvider.of<PostBloc>(context)
-                  //     .add(FetchPosts(city: 'Los Angeles'));
+                  BlocProvider.of<PostBloc>(context).add(ResetPosts());
                 },
                 icon: Icon(Icons.clear),
               ),

@@ -1,14 +1,14 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:windowshoppi/home/Home.dart';
 import 'package:windowshoppi/home_page/home_page.dart';
 import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:custom_navigator/custom_navigation.dart';
 import 'package:windowshoppi/explore/explore.dart';
-import 'package:windowshoppi/auth/user_auth.dart';
 import 'package:windowshoppi/search/Search.dart';
 import 'package:windowshoppi/Provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:windowshoppi/src/account/account_files.dart';
 
 class AppNavigation extends StatefulWidget {
   @override
@@ -24,7 +24,9 @@ class _AppNavigationState extends State<AppNavigation> {
     // Home(),
     Explore(),
     Search(),
-    UserAuth(),
+    // UserAuth(),
+    // LoginRegister(),
+    Account(),
   ];
 
   void _onTappedBar(int index) {

@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:windowshoppi/location/flutter_google_places.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:windowshoppi/models/category_model.dart';
-import 'package:windowshoppi/models/country.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/models/global.dart';
 import 'package:windowshoppi/models/local_storage_keys.dart';
-import 'package:windowshoppi/utilities/constants.dart';
+import 'package:windowshoppi/src/utilities/constants.dart';
 import 'dart:async';
 import 'package:http/http.dart' as http;
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 

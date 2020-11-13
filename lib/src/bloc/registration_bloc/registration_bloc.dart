@@ -11,8 +11,6 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
 
   @override
   Stream<RegistrationStates> mapEventToState(RegistrationEvents event) async* {
-    print('step 1 : bloc');
-    print(event);
     if (event is SaveUserData) {
       yield FormSubmitting();
       final userData = await registrationRepository.registerUser(event.data);
@@ -21,15 +19,6 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
       } else if (userData == 'success') {
         yield FormSubmitted();
       }
-
-      print('after save');
-      // try {
-      //   final List<Country> country = await countryRepository.getCountry();
-      //   yield CountryLoaded(country: country);
-      // } catch (error) {
-      //   print(error);
-      //   yield CountryError();
-      // }
     }
   }
 }

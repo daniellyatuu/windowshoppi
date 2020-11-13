@@ -73,7 +73,6 @@ class DatabaseHelper {
 
   /// get active country
   Future getActiveCountryFromUserTable() async {
-//    print('step 5: inside db, get active id country');
     Database db = await instance.database;
     var _countryId = await db
         .rawQuery("SELECT $table_1ColumnCountryId FROM $table_1 LIMIT 1");
@@ -81,7 +80,6 @@ class DatabaseHelper {
     if (_countryId.length != 0) {
       // select country data
       var activeCountry = await getCountry(_countryId[0]['active_country_id']);
-//      print('step 7: pass to front page returned country');
       return activeCountry;
     } else {
       return null;

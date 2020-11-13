@@ -9,7 +9,7 @@ import 'package:windowshoppi/models/local_storage_keys.dart';
 import 'package:windowshoppi/products/details/bottom_section.dart';
 import 'package:windowshoppi/drawer/app_drawer.dart';
 import 'package:windowshoppi/myappbar/select_country.dart';
-import 'package:windowshoppi/utilities/database_helper.dart';
+import 'package:windowshoppi/src/utilities/database_helper.dart';
 import 'package:windowshoppi/widgets/loader.dart';
 import 'top_section.dart';
 import 'post_section.dart';

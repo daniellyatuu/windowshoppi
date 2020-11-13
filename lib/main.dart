@@ -1,13 +1,11 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:windowshoppi/bloc/PostBloc.dart';
-import 'package:windowshoppi/bloc/PostEvent.dart';
-import 'package:windowshoppi/bloc/PostState.dart';
-import 'package:windowshoppi/models/post.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/navigation_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/Overseer.dart';
 import 'package:windowshoppi/Provider.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry/sentry.dart';
+import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'dart:async';
 import 'dsn.dart';
 import 'package:http/http.dart' as http;
@@ -70,16 +68,30 @@ Future<Null> main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final AuthenticationRepository authenticationRepository =
+      AuthenticationRepository(
+    authenticationAPIClient: AuthenticationAPIClient(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Provider(
       data: Overseer(),
-      child: MaterialApp(
-        theme: ThemeData(
-          primarySwatch: Colors.red,
-          brightness: Brightness.light,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthenticationBloc>(
+            create: (context) => AuthenticationBloc(
+                authenticationRepository: authenticationRepository)
+              ..add(CheckUserLoggedInStatus()),
+          ),
+        ],
+        child: MaterialApp(
+          theme: ThemeData(
+            primarySwatch: Colors.red,
+            brightness: Brightness.light,
+          ),
+          home: AppNavigation(),
         ),
-        home: AppNavigation(),
       ),
     );
   }
