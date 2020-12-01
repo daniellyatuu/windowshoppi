@@ -1,78 +1,76 @@
 import 'package:equatable/equatable.dart';
 
 class User extends Equatable {
-  final int id;
+  final int userId;
+  final int accountId;
+  final int contactId;
   final String username;
   final String firstName;
   final String lastName;
   final String email;
-  final List<UserBusiness> userBusiness;
-  final List<PhoneNumber> phoneNumber;
+  final String accountName;
+  final String group;
+  final String profileImage;
+  final String accountBio;
+  final String businessBio;
+  final String businessLocation;
+  final String call;
+  final String whatsapp;
 
   const User({
-    this.id,
+    this.userId,
+    this.accountId,
+    this.contactId,
     this.username,
     this.firstName,
     this.lastName,
     this.email,
-    this.userBusiness,
-    this.phoneNumber,
+    this.accountName,
+    this.group,
+    this.profileImage,
+    this.accountBio,
+    this.businessBio,
+    this.businessLocation,
+    this.call,
+    this.whatsapp,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
+      userId: json['user_id'],
+      accountId: json['account_id'],
+      contactId: json['contact_id'],
       username: json['username'],
       firstName: json['first_name'],
       lastName: json['last_name'],
       email: json['email'],
-      userBusiness: (json['user_business'] as List)
-          .map((i) => UserBusiness.fromJson(i))
-          .toList(),
-      phoneNumber: (json['phone_numbers'] as List)
-          .map((i) => PhoneNumber.fromJson(i))
-          .toList(),
+      accountName: json['account_name'],
+      group: json['group'],
+      profileImage: json['profile_image'],
+      accountBio: json['account_bio'],
+      businessBio: json['business_bio'],
+      businessLocation: json['location_name'],
+      call: json['call'],
+      whatsapp: json['whatsapp'],
     );
   }
 
   @override
   List<Object> get props => [
-        id,
+        userId,
+        accountId,
+        contactId,
         username,
         firstName,
         lastName,
         email,
-        userBusiness,
-        phoneNumber,
+        accountName,
+        group,
+        profileImage,
+        accountBio,
+        businessBio,
+        businessLocation,
+        call,
+        whatsapp,
       ];
-}
-
-class UserBusiness {
-  final String name;
-  final String bio;
-  final String location;
-
-  UserBusiness({this.name, this.bio, this.location});
-
-  factory UserBusiness.fromJson(Map<String, dynamic> json) {
-    return UserBusiness(
-      name: json['name'],
-      bio: json['bio'],
-      location: json['user_business'],
-    );
-  }
-}
-
-class PhoneNumber {
-  final String callNumber;
-  final String whatsappNumber;
-
-  PhoneNumber({this.callNumber, this.whatsappNumber});
-
-  factory PhoneNumber.fromJson(Map<String, dynamic> json) {
-    return PhoneNumber(
-      callNumber: json['call'],
-      whatsappNumber: json['whatsapp'],
-    );
-  }
 }

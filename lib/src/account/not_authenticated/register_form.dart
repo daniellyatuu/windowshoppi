@@ -10,17 +10,15 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-  var country = new List<Country>();
-
   final _formKey = GlobalKey<FormState>();
 
   // form data
-  String _accountName,
+  String _firstName,
+      _lastName,
       _phoneNumber,
       _userName,
       _passWord,
-      _emailAddress,
-      _country;
+      _emailAddress;
 
   Widget _divider() {
     return SizedBox(
@@ -28,26 +26,43 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Widget _buildAccountNameTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        TextFormField(
-          decoration: InputDecoration(
-            prefixIcon: Icon(Icons.account_circle, color: Colors.black54),
-            labelText: 'Account name*',
-            border: OutlineInputBorder(),
-            isDense: true,
-          ),
-          validator: (value) {
-            if (value.isEmpty) {
-              return 'account name is required';
-            }
-            return null;
-          },
-          onSaved: (value) => _accountName = value,
+  Widget _buildFirstNameTF() {
+    return Expanded(
+      child: TextFormField(
+        decoration: InputDecoration(
+          // prefixIcon: Icon(Icons.account_circle, color: Colors.black54),
+          labelText: 'First Name*',
+          border: OutlineInputBorder(),
+          isDense: true,
         ),
-      ],
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'First name is required';
+          }
+          return null;
+        },
+        onSaved: (value) => _firstName = value,
+      ),
+    );
+  }
+
+  Widget _buildLastNameTF() {
+    return Expanded(
+      child: TextFormField(
+        decoration: InputDecoration(
+          // prefixIcon: Icon(Icons.account_circle, color: Colors.black54),
+          labelText: 'Last Name*',
+          border: OutlineInputBorder(),
+          isDense: true,
+        ),
+        validator: (value) {
+          if (value.isEmpty) {
+            return 'Fast name is required';
+          }
+          return null;
+        },
+        onSaved: (value) => _lastName = value,
+      ),
     );
   }
 
@@ -100,18 +115,25 @@ class _RegisterFormState extends State<RegisterForm> {
               isDense: true,
             ),
             validator: (value) {
+              Pattern pattern = r'^[A-Za-z0-9]+(?:[_][A-Za-z0-9]+)*$';
+              RegExp regex = new RegExp(pattern);
+
               var data = value.trim();
+
               if (data.isEmpty) {
-                return 'username is required';
+                return 'Username is required';
               } else if (data.contains(' ')) {
-                return 'space between username is not required';
+                return 'Space between username is not required';
               } else if (data.contains('-')) {
-                return 'dash is not required in username';
+                return 'Dash is not required in username';
               } else if (data.length < 5) {
-                return 'username must be greater than 5 character long';
+                return 'Username must be greater than 5 character long';
+              } else if (!regex.hasMatch(data)) {
+                return 'Invalid username';
               }
               return null;
             },
+
 //             onChanged: (value) async {
 //               setState(() {
 //                 _isUsernameLoading = true;
@@ -164,7 +186,7 @@ class _RegisterFormState extends State<RegisterForm> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(10, 5, 0, 0),
             child: Text(
-              'username already exists',
+              'Username already exists',
               style: TextStyle(color: Colors.red[400], fontSize: 12.0),
             ),
           ),
@@ -211,10 +233,17 @@ class _RegisterFormState extends State<RegisterForm> {
               isDense: true,
             ),
             validator: (value) {
+              Pattern pattern = r'^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$';
+              RegExp regex = new RegExp(pattern);
+
+              var data = value.trim();
+
               if (value.isEmpty) {
-                return 'password is required';
+                return 'Password is required';
               } else if (value.length < 4) {
-                return 'password must be greater than 4 character long';
+                return 'Password must be greater than 4 character long';
+              } else if (!regex.hasMatch(data)) {
+                return 'Invalid password';
               }
               return null;
             },
@@ -241,7 +270,7 @@ class _RegisterFormState extends State<RegisterForm> {
           child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
-              labelText: 'Email address',
+              labelText: 'Email Address',
               prefixIcon: Icon(
                 Icons.email,
                 color: Colors.black54,
@@ -256,7 +285,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
               if (value.isNotEmpty) {
                 if (!regExp.hasMatch(value)) {
-                  return 'please enter valid email';
+                  return 'Please enter valid email';
                 }
               }
               return null;
@@ -268,64 +297,12 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Widget _buildSelectCountryDropDown() {
-    return Container(
-      decoration: kBoxDecorationStyle,
-      child: ButtonTheme(
-        alignedDropdown: true,
-        child: DropdownButtonFormField<String>(
-          isExpanded: true,
-          isDense: true,
-          hint: Text('Country*'),
-          // value: _activeCountryId,
-          onChanged: (String newValue) {
-            // setState(() {
-            //   _activeCountryId = newValue;
-            // });
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          validator: (value) {
-            if (value == null) {
-              return 'country is required';
-            }
-            return null;
-          },
-          onSaved: (value) => _country = value,
-          decoration: InputDecoration(
-            border: InputBorder.none,
-          ),
-          items: country.map(
-            (Country map) {
-              return DropdownMenuItem<String>(
-                onTap: () {},
-                value: map.id.toString(),
-                child: Row(
-                  children: <Widget>[
-                    SizedBox(
-                      width: 40.0,
-                      child: Image.network('${map.flag}'),
-                    ),
-                    SizedBox(
-                      width: 15.0,
-                    ),
-                    Expanded(
-                      child: Text(map.countryName),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ).toList(),
-        ),
-      ),
-    );
-  }
-
   Widget _buildRegisterBtn() {
     return BlocConsumer<RegistrationBloc, RegistrationStates>(
       listener: (context, RegistrationStates state) async {
         if (state is FormSubmitting) {
           return showDialog(
+            barrierDismissible: false,
             useRootNavigator: false,
             context: context,
             builder: (dialogContext) => Material(
@@ -356,144 +333,130 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ),
           );
+        } else if (state is FormError) {
+          await Future.delayed(Duration(milliseconds: 300), () {
+            Navigator.of(context).pop();
+            _notification(
+                'Error occurred, please try again.', Colors.red, Colors.white);
+          });
         } else if (state is UserExist) {
-          await Future.delayed(Duration(milliseconds: 500), () {
+          await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context).pop();
           });
           setState(() {
             _isUserExists = true;
           });
         } else if (state is FormSubmitted) {
-          await Future.delayed(Duration(milliseconds: 500), () {
-            Navigator.of(context).pop();
-
-            BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn());
-          });
+          BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn(
+              user: state.user,
+              isAlertDialogActive: {'status': true, 'activeDialog': 1}));
         }
       },
       builder: (context, RegistrationStates state) {
         return Container(
           width: double.infinity,
-          child: AbsorbPointer(
-            absorbing: false,
-            // absorbing: _isSubmitting ? true : false,
-            child: OutlineButton(
-              splashColor: Colors.red,
-              onPressed: () {
-                FocusScope.of(context).requestFocus(FocusNode());
+          child: OutlineButton(
+            splashColor: Colors.red,
+            onPressed: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+              if (_formKey.currentState.validate()) {
+                _formKey.currentState.save();
+                dynamic userData = {
+                  'first_name': _firstName,
+                  'last_name': _lastName,
+                  'call': _phoneNumber,
+                  'username': _userName,
+                  'password': _passWord,
+                  if (_emailAddress != '') 'email': _emailAddress,
+                  'group': 4,
+                };
 
-                if (_formKey.currentState.validate()) {
-                  _formKey.currentState.save();
-                  dynamic userData = {
-                    'group': 3,
-                    'name': _accountName,
-                    'call': _phoneNumber,
-                    'username': _userName,
-                    'password': _passWord,
-                    'email': _emailAddress,
-                    'country': _country,
-                  };
-
-                  BlocProvider.of<RegistrationBloc>(context)
-                      .add(SaveUserData(data: userData));
-                }
-              },
-              child: Text('REGISTER'),
-            ),
+                BlocProvider.of<RegistrationBloc>(context)
+                    .add(SaveUserData(data: userData));
+              }
+            },
+            child: Text('REGISTER'),
           ),
         );
       },
     );
   }
 
+  void _notification(String txt, Color bgColor, Color btnColor) {
+    final snackBar = SnackBar(
+      content: Text(txt),
+      backgroundColor: bgColor,
+      action: SnackBarAction(
+        label: 'Hide',
+        textColor: btnColor,
+        onPressed: () {
+          Scaffold.of(context).hideCurrentSnackBar();
+        },
+      ),
+    );
+    Scaffold.of(context).showSnackBar(snackBar);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<CountryBloc, CountryStates>(
-      listener: (context, CountryStates state) {
-        print(state);
-        if (state is CountryLoaded) {
-          country = state.country;
-        }
-      },
-      builder: (context, CountryStates state) {
-        if (state is CountryLoading) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is CountryError) {
-          return Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error,
-                  color: Colors.red,
-                ),
-                Text(
-                  ' Error Occurred',
-                  style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16.0),
-                ),
-              ],
+    return Center(
+      child: ListView(
+        shrinkWrap: true,
+        physics: BouncingScrollPhysics(),
+        children: [
+          Container(
+            padding: EdgeInsets.only(top: 20.0),
+            alignment: Alignment.center,
+            child: Text(
+              'CREATE ACCOUNT',
+              style: Theme.of(context).textTheme.headline6,
             ),
-          );
-        } else if (state is CountryLoaded) {
-          return Center(
-            child: ListView(
-              shrinkWrap: true,
-              physics: BouncingScrollPhysics(),
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 20.0),
-                  alignment: Alignment.center,
-                  child: Text(
-                    'CREATE ACCOUNT',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Enter your details below',
-                    style: TextStyle(
-                      fontSize: 12.0,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ),
-                _divider(),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        _buildAccountNameTF(),
-                        _divider(),
-                        _buildPhoneNumberTF(),
-                        _divider(),
-                        _buildUsernameTF(),
-                        _divider(),
-                        _buildPasswordTF(),
-                        _divider(),
-                        _buildEmailTF(),
-                        _divider(),
-                        _buildSelectCountryDropDown(),
-                        _divider(),
-                        _buildRegisterBtn(),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: Text(
+              'Enter your details below',
+              style: TextStyle(
+                fontSize: 12.0,
+                color: Colors.grey,
+              ),
             ),
-          );
-        }
-        return Text('');
-      },
+          ),
+          _divider(),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Row(
+                    children: [
+                      _buildFirstNameTF(),
+                      SizedBox(
+                        width: 3.0,
+                      ),
+                      _buildLastNameTF(),
+                    ],
+                  ),
+                  _divider(),
+                  _buildPhoneNumberTF(),
+                  _divider(),
+                  _buildUsernameTF(),
+                  _divider(),
+                  _buildPasswordTF(),
+                  _divider(),
+                  _buildEmailTF(),
+                  // _divider(),
+                  // _buildSelectCountryDropDown(),
+                  _divider(),
+                  _buildRegisterBtn(),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

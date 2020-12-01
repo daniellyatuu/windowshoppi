@@ -15,35 +15,49 @@ class AuthenticationBloc
   @override
   Stream<AuthenticationStates> mapEventToState(
       AuthenticationEvents event) async* {
-    yield AuthenticationLoading();
+    if (event is UserLoggedIn) {
+      yield IsAuthenticated(
+          user: event.user,
+          notification: 'login',
+          isAlertDialogActive: event.isAlertDialogActive);
+    } else if (event is UserUpdated) {
+      yield IsAuthenticated(
+          user: event.user,
+          notification: 'update',
+          isAlertDialogActive: event.isAlertDialogActive);
+    } else {
+      yield AuthenticationLoading();
 
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-
-    if (event is CheckUserLoggedInStatus) {
-      var token = localStorage.getString('token');
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
       bool isRegistered = localStorage.getBool('isRegistered') ?? false;
 
-      if (token != null) {
-        // get user data
-        final User user = await authenticationRepository.getUser(token);
-        yield IsAuthenticated(user: user, isLoggedIn: false);
-      } else {
+      if (event is CheckUserLoggedInStatus) {
+        var token = localStorage.getString('token');
+
+        if (token != null) {
+          try {
+            // get user
+            final User user = await authenticationRepository.getUser(token);
+
+            yield IsAuthenticated(
+                user: user, isAlertDialogActive: {'status': false});
+          } catch (error) {
+            yield AuthenticationError();
+          }
+        } else {
+          yield IsNotAuthenticated(
+              isAlreadyCreateAccount: isRegistered, logout: false);
+        }
+      } else if (event is UserLoggedOut) {
+        localStorage.remove('token');
+
+        yield IsNotAuthenticated(
+            isAlreadyCreateAccount: isRegistered, logout: true);
+      } else if (event is DeleteToken) {
+        localStorage.remove('token');
         yield IsNotAuthenticated(
             isAlreadyCreateAccount: isRegistered, logout: false);
       }
-    } else if (event is UserLoggedIn) {
-      // GET USER DATA FOR TEMPORARY .START
-      var token = localStorage.getString('token');
-      final User user = await authenticationRepository.getUser(token);
-      // GET USER DATA FOR TEMPORARY .END
-
-      yield IsAuthenticated(user: user, isLoggedIn: true);
-    } else if (event is UserLoggedOut) {
-      bool isRegistered = localStorage.getBool('isRegistered') ?? false;
-      localStorage.remove('token');
-
-      yield IsNotAuthenticated(
-          isAlreadyCreateAccount: isRegistered, logout: true);
     }
   }
 }

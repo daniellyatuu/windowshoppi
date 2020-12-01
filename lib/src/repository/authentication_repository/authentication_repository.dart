@@ -8,7 +8,6 @@ class AuthenticationRepository {
       : assert(authenticationAPIClient != null);
 
   Future getUser(token) {
-    print('step 2 : auth repository');
     return authenticationAPIClient.getUser(token);
   }
 }

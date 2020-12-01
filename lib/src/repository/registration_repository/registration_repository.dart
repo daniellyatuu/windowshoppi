@@ -8,7 +8,6 @@ class RegistrationRepository {
       : assert(registrationAPIClient != null);
 
   Future registerUser(data) {
-    print('step 2 : register repository');
     return registrationAPIClient.registerUser(data);
   }
 }

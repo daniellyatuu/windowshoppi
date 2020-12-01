@@ -6,11 +6,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class RegisterInit extends StatelessWidget {
-  final CountryRepository countryRepository = CountryRepository(
-    countryAPIClient: CountryAPIClient(
-      httpClient: http.Client(),
-    ),
-  );
+  // final CountryRepository countryRepository = CountryRepository(
+  //   countryAPIClient: CountryAPIClient(
+  //     httpClient: http.Client(),
+  //   ),
+  // );
 
   final RegistrationRepository registrationRepository = RegistrationRepository(
     registrationAPIClient: RegistrationAPIClient(),
@@ -20,10 +20,10 @@ class RegisterInit extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<CountryBloc>(
-          create: (context) => CountryBloc(countryRepository: countryRepository)
-            ..add(FetchCountry()),
-        ),
+        // BlocProvider<CountryBloc>(
+        //   create: (context) => CountryBloc(countryRepository: countryRepository)
+        //     ..add(FetchCountry()),
+        // ),
         BlocProvider<RegistrationBloc>(
           create: (context) =>
               RegistrationBloc(registrationRepository: registrationRepository),

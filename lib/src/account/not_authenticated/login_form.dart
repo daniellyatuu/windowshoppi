@@ -170,9 +170,10 @@ class _LoginState extends State<Login> {
   Widget _buildLoginBtn() {
     return BlocConsumer<LoginBloc, LoginStates>(
       listener: (context, LoginStates state) async {
-        print(state);
+        print('FORM STATE = $state');
         if (state is LoginFormSubmitting) {
           return showDialog(
+            barrierDismissible: false,
             useRootNavigator: false,
             context: context,
             builder: (dialogContext) => Material(
@@ -203,14 +204,18 @@ class _LoginState extends State<Login> {
               ),
             ),
           );
-        } else if (state is ValidAccount) {
-          await Future.delayed(Duration(milliseconds: 500), () {
+        } else if (state is LoginFormError) {
+          await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context).pop();
-
-            BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn());
+            _notification(
+                'Sorry, login failed. try again', Colors.red, Colors.black);
           });
+        } else if (state is ValidAccount) {
+          BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn(
+              user: state.user,
+              isAlertDialogActive: {'status': true, 'activeDialog': 1}));
         } else if (state is InvalidAccount) {
-          await Future.delayed(Duration(milliseconds: 500), () {
+          await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context).pop();
             _notification(
                 'wrong username or password', Colors.black, Colors.red);
@@ -228,7 +233,7 @@ class _LoginState extends State<Login> {
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
                 dynamic loginInfo = {
-                  'username': _userName,
+                  'user_name': _userName,
                   'password': _passWord,
                 };
 

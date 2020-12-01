@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:windowshoppi/api.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
 
 class RegistrationAPIClient {
   Future registerUser(data) async {
@@ -14,21 +16,28 @@ class RegistrationAPIClient {
     );
 
     var _user = json.decode(response.body);
-    print(response.statusCode);
-    print(response.body);
 
     if (_user['username'] != null) {
       if (_user['username'][0] == 'user with this username already exists.') {
         return 'user_exists';
       }
-    } else if (response.statusCode == 201) {
+    }
+
+    if (response.statusCode == 201) {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
 
       localStorage.setBool('isRegistered', true);
       localStorage.setString('token', _user['token']);
-      return 'success';
+
+      return compute(_parseUser, response.body);
     } else {
       throw Exception('Failed to register user.');
     }
   }
+}
+
+User _parseUser(String responseData) {
+  final parsed = jsonDecode(responseData);
+
+  return User.fromJson(parsed);
 }
