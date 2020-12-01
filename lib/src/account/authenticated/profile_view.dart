@@ -1,178 +1,240 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
 
 class ProfileView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(5.0),
-      child: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-        builder: (context, state) {
-          if (state is IsAuthenticated) {
-            var data = state.user;
-            return ListView(
+    return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+      builder: (context, state) {
+        if (state is IsAuthenticated) {
+          var data = state.user;
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: Column(
               children: [
-                Row(
-                  children: <Widget>[
-                    CircleAvatar(
-                      radius: 30.0,
-                      backgroundColor: Colors.grey[300],
-                      child: Icon(Icons.store, size: 28, color: Colors.grey),
+                GestureDetector(
+                  onTap: () {
+                    print('change profile picture');
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey[300], width: 2.0),
+                        borderRadius: BorderRadius.circular(8.0),
+                        shape: BoxShape.rectangle,
+                      ),
+                      child: Icon(
+                        Icons.account_box,
+                        color: Colors.grey[300],
+                        size: 70,
+                      ),
                     ),
-                    Expanded(
-                      child: data.userBusiness[0].location != null
-                          ? ListTile(
-                              title: Text('${data.userBusiness[0].name}'),
-                              subtitle:
-                                  Text('${data.userBusiness[0].location}'),
-                              trailing: Column(
-                                children: <Widget>[
-                                  Text(
-                                    '12',
-                                    style: TextStyle(
-                                        fontSize: 22.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      'POSTS',
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
-                          : ListTile(
-                              title: Text('${data.userBusiness[0].name}'),
-                              trailing: Column(
-                                children: <Widget>[
-                                  Text(
-                                    '12',
-                                    style: TextStyle(
-                                        fontSize: 22.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 4.0),
-                                    child: Text(
-                                      'POSTS',
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 15.0,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                    ),
-                  ],
+                  ),
                 ),
-                Padding(
-                  padding: EdgeInsets.all(3.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            CircleAvatar(
-                              backgroundColor: Colors.blue,
-                              radius: 15.0,
-                              child: FaIcon(
-                                FontAwesomeIcons.phone,
-                                size: 15.0,
-                                color: Colors.white,
+                Text(
+                  '${data.accountName}',
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                if (data.group == 'vendor')
+                  if (data.email != null)
+                    Text(
+                      '${data.email}',
+                      style: Theme.of(context).textTheme.bodyText2,
+                    ),
+                if (data.group == 'windowshopper') Divider(),
+                if (data.group == 'vendor')
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Expanded(
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: CircleAvatar(
+                                backgroundColor: Colors.blue,
+                                child: FaIcon(
+                                  FontAwesomeIcons.phone,
+                                  size: 15.0,
+                                  color: Colors.white,
+                                ),
                               ),
+                              title: Text('${data.call}'),
+                              dense: true,
                             ),
-                            SizedBox(
-                              width: 8.0,
-                            ),
-                            Expanded(
-                              child: Text(
-                                '${data.phoneNumber[0].callNumber}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Expanded(
+                            child: ListTile(
+                              contentPadding: EdgeInsets.zero,
+                              leading: CircleAvatar(
+                                backgroundColor: Color(0xFF06B862),
+                                child: FaIcon(
+                                  FontAwesomeIcons.whatsapp,
+                                  size: 18.0,
+                                  color: Colors.white,
+                                ),
                               ),
+                              title: data.whatsapp != null
+                                  ? Text('${data.whatsapp}')
+                                  : WhatsappNumberPopUp(),
+                              dense: true,
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                      Expanded(
-                        child: Row(
-                          children: <Widget>[
-                            CircleAvatar(
-                              backgroundColor: Color(0xFF06B862),
-                              radius: 15.0,
-                              child: FaIcon(
-                                FontAwesomeIcons.whatsapp,
-                                size: 15.0,
-                                color: Colors.white,
-                              ),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.circle,
+                            size: 8.0,
+                          ),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              ' ${data.businessBio}',
+                              style: Theme.of(context).textTheme.bodyText1,
                             ),
-                            SizedBox(
-                              width: 8.0,
-                            ),
-                            Expanded(
-                              child: data.phoneNumber[0].whatsappNumber != null
-                                  ? Text(
-                                      '${data.phoneNumber[0].whatsappNumber}',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  : Text(
-                                      'not specified',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                            )
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
+                      if (data.accountBio != null)
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: ExpandableText(
+                            text: '${data.accountBio}',
+                            trimLines: 3,
+                            readLess: true,
+                          ),
+                        ),
                     ],
                   ),
+                if (data.group == 'windowshopper')
+                  Column(
+                    children: [
+                      if (data.email != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 3.0),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.email,
+                                size: 16,
+                                color: Colors.grey,
+                              ),
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: ' ${data.email}',
+                                    style:
+                                        Theme.of(context).textTheme.bodyText1,
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                          text: ' (private)',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .caption),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 3.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.call,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
+                            Expanded(
+                              child: RichText(
+                                text: TextSpan(
+                                  text: ' ${data.call}',
+                                  style: Theme.of(context).textTheme.bodyText1,
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                        text: ' (private)',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .caption),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (data.accountBio != null)
+                        Container(
+                          alignment: Alignment.centerLeft,
+                          child: ExpandableText(
+                            text: '${data.accountBio}',
+                            trimLines: 3,
+                            readLess: true,
+                          ),
+                        ),
+                    ],
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: OutlineButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  data.group == 'windowshopper'
+                                      ? UpdateProfileInit()
+                                      : VendorUpdateProfileInit(),
+                            ),
+                          );
+                        },
+                        child: Text('edit profile'),
+                      ),
+                    ),
+                    if (data.group == 'windowshopper')
+                      SizedBox(
+                        width: 8.0,
+                      ),
+                    if (data.group == 'windowshopper')
+                      Expanded(
+                        flex: 2,
+                        child: RaisedButton(
+                          color: Colors.teal,
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => IntroScreen(),
+                              ),
+                            );
+                          },
+                          child: Text(
+                            'switch to business account',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                if (data.email != null)
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(top: 5.0),
-                    child: Text(
-                      '${data.email}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                if (data.userBusiness[0].bio != null)
-                  Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: ExpandableText(
-                      text: '${data.userBusiness[0].bio}',
-                      trimLines: 1,
-                      readLess: true,
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                  child: OutlineButton(
-                    padding: EdgeInsets.zero,
-                    splashColor: Colors.red,
-                    onPressed: () {},
-                    child: Text('UPDATE PROFILE'),
-                  ),
-                )
               ],
-            );
-          } else {
-            return Container();
-          }
-        },
-      ),
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }

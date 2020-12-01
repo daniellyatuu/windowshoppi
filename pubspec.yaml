@@ -34,6 +34,9 @@ dependencies:
   equatable: ^1.2.5
   flutter_bloc: ^6.0.6
   provider: ^4.3.2+2
+  animations: ^1.1.2
+  sticky_headers: ^0.1.8+1
+  introduction_screen: ^1.0.9
 
 
 dev_dependencies:
@@ -55,3 +58,4 @@ flutter:
 
   assets:
     - assets/logo/
+    - assets/image/

@@ -44,9 +44,6 @@ class _LoginRegisterState extends State<LoginRegister> {
                       padding: const EdgeInsets.only(right: 2.0),
                       child: RaisedButton(
                         onPressed: _registerIsActive ? null : _togglePage,
-                        // onPressed: () => _page == 'register'
-                        //     ? print('here')
-                        //     : _togglePage('register'),
                         textColor: Theme.of(context).colorScheme.onPrimary,
                         color: Theme.of(context).colorScheme.primary,
                         child: const Text('REGISTER'),
@@ -58,8 +55,6 @@ class _LoginRegisterState extends State<LoginRegister> {
                       padding: const EdgeInsets.only(left: 2.0),
                       child: RaisedButton(
                         onPressed: _registerIsActive ? _togglePage : null,
-                        // onPressed: () =>
-                        //     _page == 'register' ? _togglePage('login') : null,
                         color: Theme.of(context).colorScheme.primary,
                         textColor: Theme.of(context).colorScheme.onPrimary,
                         child: const Text('LOGIN'),

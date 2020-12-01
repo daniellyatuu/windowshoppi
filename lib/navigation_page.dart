@@ -20,10 +20,19 @@ class _AppNavigationState extends State<AppNavigation> {
   bool isLoggedIn = false;
 
   final List<Widget> _children = [
-    HomePage(),
+    // HomePage(),
+    Center(
+      child: Text('Homepage'),
+    ),
     // Home(),
-    Explore(),
-    Search(),
+    // Explore(),
+    Center(
+      child: Text('Explore page'),
+    ),
+    // Search(),
+    Center(
+      child: Text('Search page'),
+    ),
     // UserAuth(),
     // LoginRegister(),
     Account(),

@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:flutter/cupertino.dart';
@@ -5,6 +6,83 @@ import 'package:flutter/material.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 
 class UserAccount extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // Persistent AppBar that never scrolls
+      appBar: AppBar(
+        title: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+          builder: (context, state) {
+            if (state is IsAuthenticated) {
+              return Text("@${state.user.username}");
+            } else {
+              return Container();
+            }
+          },
+        ),
+        centerTitle: true,
+      ),
+      endDrawer: UserEndDrawer(),
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          headerSliverBuilder: (context, _) {
+            return [
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int pdIndex) {
+                    return Column(
+                      children: [
+                        ProfileView(),
+                      ],
+                    );
+                  },
+                  childCount: 1,
+                ),
+              ),
+            ];
+          },
+          // You tab view goes here
+          body: Column(
+            children: <Widget>[
+              TabBar(
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.grey[700],
+                tabs: [
+                  Tab(icon: Icon(Icons.grid_on)),
+                  Tab(icon: Icon(Icons.view_list)),
+                ],
+              ),
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    ListView.builder(
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading: CircleAvatar(),
+                          title: Text('index ${index + 1}'),
+                        );
+                      },
+                      itemCount: 20,
+                    ),
+                    Center(
+                      child: Text('list view'),
+                    ),
+                    // UserPostGridView(),
+                    // UserPostListView(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class UserAccount1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +110,34 @@ class UserAccount extends StatelessWidget {
                 collapsedHeight: MediaQuery.of(context).size.height / 4,
                 expandedHeight: MediaQuery.of(context).size.height / 4,
                 actions: [Container()],
-                flexibleSpace: ProfileView(),
+                flexibleSpace: Container(
+                  color: Colors.teal,
+                  height: 5000,
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 100,
+                      ),
+                      Text('ddf'),
+                    ],
+                  ),
+                ),
+                //     BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                //   builder: (context, state) {
+                //     if (state is IsAuthenticated) {
+                //       var data = state.user;
+                //       if (data.group == 'windowshopper') {
+                //         return VendorProfileView();
+                //       } else if (data.group == 'vendor') {
+                //         return WindowshopperProfileView();
+                //       } else {
+                //         return Container();
+                //       }
+                //     } else {
+                //       return Container();
+                //     }
+                //   },
+                // ),
               ),
               SliverPersistentHeader(
                 delegate: AccountDelegate(
@@ -52,12 +157,8 @@ class UserAccount extends StatelessWidget {
           },
           body: TabBarView(
             children: [
-              Center(
-                child: Text('1'),
-              ),
-              Center(
-                child: Text('2'),
-              ),
+              UserPostGridView(),
+              UserPostListView(),
             ],
           ),
         ),

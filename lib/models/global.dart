@@ -1,4 +1,4 @@
-const SERVER_NAME = "http://192.168.1.83:8000";
+const SERVER_NAME = "http://192.168.1.59:8000";
 // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
 const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/";
