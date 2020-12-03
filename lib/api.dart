@@ -9,6 +9,8 @@ const UPDATE_WINDOWSHOPPER_PROFILE =
 const BUSINESS_ACCOUNT_SWITCH = "$SERVER_NAME/business-account-switch/";
 const UPDATE_VENDOR_PROFILE = "$SERVER_NAME/update-vendor-profile/";
 const CHANGE_PASSWORD = "$SERVER_NAME/change-password/";
+const USER_POST = '$SERVER_NAME/post/user-post/';
+const VENDOR_POST = "$SERVER_NAME/post/vendor/"; // will be removed
 
 const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/";
 const FETCH_POST_API = "$SERVER_NAME/post/post-list/";
@@ -17,7 +19,7 @@ const TOP30_CATEGORY = "$SERVER_NAME/master_data/top30category/";
 const ALL_CATEGORY = "$SERVER_NAME/master_data/allCategory/";
 const CREATE_POST = "$SERVER_NAME/post/create/";
 const SEARCH_POST = "$SERVER_NAME/post/search/";
-const VENDOR_POST = "$SERVER_NAME/post/vendor/";
+
 const BUSINESS_INFO = "$SERVER_NAME/business/";
 const VALIDATE_USERNAME = "$SERVER_NAME/validate/";
 // const USER_LOGIN = "$SERVER_NAME/user-login/";

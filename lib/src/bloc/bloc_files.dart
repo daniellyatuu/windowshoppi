@@ -52,3 +52,8 @@ export 'vendor_profile_update_bloc/vendor_profile_update_states.dart';
 export 'change_password_bloc/change_password_events.dart';
 export 'change_password_bloc/change_password_bloc.dart';
 export 'change_password_bloc/change_password_states.dart';
+
+// bloc files for user post
+export 'user_post_bloc/user_post_events.dart';
+export 'user_post_bloc/user_post_bloc.dart';
+export 'user_post_bloc/user_post_states.dart';

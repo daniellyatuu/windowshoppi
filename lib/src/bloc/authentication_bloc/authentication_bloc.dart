@@ -42,7 +42,12 @@ class AuthenticationBloc
             yield IsAuthenticated(
                 user: user, isAlertDialogActive: {'status': false});
           } catch (error) {
-            yield AuthenticationError();
+            // yield AuthenticationError();
+
+            // if any error happen on authentication, Logout user
+            localStorage.remove('token');
+            yield IsNotAuthenticated(
+                isAlreadyCreateAccount: isRegistered, logout: false);
           }
         } else {
           yield IsNotAuthenticated(

@@ -9,17 +9,14 @@ import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:http/http.dart' as http;
 
 class UserAccountInit extends StatelessWidget {
-  final PostRepository postRepository = PostRepository(
-    postAPIClient: PostAPIClient(
-      httpClient: http.Client(),
-    ),
+  final UserPostRepository userPostRepository = UserPostRepository(
+    userPostAPIClient: UserPostAPIClient(),
   );
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          PostBloc(postRepository: postRepository)..add(PostFetched()),
+    return BlocProvider<UserPostBloc>(
+      create: (context) => UserPostBloc(userPostRepository: userPostRepository),
       child: UserAccount(),
     );
   }
