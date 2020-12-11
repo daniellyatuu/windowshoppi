@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:windowshoppi/api.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
+import 'dart:convert';
 
 class ChangePasswordAPIClient {
   Future changePassword(data) async {
@@ -21,11 +19,7 @@ class ChangePasswordAPIClient {
       body: jsonEncode(data),
     );
 
-    print(response.statusCode);
-    print(response.body);
-
     var _result = json.decode(response.body);
-    print(_result);
 
     if (_result['current_password'] != null) {
       if (_result['current_password'][0] == 'Wrong password.') {

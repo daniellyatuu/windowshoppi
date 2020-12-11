@@ -67,7 +67,7 @@ class _AppNavigationState extends State<AppNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomNavigator(
-        navigatorKey: navigatorKey,
+        // navigatorKey: navigatorKey,
         home: _children[_currentIndex],
         pageRoute: PageRoutes.materialPageRoute,
       ),

@@ -1,5 +1,3 @@
-import 'package:windowshoppi/src/utilities/constants.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';

@@ -10,7 +10,7 @@ class UserPostAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = USER_POST + '$accountId/';
+    var _url = USER_POST + '$accountId/?limit=$limit&offset=$offset';
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -21,9 +21,6 @@ class UserPostAPIClient {
       _url,
       headers: headers,
     );
-
-    print(response.statusCode);
-    print(response.body);
 
     var _post = json.decode(response.body);
 

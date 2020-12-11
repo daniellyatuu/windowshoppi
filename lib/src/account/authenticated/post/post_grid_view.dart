@@ -1,21 +1,54 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class PostGridView extends StatefulWidget {
+  final ScrollController _primaryScrollController;
+  final int accountId;
+
+  PostGridView(this._primaryScrollController, this.accountId);
+
   @override
   _PostGridViewState createState() => _PostGridViewState();
 }
 
 class _PostGridViewState extends State<PostGridView> {
+  final _scrollThreshold = 200.0;
+
+  void _scrollListener() {
+    if (context != null) {
+      final maxScroll = this
+          .widget
+          ._primaryScrollController
+          // ignore: invalid_use_of_protected_member
+          .positions
+          .elementAt(0)
+          .maxScrollExtent;
+      final currentScroll =
+          // ignore: invalid_use_of_protected_member
+          this.widget._primaryScrollController.positions.elementAt(0).pixels;
+
+      if (maxScroll - currentScroll <= _scrollThreshold) {
+        BlocProvider.of<UserPostBloc>(context)
+          ..add(UserPostFetched(accountId: this.widget.accountId));
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.widget._primaryScrollController.addListener(_scrollListener);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UserPostBloc, UserPostStates>(
       listener: (context, state) {
-        print('User Post Listener = $state');
         if (state is InvalidToken) {
           BlocProvider.of<AuthenticationBloc>(context)..add(DeleteToken());
         }
@@ -34,6 +67,7 @@ class _PostGridViewState extends State<PostGridView> {
           );
         } else if (state is UserPostSuccess) {
           var data = state.posts;
+          print(data.length);
 
           if (state.posts.isEmpty) {
             return Center(
@@ -47,7 +81,7 @@ class _PostGridViewState extends State<PostGridView> {
             children: [
               GridView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: ScrollPhysics(),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                 ),
@@ -104,7 +138,7 @@ class _PostGridViewState extends State<PostGridView> {
                               ),
                               padding: EdgeInsets.all(5.0),
                               child: Text(
-                                '1+',
+                                '${data[index].productPhoto.toList().length - 1}+',
                                 style: TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,

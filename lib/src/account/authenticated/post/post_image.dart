@@ -13,6 +13,13 @@ class PostImage extends StatefulWidget {
 
 class _PostImageState extends State<PostImage> {
   int _activePhoto = 1;
+  bool _imageCover = true;
+
+  void _changeImageView() {
+    setState(() {
+      _imageCover = !_imageCover;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +86,7 @@ class _PostImageState extends State<PostImage> {
           bottom: 10.0,
           right: 10.0,
           child: GestureDetector(
-            // onTap: _changeImageView,
+            onTap: _changeImageView,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.0),
@@ -87,18 +94,17 @@ class _PostImageState extends State<PostImage> {
               ),
               padding: EdgeInsets.all(5.0),
               child: Icon(
-                Icons.fullscreen_exit,
+                _imageCover ? Icons.fullscreen_exit : Icons.fullscreen,
                 color: Colors.white,
                 size: 20.0,
               ),
             ),
           ),
         ),
-        Positioned(
-          top: 3.0,
-          right: 6.0,
-          child: GestureDetector(
-            // onTap: _changeImageView,
+        if (widget.postImage.toList().length != 1)
+          Positioned(
+            top: 3.0,
+            right: 6.0,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.0),
@@ -106,7 +112,7 @@ class _PostImageState extends State<PostImage> {
               ),
               padding: EdgeInsets.all(5.0),
               child: Text(
-                '1/2',
+                '$_activePhoto/${widget.postImage.toList().length}',
                 style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -114,7 +120,6 @@ class _PostImageState extends State<PostImage> {
               ),
             ),
           ),
-        ),
       ],
     );
   }

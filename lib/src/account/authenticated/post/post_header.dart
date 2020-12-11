@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class PostHeader extends StatelessWidget {
   @override
@@ -47,14 +46,6 @@ class PostHeader extends StatelessWidget {
                               ),
                             ),
                           ),
-                          // SizedBox(
-                          //   width: MediaQuery.of(context).size.width / 2,
-                          //   child: Text(
-                          //     '${post.businessLocation}',
-                          //     overflow: TextOverflow.ellipsis,
-                          //     style: TextStyle(fontSize: 13.0),
-                          //   ),
-                          // ),
                         ],
                       ),
                     ],

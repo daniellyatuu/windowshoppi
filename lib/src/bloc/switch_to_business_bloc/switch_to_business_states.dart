@@ -1,7 +1,6 @@
+import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
 
 abstract class SwitchToBusinessStates extends Equatable {
   const SwitchToBusinessStates();

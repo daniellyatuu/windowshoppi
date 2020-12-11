@@ -1,7 +1,6 @@
-import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:flutter/foundation.dart';
 import 'package:bloc/bloc.dart';
 
 class VendorProfileUpdateBloc
@@ -21,7 +20,6 @@ class VendorProfileUpdateBloc
         if (_user == 'user_exists') {
           yield VendorProfileUpdateUserExist();
         } else if (_user is User) {
-          final User user = _user;
           yield VendorProfileUpdateFormSubmitted(user: _user);
         }
       } catch (error) {

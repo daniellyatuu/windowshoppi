@@ -27,24 +27,17 @@ class AuthenticationErrorMessage extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: 100,
-          ),
-          FlatButton(
-            // color: Colors.red,
-            onPressed: () {
-              BlocProvider.of<AuthenticationBloc>(context).add(DeleteToken());
-            },
-            child: Text(
-              'click here to login or register again',
-              style: Theme.of(context).textTheme.caption,
-            ),
-          ),
-          // Padding(
-          //   padding: const EdgeInsets.all(8.0),
-          //   child: RaisedButton(
-          //     onPressed: () {},
-          //     child: Text('register or login'),
+          // SizedBox(
+          //   height: 100,
+          // ),
+          // FlatButton(
+          //   // color: Colors.red,
+          //   onPressed: () {
+          //     BlocProvider.of<AuthenticationBloc>(context).add(DeleteToken());
+          //   },
+          //   child: Text(
+          //     'click here to login or register again',
+          //     style: Theme.of(context).textTheme.caption,
           //   ),
           // ),
         ],

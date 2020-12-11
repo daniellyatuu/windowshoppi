@@ -4,12 +4,49 @@ import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 
-class PostListView extends StatelessWidget {
+class PostListView extends StatefulWidget {
+  final ScrollController _primaryScrollController;
+  final int accountId;
+
+  PostListView(this._primaryScrollController, this.accountId);
+
+  @override
+  _PostListViewState createState() => _PostListViewState();
+}
+
+class _PostListViewState extends State<PostListView> {
+  final _scrollThreshold = 300.0;
+
+  void _scrollListener() {
+    if (context != null) {
+      final maxScroll = this
+          .widget
+          ._primaryScrollController
+          // ignore: invalid_use_of_protected_member
+          .positions
+          .elementAt(0)
+          .maxScrollExtent;
+      final currentScroll =
+          // ignore: invalid_use_of_protected_member
+          this.widget._primaryScrollController.positions.elementAt(0).pixels;
+
+      if (maxScroll - currentScroll <= _scrollThreshold) {
+        BlocProvider.of<UserPostBloc>(context)
+          ..add(UserPostFetched(accountId: this.widget.accountId));
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    this.widget._primaryScrollController.addListener(_scrollListener);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<UserPostBloc, UserPostStates>(
       listener: (context, state) {
-        print('User Post Listener = $state');
         if (state is InvalidToken) {
           BlocProvider.of<AuthenticationBloc>(context)..add(DeleteToken());
         }
@@ -36,14 +73,12 @@ class PostListView extends StatelessWidget {
               ),
             );
           }
-
           return ListView(
             children: [
-              ListView.separated(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                separatorBuilder: (context, index) => Divider(),
+              ListView.builder(
                 itemCount: data.length,
+                shrinkWrap: true,
+                physics: ScrollPhysics(),
                 itemBuilder: (context, index) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -58,11 +93,12 @@ class PostListView extends StatelessWidget {
                       PostCaption(
                         caption: data[index].caption,
                       ),
+                      Divider(),
                     ],
                   );
                 },
               ),
-              BottomLoader(),
+              if (!state.hasReachedMax) BottomLoader(),
             ],
           );
         } else {
