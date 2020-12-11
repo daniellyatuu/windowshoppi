@@ -36,3 +36,10 @@ export 'vendor_profile_update_repository/vendor_profile_update_api_client.dart';
 
 // repo files for change password
 export 'change_password_repository/change_password_api_client.dart';
+
+// repo files for user post
+export 'user_post_repository/user_post_repository.dart';
+export 'user_post_repository/user_post_api_client.dart';
+
+// repo files for create post
+export 'create_post_repository/create_post_api_client.dart';

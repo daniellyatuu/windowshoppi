@@ -1,7 +1,6 @@
-import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:flutter/foundation.dart';
 import 'package:bloc/bloc.dart';
 
 class WhatsappNumberBloc

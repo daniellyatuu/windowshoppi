@@ -1,26 +1,36 @@
-import 'dart:math';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sticky_headers/sticky_headers/widget.dart';
-import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:flutter/material.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
-import 'package:http/http.dart' as http;
+import 'package:windowshoppi/src/account/account_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class UserAccountInit extends StatelessWidget {
-  final PostRepository postRepository = PostRepository(
-    postAPIClient: PostAPIClient(
-      httpClient: http.Client(),
-    ),
+  final UserPostRepository userPostRepository = UserPostRepository(
+    userPostAPIClient: UserPostAPIClient(),
   );
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          PostBloc(postRepository: postRepository)..add(PostFetched()),
-      child: UserAccount(),
+    return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+      builder: (context, state) {
+        if (state is IsAuthenticated) {
+          return MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create: (context) =>
+                    UserPostBloc(userPostRepository: userPostRepository)
+                      ..add(UserPostFetched(accountId: state.user.accountId)),
+              ),
+              BlocProvider<ImageSelectionBloc>(
+                create: (context) => ImageSelectionBloc()..add(CheckImage()),
+              ),
+            ],
+            child: UserAccount(),
+          );
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }

@@ -2,38 +2,40 @@ import 'package:equatable/equatable.dart';
 
 class Post extends Equatable {
   final int id;
-  final int business;
+  final String username;
+  final int accountId;
   final String accountName;
-  final String accountPicture;
+  final String accountProfile;
   final String callNumber;
   final String whatsappNumber;
-  final String businessLocation;
   final String caption;
+  final String datePosted;
   final List<Images> productPhoto;
 
   const Post({
     this.id,
-    this.business,
+    this.username,
+    this.accountId,
     this.accountName,
-    this.accountPicture,
+    this.accountProfile,
     this.callNumber,
     this.whatsappNumber,
-    this.businessLocation,
     this.caption,
+    this.datePosted,
     this.productPhoto,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
       id: json['id'],
-      business: json['bussiness'],
+      username: json['username'],
+      accountId: json['account_id'],
       accountName: json['account_name'],
-      accountPicture: json['account_profile'],
+      accountProfile: json['account_profile'],
       callNumber: json['call_number'],
-      whatsappNumber:
-          json['whatsapp_number'] != null ? json['whatsapp_number'] : null,
-      businessLocation: json['business_location'],
+      whatsappNumber: json['whatsapp_number'],
       caption: json['caption'],
+      datePosted: json['date_posted'],
       productPhoto:
           (json['post_photos'] as List).map((i) => Images.fromJson(i)).toList(),
     );
@@ -42,13 +44,14 @@ class Post extends Equatable {
   @override
   List<Object> get props => [
         id,
-        business,
+        username,
+        accountId,
         accountName,
-        accountPicture,
+        accountProfile,
         callNumber,
         whatsappNumber,
-        businessLocation,
         caption,
+        datePosted,
         productPhoto,
       ];
 
