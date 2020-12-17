@@ -48,7 +48,27 @@ export 'image_selection_bloc/image_selection_events.dart';
 export 'image_selection_bloc/image_selection_bloc.dart';
 export 'image_selection_bloc/image_selection_states.dart';
 
-// bloc files for create post bloc
+// bloc files for create post
 export 'create_post_bloc/create_post_events.dart';
 export 'create_post_bloc/create_post_bloc.dart';
 export 'create_post_bloc/create_post_states.dart';
+
+// bloc files for search textfield
+export 'search_textfield_bloc/search_textfield_events.dart';
+export 'search_textfield_bloc/search_textfield_bloc.dart';
+export 'search_textfield_bloc/search_textfield_states.dart';
+
+// bloc files for search post
+export 'search_post_bloc/search_post_events.dart';
+export 'search_post_bloc/search_post_bloc.dart';
+export 'search_post_bloc/search_post_states.dart';
+
+// bloc files for search account
+export 'search_account_bloc/search_account_events.dart';
+export 'search_account_bloc/search_account_bloc.dart';
+export 'search_account_bloc/search_account_states.dart';
+
+// bloc files for delete post
+export 'delete_post_bloc/delete_post_events.dart';
+export 'delete_post_bloc/delete_post_bloc.dart';
+export 'delete_post_bloc/delete_post_states.dart';

@@ -3,6 +3,9 @@ import 'package:equatable/equatable.dart';
 class Post extends Equatable {
   final int id;
   final String username;
+  final String group;
+  final String accountBio;
+  final String businessBio;
   final int accountId;
   final String accountName;
   final String accountProfile;
@@ -15,6 +18,9 @@ class Post extends Equatable {
   const Post({
     this.id,
     this.username,
+    this.group,
+    this.accountBio,
+    this.businessBio,
     this.accountId,
     this.accountName,
     this.accountProfile,
@@ -29,6 +35,9 @@ class Post extends Equatable {
     return Post(
       id: json['id'],
       username: json['username'],
+      group: json['group'],
+      accountBio: json['account_bio'],
+      businessBio: json['business_bio'],
       accountId: json['account_id'],
       accountName: json['account_name'],
       accountProfile: json['account_profile'],
@@ -45,6 +54,9 @@ class Post extends Equatable {
   List<Object> get props => [
         id,
         username,
+        group,
+        accountBio,
+        businessBio,
         accountId,
         accountName,
         accountProfile,

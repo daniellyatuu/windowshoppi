@@ -105,7 +105,7 @@ class _PostCreateState extends State<PostCreate> {
                                       height: 10.0,
                                     ),
                                     Text(
-                                      'Saving..',
+                                      'Posting..',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontSize: 16.0,

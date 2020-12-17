@@ -42,11 +42,12 @@ class ProfileView extends StatelessWidget {
                   style: Theme.of(context).textTheme.headline6,
                 ),
                 if (data.group == 'vendor')
-                  if (data.email != null)
-                    Text(
-                      '${data.email}',
+                  Container(
+                    child: Text(
+                      ' ${data.businessBio}',
                       style: Theme.of(context).textTheme.bodyText2,
                     ),
+                  ),
                 if (data.group == 'windowshopper') Divider(),
                 if (data.group == 'vendor')
                   Column(
@@ -88,27 +89,28 @@ class ProfileView extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.circle,
-                            size: 8.0,
-                          ),
-                          Container(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              ' ${data.businessBio}',
-                              style: Theme.of(context).textTheme.bodyText1,
+                      if (data.email != null)
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.email_outlined,
+                              size: 16.0,
                             ),
-                          ),
-                        ],
-                      ),
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                ' ${data.email}',
+                                style: Theme.of(context).textTheme.bodyText1,
+                              ),
+                            ),
+                          ],
+                        ),
                       if (data.accountBio != null)
                         Container(
                           alignment: Alignment.centerLeft,
                           child: ExpandableText(
                             text: '${data.accountBio}',
-                            trimLines: 3,
+                            trimLines: 5,
                             readLess: true,
                           ),
                         ),
@@ -123,7 +125,7 @@ class ProfileView extends StatelessWidget {
                           child: Row(
                             children: [
                               Icon(
-                                Icons.email,
+                                Icons.email_outlined,
                                 size: 16,
                                 color: Colors.grey,
                               ),

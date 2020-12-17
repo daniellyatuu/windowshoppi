@@ -1,4 +1,4 @@
-const SERVER_NAME = "http://192.168.43.155:8000";
+const SERVER_NAME = "http://192.168.1.10:8000";
 // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
 const REGISTER_USER = "$SERVER_NAME/register/";
@@ -14,14 +14,15 @@ const VENDOR_POST = "$SERVER_NAME/post/vendor/"; // will be removed
 const USER_CREATE_POST = "$SERVER_NAME/post/create-post/";
 const USER_SINGLE_POST_DATA = "$SERVER_NAME/post/post-data/";
 const CREATE_POST = "$SERVER_NAME/post/create/"; // will be removed
+const SEARCH_ACCOUNT_POST = "$SERVER_NAME/post/search-post/";
+const SEARCH_POST = "$SERVER_NAME/post/search/"; // will be removed
+const SEARCH_ACCOUNT = "$SERVER_NAME/account/search-account/";
 
 const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/";
 const FETCH_POST_API = "$SERVER_NAME/post/post-list/";
 const ALL_COUNTRY_URL = "$SERVER_NAME/master_data/country/";
 const TOP30_CATEGORY = "$SERVER_NAME/master_data/top30category/";
 const ALL_CATEGORY = "$SERVER_NAME/master_data/allCategory/";
-
-const SEARCH_POST = "$SERVER_NAME/post/search/";
 
 const BUSINESS_INFO = "$SERVER_NAME/business/";
 const VALIDATE_USERNAME = "$SERVER_NAME/validate/";

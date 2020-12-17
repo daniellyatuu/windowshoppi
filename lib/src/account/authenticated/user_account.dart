@@ -22,11 +22,7 @@ class _UserAccountState extends State<UserAccount> {
             child: PostCreate(),
           );
         } else {
-          return Container(
-            child: Center(
-              child: Text('herer error'),
-            ),
-          );
+          return Container();
         }
       },
     );

@@ -20,13 +20,6 @@ class UserPostSuccess extends UserPostStates {
 
   const UserPostSuccess({this.posts, this.hasReachedMax});
 
-  UserPostSuccess copyWith({List<Post> posts, bool hasReachedMax}) {
-    return UserPostSuccess(
-      posts: posts ?? this.posts,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-    );
-  }
-
   @override
   List<Object> get props => [posts, hasReachedMax];
 

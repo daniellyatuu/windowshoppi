@@ -37,6 +37,12 @@ class _PostListViewState extends State<PostListView> {
     }
   }
 
+  Future<void> refresh() async {
+    BlocProvider.of<UserPostBloc>(context)
+      ..add(UserPostRefresh(accountId: this.widget.accountId));
+    await Future.delayed(Duration(milliseconds: 700));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -73,33 +79,39 @@ class _PostListViewState extends State<PostListView> {
               ),
             );
           }
-          return ListView(
-            children: [
-              ListView.builder(
-                itemCount: data.length,
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-                itemBuilder: (context, index) {
-                  return Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      PostHeader(),
-                      PostImage(
-                        postImage: data[index].productPhoto,
-                      ),
-                      PostButton(),
-                      PostCaption(
-                        caption: data[index].caption,
-                      ),
-                      Divider(),
-                    ],
-                  );
-                },
-              ),
-              if (!state.hasReachedMax) BottomLoader(),
-            ],
+          return RefreshIndicator(
+            onRefresh: refresh,
+            child: ListView(
+              physics: BouncingScrollPhysics(),
+              children: [
+                ListView.builder(
+                  itemCount: data.length,
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  itemBuilder: (context, index) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        PostHeader(
+                          post: data[index],
+                        ),
+                        PostImage(
+                          postImage: data[index].productPhoto,
+                        ),
+                        PostButton(),
+                        PostCaption(
+                          caption: data[index].caption,
+                        ),
+                        Divider(),
+                      ],
+                    );
+                  },
+                ),
+                if (!state.hasReachedMax) BottomLoader(),
+              ],
+            ),
           );
         } else {
           return Container();
