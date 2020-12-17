@@ -3,6 +3,7 @@ import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/utilities/action.dart';
 
 class PostButton extends StatelessWidget {
   @override
@@ -10,70 +11,65 @@ class PostButton extends StatelessWidget {
     return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
         builder: (context, state) {
       if (state is IsAuthenticated) {
+        var data = state.user;
+
         return Padding(
           padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10.0),
-                    child: Column(
+              data.group == 'vendor'
+                  ? Row(
                       children: <Widget>[
-                        InkWell(
-                          onTap: () {
-                            // call(widget.callNo);
-                          },
-                          child: CircleAvatar(
-                            backgroundColor: Colors.blue,
-                            radius: 15.0,
-                            child: FaIcon(
-                              FontAwesomeIcons.phone,
-                              size: 15.0,
-                              color: Colors.white,
-                            ),
+                        Padding(
+                          padding: const EdgeInsets.only(right: 10.0),
+                          child: Column(
+                            children: <Widget>[
+                              InkWell(
+                                onTap: () {
+                                  call(data.call);
+                                },
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.blue,
+                                  radius: 15.0,
+                                  child: FaIcon(
+                                    FontAwesomeIcons.phone,
+                                    size: 15.0,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              Text('call'),
+                            ],
                           ),
                         ),
-                        Text('call'),
-                      ],
-                    ),
-                  ),
-                  if (state.user.whatsapp != null)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: Column(
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              // chat(widget.whatsapp,
-                              //     "Hi there! I have seen your post on windowshoppi");
-                              // AppAvailability.checkAvailability(_packageName)
-                              //     .then((_) async {
-                              //   await chat(widget.whatsapp,
-                              //       "Hi there! I have seen your post on windowshoppi");
-                              // }).catchError((err) {
-                              //   Scaffold.of(context).hideCurrentSnackBar();
-                              //   _notification(
-                              //       'WhatsApp not found', Colors.black, Colors.red);
-                              // });
-                            },
-                            child: CircleAvatar(
-                              backgroundColor: Color(0xFF06B862),
-                              radius: 15.0,
-                              child: FaIcon(
-                                FontAwesomeIcons.whatsapp,
-                                size: 15.0,
-                                color: Colors.white,
-                              ),
+                        if (state.user.whatsapp != null)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 10.0),
+                            child: Column(
+                              children: <Widget>[
+                                InkWell(
+                                  onTap: () {
+                                    chat(data.whatsapp,
+                                        "Hi there! I have seen your post on windowshoppi");
+                                  },
+                                  child: CircleAvatar(
+                                    backgroundColor: Color(0xFF06B862),
+                                    radius: 15.0,
+                                    child: FaIcon(
+                                      FontAwesomeIcons.whatsapp,
+                                      size: 15.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Text('chat'),
+                              ],
                             ),
                           ),
-                          Text('chat'),
-                        ],
-                      ),
-                    ),
-                ],
-              ),
+                      ],
+                    )
+                  : Container(),
               AbsorbPointer(
                 absorbing: false,
                 child: RaisedButton(

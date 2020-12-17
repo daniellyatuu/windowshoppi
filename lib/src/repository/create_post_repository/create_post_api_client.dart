@@ -54,58 +54,25 @@ class CreatePostAPIClient {
 
     if (response.statusCode == 201) {
       String result = await utf8.decoder.bind(response.stream).join();
-      print(result);
+
       var _postResult = json.decode(result);
 
-      print('result was returned');
-
       // get post data
-      // USER_SINGLE_POST_DATA
       int _postId = _postResult['id'];
 
       var _postUrl = USER_SINGLE_POST_DATA + "$_postId/";
-
-      print(_postUrl);
 
       final getPostResponse = await http.get(
         _postUrl,
         headers: {HttpHeaders.authorizationHeader: "Token $token"},
       );
 
-      print(getPostResponse.statusCode);
-      print(getPostResponse.body);
-
       if (getPostResponse.statusCode == 200) {
         return compute(_parseUser, getPostResponse.body);
       } else {
         throw Exception('Error fetching data from server');
       }
-
-      // if (response.statusCode == 200) {
-      //   return compute(parseUser, response.body);
-      // } else {
-      //   throw Exception('Error fetching data from server');
-      // }
-      // var _post = Post.fromJson(jsonDecode(result));
-      // return _post;
     }
-
-    // // listen for response
-    // response.stream.transform(utf8.decoder).listen((result) async {
-    //   print(result);
-    //   return result;
-    //   // if (result == '"success"') {
-    //   //   clearImage(); // remove images
-    //   //   _notification('Post created successfully', Colors.black, Colors.red);
-    //   //   fetchProduct(VENDOR_POST, removeListData = true, firstLoading = true);
-    //   // }
-    // });
-    //
-    // if (response.statusCode == 201) {
-    //   return 'created';
-    // } else {
-    //   return 'error';
-    // }
   }
 }
 

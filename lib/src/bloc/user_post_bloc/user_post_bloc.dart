@@ -23,7 +23,29 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
 
   @override
   Stream<UserPostStates> mapEventToState(UserPostEvents event) async* {
+    int _limit = 21;
     final currentState = state;
+
+    if (event is UserPostRefresh) {
+      if (currentState is UserPostSuccess) {
+        // get new posts
+        final _posts =
+            await userPostRepository.userPost(0, _limit, event.accountId);
+
+        if (_posts == 'invalid_token') {
+          yield InvalidToken();
+        } else if (_posts is List<Post>) {
+          // remove current posts
+          currentState.posts.clear();
+
+          final List<Post> posts = _posts;
+
+          yield UserPostSuccess(
+              posts: posts,
+              hasReachedMax: posts.length < _limit ? true : false);
+        }
+      }
+    }
 
     if (event is UserPostInsert) {
       yield UserPostInitial();
@@ -31,7 +53,7 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
         currentState.posts.insert(0, event.post);
         yield UserPostSuccess(
           posts: currentState.posts,
-          hasReachedMax: false,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
         );
       }
     }
@@ -40,29 +62,30 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
       try {
         if (currentState is UserPostInitial) {
           final _posts =
-              await userPostRepository.userPost(0, 21, event.accountId);
+              await userPostRepository.userPost(0, _limit, event.accountId);
 
           if (_posts == 'invalid_token') {
             yield InvalidToken();
           } else if (_posts is List<Post>) {
             final List<Post> posts = _posts;
-            yield UserPostSuccess(posts: posts, hasReachedMax: false);
+
+            yield UserPostSuccess(
+                posts: posts,
+                hasReachedMax: posts.length < _limit ? true : false);
           }
         }
         if (currentState is UserPostSuccess) {
           final _posts = await userPostRepository.userPost(
-              currentState.posts.length, 21, event.accountId);
+              currentState.posts.length, _limit, event.accountId);
 
           if (_posts == 'invalid_token') {
             yield InvalidToken();
           } else if (_posts is List<Post>) {
             final List<Post> posts = _posts;
-            yield posts.isEmpty
-                ? currentState.copyWith(hasReachedMax: true)
-                : UserPostSuccess(
-                    posts: currentState.posts + posts,
-                    hasReachedMax: false,
-                  );
+            yield UserPostSuccess(
+              posts: currentState.posts + posts,
+              hasReachedMax: posts.length < _limit ? true : false,
+            );
           }
         }
       } catch (_) {

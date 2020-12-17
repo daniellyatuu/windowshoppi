@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 
@@ -39,6 +40,12 @@ class _PostGridViewState extends State<PostGridView> {
     }
   }
 
+  Future<void> refresh() async {
+    BlocProvider.of<UserPostBloc>(context)
+      ..add(UserPostRefresh(accountId: this.widget.accountId));
+    await Future.delayed(Duration(milliseconds: 700));
+  }
+
   @override
   void initState() {
     super.initState();
@@ -67,7 +74,6 @@ class _PostGridViewState extends State<PostGridView> {
           );
         } else if (state is UserPostSuccess) {
           var data = state.posts;
-          print(data.length);
 
           if (state.posts.isEmpty) {
             return Center(
@@ -77,82 +83,92 @@ class _PostGridViewState extends State<PostGridView> {
               ),
             );
           }
-          return ListView(
-            children: [
-              GridView.builder(
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                ),
-                itemCount: data.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () async {},
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: <Widget>[
-                        // data[index].productPhoto[0].filename
-                        ExtendedImage.network(
-                          '${data[index].productPhoto[0].filename}',
-                          cache: true,
-                          loadStateChanged: (ExtendedImageState state) {
-                            switch (state.extendedImageLoadState) {
-                              case LoadState.loading:
-                                return CupertinoActivityIndicator();
-                                break;
+          return RefreshIndicator(
+            onRefresh: refresh,
+            child: ListView(
+              physics: BouncingScrollPhysics(),
+              children: [
+                GridView.builder(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                  ),
+                  itemCount: data.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PostDetail(post: data[index]),
+                          ),
+                        );
+                      },
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          ExtendedImage.network(
+                            '${data[index].productPhoto[0].filename}',
+                            cache: true,
+                            loadStateChanged: (ExtendedImageState state) {
+                              switch (state.extendedImageLoadState) {
+                                case LoadState.loading:
+                                  return CupertinoActivityIndicator();
+                                  break;
 
-                              ///if you don't want override completed widget
-                              ///please return null or state.completedWidget
-                              //return null;
-                              //return state.completedWidget;
-                              case LoadState.completed:
-                                return ExtendedRawImage(
-                                  fit: BoxFit.cover,
-                                  image: state.extendedImageInfo?.image,
-                                );
-                                break;
-                              case LoadState.failed:
-                                // _controller.reset();
-                                return GestureDetector(
-                                  child: Center(
-                                    child: Icon(Icons.refresh),
-                                  ),
-                                  onTap: () {
-                                    state.reLoadImage();
-                                  },
-                                );
-                                break;
-                            }
-                            return null;
-                          },
-                        ),
-                        if (data[index].productPhoto.toList().length != 1)
-                          Positioned(
-                            top: 6.0,
-                            right: 6.0,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5.0),
-                                color: Colors.black.withOpacity(0.5),
-                              ),
-                              padding: EdgeInsets.all(5.0),
-                              child: Text(
-                                '${data[index].productPhoto.toList().length - 1}+',
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10.0),
+                                ///if you don't want override completed widget
+                                ///please return null or state.completedWidget
+                                //return null;
+                                //return state.completedWidget;
+                                case LoadState.completed:
+                                  return ExtendedRawImage(
+                                    fit: BoxFit.cover,
+                                    image: state.extendedImageInfo?.image,
+                                  );
+                                  break;
+                                case LoadState.failed:
+                                  // _controller.reset();
+                                  return GestureDetector(
+                                    child: Center(
+                                      child: Icon(Icons.refresh),
+                                    ),
+                                    onTap: () {
+                                      state.reLoadImage();
+                                    },
+                                  );
+                                  break;
+                              }
+                              return null;
+                            },
+                          ),
+                          if (data[index].productPhoto.toList().length != 1)
+                            Positioned(
+                              top: 6.0,
+                              right: 6.0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  color: Colors.black.withOpacity(0.3),
+                                ),
+                                padding: EdgeInsets.all(5.0),
+                                child: Text(
+                                  '${data[index].productPhoto.toList().length - 1}+',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 10.0),
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              if (!state.hasReachedMax) BottomLoader(),
-            ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+                if (!state.hasReachedMax) BottomLoader(),
+              ],
+            ),
           );
         } else {
           return Container();

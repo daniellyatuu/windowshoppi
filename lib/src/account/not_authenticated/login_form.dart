@@ -170,7 +170,6 @@ class _LoginState extends State<Login> {
   Widget _buildLoginBtn() {
     return BlocConsumer<LoginBloc, LoginStates>(
       listener: (context, LoginStates state) async {
-        print('FORM STATE = $state');
         if (state is LoginFormSubmitting) {
           return showDialog(
             barrierDismissible: false,

@@ -90,7 +90,7 @@ class _PostImageState extends State<PostImage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.0),
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withOpacity(0.3),
               ),
               padding: EdgeInsets.all(5.0),
               child: Icon(
@@ -108,7 +108,7 @@ class _PostImageState extends State<PostImage> {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5.0),
-                color: Colors.black.withOpacity(0.5),
+                color: Colors.black.withOpacity(0.3),
               ),
               padding: EdgeInsets.all(5.0),
               child: Text(

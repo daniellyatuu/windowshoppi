@@ -9,3 +9,6 @@ export 'post_model.dart';
 
 // whatsapp number model
 export 'whatsapp_number_model.dart';
+
+// account model
+export 'account_model.dart';

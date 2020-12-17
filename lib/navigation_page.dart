@@ -3,12 +3,12 @@ import 'package:windowshoppi/home_page/home_page.dart';
 import 'package:windowshoppi/managers/NavigationManager.dart';
 import 'package:custom_navigator/custom_navigation.dart';
 import 'package:windowshoppi/explore/explore.dart';
-import 'package:windowshoppi/search/Search.dart';
 import 'package:windowshoppi/Provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:windowshoppi/src/account/account_files.dart';
+import 'package:windowshoppi/src/search/search_files.dart';
 
 class AppNavigation extends StatefulWidget {
   @override
@@ -29,10 +29,7 @@ class _AppNavigationState extends State<AppNavigation> {
     Center(
       child: Text('Explore page'),
     ),
-    // Search(),
-    Center(
-      child: Text('Search page'),
-    ),
+    Search(),
     // UserAuth(),
     // LoginRegister(),
     Account(),
@@ -67,7 +64,7 @@ class _AppNavigationState extends State<AppNavigation> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomNavigator(
-        // navigatorKey: navigatorKey,
+        navigatorKey: navigatorKey,
         home: _children[_currentIndex],
         pageRoute: PageRoutes.materialPageRoute,
       ),

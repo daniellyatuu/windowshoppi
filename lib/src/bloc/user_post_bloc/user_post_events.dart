@@ -23,3 +23,11 @@ class UserPostInsert extends UserPostEvents {
   @override
   List<Object> get props => [post];
 }
+
+class UserPostRefresh extends UserPostEvents {
+  final int accountId;
+  UserPostRefresh({@required this.accountId});
+
+  @override
+  List<Object> get props => [accountId];
+}

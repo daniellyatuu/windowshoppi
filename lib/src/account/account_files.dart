@@ -33,3 +33,4 @@ export 'authenticated/post/post_caption.dart';
 export 'authenticated/post_view.dart';
 export 'authenticated/post_create.dart';
 export 'authenticated/select_image_button.dart';
+export 'authenticated/post/post_detail.dart';

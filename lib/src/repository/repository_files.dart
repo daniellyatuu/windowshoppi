@@ -43,3 +43,15 @@ export 'user_post_repository/user_post_api_client.dart';
 
 // repo files for create post
 export 'create_post_repository/create_post_api_client.dart';
+
+// repo files for search post
+export 'search_post_repository/search_post_repository.dart';
+export 'search_post_repository/search_post_api_client.dart';
+
+// repo files for search account
+export 'search_account_repository/search_account_repository.dart';
+export 'search_account_repository/search_account_api_client.dart';
+
+// repo files for search account
+export 'search_account_repository/search_account_repository.dart';
+export 'search_account_repository/search_account_api_client.dart';

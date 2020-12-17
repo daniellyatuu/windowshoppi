@@ -5,12 +5,21 @@ import 'package:flutter/material.dart';
 class ExpandableText extends StatefulWidget {
   final String username;
   final String text;
+  final Color widgetColor;
+  final bool textBold;
   final int trimLines;
+  final bool readMore;
   final bool readLess;
-  ExpandableText(
-      {Key key, this.username, this.text, this.trimLines, this.readLess})
-      : assert(text != null),
-        super(key: key);
+  ExpandableText({
+    Key key,
+    this.username,
+    this.text,
+    this.widgetColor = Colors.black,
+    this.textBold = false,
+    this.trimLines,
+    this.readMore = true,
+    this.readLess = true,
+  }) : super(key: key);
 
   @override
   ExpandableTextState createState() => ExpandableTextState();
@@ -25,17 +34,20 @@ class ExpandableTextState extends State<ExpandableText> {
   @override
   Widget build(BuildContext context) {
     final colorClickableText = Colors.red;
-    final widgetColor = Colors.black;
-    TextSpan link = TextSpan(
-        text: _readMore
-            ? "... read more"
-            : widget.readLess
-                ? " read less"
-                : null,
-        style: TextStyle(
-          color: colorClickableText,
-        ),
-        recognizer: TapGestureRecognizer()..onTap = _onTapLink);
+    TextSpan link = widget.readMore
+        ? TextSpan(
+            text: _readMore
+                ? "... read more"
+                : widget.readLess
+                    ? " read less"
+                    : null,
+            style: TextStyle(
+              color: colorClickableText,
+            ),
+            recognizer: TapGestureRecognizer()..onTap = _onTapLink)
+        : TextSpan(
+            text: _readMore ? "...." : null,
+            recognizer: TapGestureRecognizer()..onTap = _onTapLink);
     Widget result = LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         assert(constraints.hasBoundedWidth);
@@ -70,17 +82,31 @@ class ExpandableTextState extends State<ExpandableText> {
         if (textPainter.didExceedMaxLines) {
           textSpan = TextSpan(
             text: _readMore ? widget.text.substring(0, endIndex) : widget.text,
-            style: TextStyle(
-              color: widgetColor,
-            ),
+            style: widget.textBold
+                ? TextStyle(
+                    color: widget.widgetColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.0,
+                  )
+                : TextStyle(
+                    color: widget.widgetColor,
+                    fontSize: 15.0,
+                  ),
             children: <TextSpan>[link],
           );
         } else {
           textSpan = TextSpan(
             text: widget.text,
-            style: TextStyle(
-              color: widgetColor,
-            ),
+            style: widget.textBold
+                ? TextStyle(
+                    color: widget.widgetColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.0,
+                  )
+                : TextStyle(
+                    color: widget.widgetColor,
+                    fontSize: 15.0,
+                  ),
           );
         }
         return RichText(
