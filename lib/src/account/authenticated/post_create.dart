@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:windowshoppi/api.dart';
+import 'package:windowshoppi/location/flutter_google_places.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+
+// to get places detail (lat/lng)
+GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
 
 class PostCreate extends StatefulWidget {
   @override
@@ -10,14 +16,19 @@ class PostCreate extends StatefulWidget {
 
 class _PostCreateState extends State<PostCreate> {
   final _postFormKey = GlobalKey<FormState>();
+  final homeScaffoldKey = GlobalKey<ScaffoldState>();
   String _postCaptionText;
+
+  // for location
+  String _activeLocation;
+  String latitude, longitude;
 
   Widget _buildPostCaption() {
     return Row(
       children: <Widget>[
         Container(
-          width: 40,
-          height: 40,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             color: Colors.grey,
             shape: BoxShape.circle,
@@ -32,8 +43,13 @@ class _PostCreateState extends State<PostCreate> {
             maxLines: null,
             keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
-              hintText: 'Write Caption...',
+              hintText: 'Write Caption',
               border: InputBorder.none,
+            ),
+            style: TextStyle(
+              color: Colors.grey[700],
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -47,6 +63,98 @@ class _PostCreateState extends State<PostCreate> {
       ],
     );
   }
+
+  Widget _buildPostTagLocation() {
+    return Row(
+      children: [
+        Expanded(
+          child: FlatButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+              _searchLocation();
+            },
+            child: Row(
+              children: <Widget>[
+                Icon(Icons.location_on_outlined, size: 30, color: Colors.grey),
+                SizedBox(width: 10.0),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    child: Text(
+                      _activeLocation ?? 'Tag Location',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (_activeLocation != null)
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _activeLocation = null;
+                latitude = null;
+                longitude = null;
+              });
+            },
+            icon: Icon(Icons.clear),
+            color: Colors.black54,
+          ),
+      ],
+    );
+  }
+
+  // LOCATION .START
+  void onError(PlacesAutocompleteResponse response) {
+    homeScaffoldKey.currentState.showSnackBar(
+      SnackBar(content: Text(response.errorMessage)),
+    );
+  }
+
+  Future<void> _searchLocation() async {
+    // show input autocomplete with selected mode
+    // then get the Prediction selected
+    Prediction p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: kGoogleApiKey,
+      onError: onError,
+      mode: Mode.overlay,
+//      mode: _mode,
+//       language: 'en',
+//       components: [Component(Component.country, 'tz')],
+    );
+
+    displayPrediction(p, homeScaffoldKey.currentState);
+  }
+
+  Future<Null> displayPrediction(Prediction p, ScaffoldState scaffold) async {
+    if (p != null) {
+      // get detail (lat/lng)
+      PlacesDetailsResponse detail =
+          await _places.getDetailsByPlaceId(p.placeId);
+      final lat = detail.result.geometry.location.lat;
+      final lng = detail.result.geometry.location.lng;
+      setState(() {
+        _activeLocation = p.description;
+        latitude = lat.toString();
+        longitude = lng.toString();
+      });
+      print(_activeLocation);
+      print(latitude);
+      print(longitude);
+//      scaffold.showSnackBar(
+//        SnackBar(content: Text("${p.description} - $lat/$lng")),
+//      );
+    }
+  }
+  // LOCATION .END
 
   void _notification(String txt, Color bgColor, Color btnColor) {
     final snackBar = SnackBar(
@@ -70,6 +178,7 @@ class _PostCreateState extends State<PostCreate> {
         if (state is ImageSelected) {
           var data = state.resultList;
           return Scaffold(
+            key: homeScaffoldKey,
             appBar: AppBar(
               leading: IconButton(
                 onPressed: () => BlocProvider.of<ImageSelectionBloc>(context)
@@ -87,7 +196,6 @@ class _PostCreateState extends State<PostCreate> {
                         if (state is CreatePostSubmitting) {
                           return showDialog(
                             barrierDismissible: false,
-                            useRootNavigator: false,
                             context: context,
                             builder: (dialogContext) => Material(
                               type: MaterialType.transparency,
@@ -118,11 +226,11 @@ class _PostCreateState extends State<PostCreate> {
                             ),
                           );
                         } else if (state is CreatePostError) {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
                           _notification('Error occurred, please try again.',
                               Colors.red, Colors.white);
                         } else if (state is CreatePostSuccess) {
-                          Navigator.of(context).pop();
+                          Navigator.of(context, rootNavigator: true).pop();
 
                           // add post
                           BlocProvider.of<UserPostBloc>(context)
@@ -137,13 +245,15 @@ class _PostCreateState extends State<PostCreate> {
                         padding: const EdgeInsets.only(right: 10.0),
                         child: GestureDetector(
                           onTap: () async {
-                            print('save post in here');
                             if (_postFormKey.currentState.validate()) {
                               _postFormKey.currentState.save();
 
                               FocusScope.of(context).requestFocus(FocusNode());
 
                               print(_postCaptionText);
+                              print(_activeLocation);
+                              print(latitude);
+                              print(longitude);
                               print(data);
 
                               BlocProvider.of<CreatePostBloc>(context)
@@ -151,6 +261,9 @@ class _PostCreateState extends State<PostCreate> {
                                   CreatePost(
                                     accountId: state.user.accountId,
                                     caption: _postCaptionText,
+                                    location: _activeLocation,
+                                    lat: latitude,
+                                    long: longitude,
                                     resultList: data,
                                   ),
                                 );
@@ -183,6 +296,8 @@ class _PostCreateState extends State<PostCreate> {
                   child: ListView(
                     children: <Widget>[
                       _buildPostCaption(),
+                      Divider(),
+                      _buildPostTagLocation(),
                       Divider(),
                       Container(
                         child: GridView.count(

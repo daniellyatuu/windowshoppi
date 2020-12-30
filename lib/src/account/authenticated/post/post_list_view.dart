@@ -30,7 +30,7 @@ class _PostListViewState extends State<PostListView> {
           // ignore: invalid_use_of_protected_member
           this.widget._primaryScrollController.positions.elementAt(0).pixels;
 
-      if (maxScroll - currentScroll <= _scrollThreshold) {
+      if (maxScroll - currentScroll <= _scrollThreshold && currentScroll > 0) {
         BlocProvider.of<UserPostBloc>(context)
           ..add(UserPostFetched(accountId: this.widget.accountId));
       }
@@ -41,6 +41,13 @@ class _PostListViewState extends State<PostListView> {
     BlocProvider.of<UserPostBloc>(context)
       ..add(UserPostRefresh(accountId: this.widget.accountId));
     await Future.delayed(Duration(milliseconds: 700));
+  }
+
+  void _scrollOnTop() async {
+    if (widget._primaryScrollController.hasClients) {
+      await widget._primaryScrollController.animateTo(0,
+          duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+    }
   }
 
   @override
@@ -81,36 +88,44 @@ class _PostListViewState extends State<PostListView> {
           }
           return RefreshIndicator(
             onRefresh: refresh,
-            child: ListView(
-              physics: BouncingScrollPhysics(),
-              children: [
-                ListView.builder(
-                  itemCount: data.length,
-                  shrinkWrap: true,
-                  physics: ScrollPhysics(),
-                  itemBuilder: (context, index) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        PostHeader(
-                          post: data[index],
-                        ),
-                        PostImage(
-                          postImage: data[index].productPhoto,
-                        ),
-                        PostButton(),
-                        PostCaption(
-                          caption: data[index].caption,
-                        ),
-                        Divider(),
-                      ],
-                    );
-                  },
-                ),
-                if (!state.hasReachedMax) BottomLoader(),
-              ],
+            child: BlocListener<ScrollToTopBloc, ScrollToTopStates>(
+              listener: (context, state) async {
+                if (state is IndexThreeScrollToTop) _scrollOnTop();
+              },
+              child: ListView(
+                physics: BouncingScrollPhysics(),
+                children: [
+                  ListView.builder(
+                    itemCount: data.length,
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          PostHeader(
+                            post: data[index],
+                            from: 'post_list',
+                          ),
+                          PostImage(
+                            postImage: data[index].productPhoto,
+                          ),
+                          AccountPostButton(
+                            post: data[index],
+                          ),
+                          PostCaption(
+                            caption: data[index].caption,
+                          ),
+                          Divider(),
+                        ],
+                      );
+                    },
+                  ),
+                  if (!state.hasReachedMax) BottomLoader(),
+                ],
+              ),
             ),
           );
         } else {

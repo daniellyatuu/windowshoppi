@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
 
 class ExpandableText extends StatefulWidget {
+  final int accountId;
   final String username;
   final String text;
   final Color widgetColor;
@@ -12,6 +14,7 @@ class ExpandableText extends StatefulWidget {
   final bool readLess;
   ExpandableText({
     Key key,
+    this.accountId,
     this.username,
     this.text,
     this.widgetColor = Colors.black,
@@ -114,6 +117,18 @@ class ExpandableTextState extends State<ExpandableText> {
           overflow: TextOverflow.clip,
           text: TextSpan(children: [
             TextSpan(
+              recognizer: TapGestureRecognizer()
+                ..onTap = () {
+                  if (widget.accountId != null)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AccountPageInit(
+                          accountId: widget.accountId,
+                        ),
+                      ),
+                    );
+                },
               text: widget.username != null
                   ? "@" + widget.username + " "
                   : widget.username,

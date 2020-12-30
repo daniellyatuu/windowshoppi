@@ -84,6 +84,9 @@ class MyApp extends StatelessWidget {
                 authenticationRepository: authenticationRepository)
               ..add(CheckUserLoggedInStatus()),
           ),
+          BlocProvider<ScrollToTopBloc>(
+            create: (context) => ScrollToTopBloc(),
+          ),
         ],
         child: MaterialApp(
           theme: ThemeData(

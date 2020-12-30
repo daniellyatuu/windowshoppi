@@ -11,8 +11,14 @@ class CreatePostBloc extends Bloc<CreatePostEvents, CreatePostStates> {
     yield CreatePostSubmitting();
     if (event is CreatePost) {
       try {
-        final Post _post = await CreatePostAPIClient()
-            .createPost(event.accountId, event.caption, event.resultList);
+        final Post _post = await CreatePostAPIClient().createPost(
+          event.accountId,
+          event.caption,
+          event.location,
+          event.lat,
+          event.long,
+          event.resultList,
+        );
 
         if (_post is Post) {
           yield CreatePostSuccess(post: _post);

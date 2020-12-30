@@ -41,6 +41,7 @@ class PostView extends StatelessWidget {
                         PrimaryScrollController.of(context);
 
                     return Column(
+                      mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
                         TabBar(
                           unselectedLabelColor: Colors.grey,

@@ -72,3 +72,23 @@ export 'search_account_bloc/search_account_states.dart';
 export 'delete_post_bloc/delete_post_events.dart';
 export 'delete_post_bloc/delete_post_bloc.dart';
 export 'delete_post_bloc/delete_post_states.dart';
+
+// bloc files for account detail
+export 'account_detail_bloc/account_detail_events.dart';
+export 'account_detail_bloc/account_detail_bloc.dart';
+export 'account_detail_bloc/account_detail_states.dart';
+
+// bloc files for account post
+export 'account_post_bloc/account_post_events.dart';
+export 'account_post_bloc/account_post_bloc.dart';
+export 'account_post_bloc/account_post_states.dart';
+
+// bloc files for all post
+export 'all_post_bloc/all_post_events.dart';
+export 'all_post_bloc/all_post_bloc.dart';
+export 'all_post_bloc/all_post_states.dart';
+
+// bloc files for scroll to top
+export 'scroll_to_top_bloc/scroll_to_top_events.dart';
+export 'scroll_to_top_bloc/scroll_to_top_bloc.dart';
+export 'scroll_to_top_bloc/scroll_to_top_states.dart';

@@ -10,10 +10,16 @@ abstract class CreatePostEvents extends Equatable {
 class CreatePost extends CreatePostEvents {
   final int accountId;
   final String caption;
+  final String location;
+  final String lat;
+  final String long;
   final List<Asset> resultList;
   CreatePost({
     @required this.accountId,
     @required this.caption,
+    @required this.location,
+    @required this.lat,
+    @required this.long,
     @required this.resultList,
   });
 

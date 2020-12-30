@@ -17,6 +17,7 @@ class PostCaption extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
             child: ExpandableText(
+              accountId: state.user.accountId,
               username: state.user.username,
               text: caption,
               trimLines: 5,

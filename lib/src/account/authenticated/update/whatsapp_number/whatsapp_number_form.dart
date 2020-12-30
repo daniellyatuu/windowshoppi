@@ -77,7 +77,7 @@ class _WhatsappNumberFormState extends State<WhatsappNumberForm> {
                           listener: (context, state) {
                             if (state is WhatsappNumberFormSubmitting) {
                               return showDialog(
-                                useRootNavigator: false,
+                                barrierDismissible: false,
                                 context: context,
                                 builder: (dialogContext) => Material(
                                   type: MaterialType.transparency,

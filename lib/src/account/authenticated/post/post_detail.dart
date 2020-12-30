@@ -19,11 +19,16 @@ class _PostDetailState extends State<PostDetail> {
       ),
       body: ListView(
         children: [
-          PostHeader(),
+          PostHeader(
+            post: widget.post,
+            from: 'post_detail',
+          ),
           PostImage(
             postImage: widget.post.productPhoto,
           ),
-          PostButton(),
+          AccountPostButton(
+            post: widget.post,
+          ),
           PostCaption(
             caption: widget.post.caption,
           ),

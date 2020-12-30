@@ -35,10 +35,11 @@ class _AccountState extends State<Account> {
         if (state is IsAuthenticated) {
           if (state.isAlertDialogActive['status'] == true) {
             // close transparent loader
-            int count = 0;
-            Navigator.popUntil(context, (route) {
-              return count++ == state.isAlertDialogActive['activeDialog'];
-            });
+            for (int x = 0;
+                x < state.isAlertDialogActive['activeDialog'];
+                x++) {
+              Navigator.of(context, rootNavigator: x == 0 ? true : false).pop();
+            }
           }
 
           if (state.notification == 'login') {
