@@ -1,3 +1,5 @@
+import 'package:international_phone_input/international_phone_input.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
@@ -11,12 +13,17 @@ class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
 
   // form data
-  String _firstName,
-      _lastName,
-      _phoneNumber,
-      _userName,
-      _passWord,
-      _emailAddress;
+  String _firstName;
+  String _lastName;
+  String _phoneNumber;
+  String _userName;
+  String _passWord;
+  String _emailAddress;
+
+  String initialCountry = 'TZ';
+  PhoneNumber number = PhoneNumber(isoCode: 'TZ');
+  String _enteredPhoneNumber;
+  String _selectedIsoCode;
 
   Widget _divider() {
     return SizedBox(
@@ -68,30 +75,40 @@ class _RegisterFormState extends State<RegisterForm> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(0.0),
-          alignment: Alignment.centerLeft,
-          child: TextFormField(
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.phone, color: Colors.black54),
-              labelText: 'Phone number*',
+        InternationalPhoneNumberInput(
+          inputDecoration: InputDecoration(
+            labelText: 'Phone number*',
               border: OutlineInputBorder(),
-              isDense: true,
-            ),
-            validator: (value) {
-              String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
-              RegExp regExp = new RegExp(pattern);
-              if (value.isEmpty) {
-                return 'phone number is required';
-              } else if (!regExp.hasMatch(value)) {
-                return 'Please enter valid phone number';
-              }
-              return null;
-            },
-            onSaved: (value) => _phoneNumber = value,
+            isDense: true,
           ),
+          onInputChanged: (PhoneNumber number) {
+            print(number.phoneNumber);
+            setState(() {
+              _enteredPhoneNumber = number.phoneNumber;
+              _selectedIsoCode = number.isoCode;
+            });
+          },
+          // onInputValidated: (bool value) {
+          //   // print(value);
+          // },
+          onSaved: (value) => _phoneNumber = _enteredPhoneNumber,
+          selectorConfig: SelectorConfig(
+            selectorType: PhoneInputSelectorType.DIALOG,
+          ),
+          ignoreBlank: false,
+          autoValidateMode: AutovalidateMode.disabled,
+          selectorTextStyle: TextStyle(color: Colors.black),
+          initialValue: number,
+          inputBorder: OutlineInputBorder(),
         ),
+        if (_enteredPhoneNumber != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '$_enteredPhoneNumber',
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
       ],
     );
   }
@@ -301,7 +318,6 @@ class _RegisterFormState extends State<RegisterForm> {
         if (state is FormSubmitting) {
           return showDialog(
             barrierDismissible: false,
-            useRootNavigator: false,
             context: context,
             builder: (dialogContext) => Material(
               type: MaterialType.transparency,
@@ -333,13 +349,13 @@ class _RegisterFormState extends State<RegisterForm> {
           );
         } else if (state is FormError) {
           await Future.delayed(Duration(milliseconds: 300), () {
-            Navigator.of(context).pop();
+            Navigator.of(context, rootNavigator: true).pop();
             _notification(
                 'Error occurred, please try again.', Colors.red, Colors.white);
           });
         } else if (state is UserExist) {
           await Future.delayed(Duration(milliseconds: 300), () {
-            Navigator.of(context).pop();
+            Navigator.of(context, rootNavigator: true).pop();
           });
           setState(() {
             _isUserExists = true;
@@ -363,10 +379,11 @@ class _RegisterFormState extends State<RegisterForm> {
                   'first_name': _firstName,
                   'last_name': _lastName,
                   'call': _phoneNumber,
+                  'call_iso_code': _selectedIsoCode,
                   'username': _userName,
                   'password': _passWord,
                   if (_emailAddress != '') 'email': _emailAddress,
-                  'group': 4,
+                  'group': 'windowshopper',
                 };
 
                 BlocProvider.of<RegistrationBloc>(context)
@@ -381,6 +398,8 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void _notification(String txt, Color bgColor, Color btnColor) {
+    Scaffold.of(context).hideCurrentSnackBar();
+
     final snackBar = SnackBar(
       content: Text(txt),
       backgroundColor: bgColor,

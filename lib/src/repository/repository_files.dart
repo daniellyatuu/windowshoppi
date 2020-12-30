@@ -55,3 +55,17 @@ export 'search_account_repository/search_account_api_client.dart';
 // repo files for search account
 export 'search_account_repository/search_account_repository.dart';
 export 'search_account_repository/search_account_api_client.dart';
+
+// repo files for delete post
+export 'delete_post_repository/delete_post_api_client.dart';
+
+// repo files for account details
+export 'account_detail_repository/account_detail_repository.dart';
+
+// repo files for account post
+export 'account_post_repository/account_post_repository.dart';
+export 'account_post_repository/account_post_api_client.dart';
+
+// repo files for all posts
+export 'all_post_repository/all_post_repository.dart';
+export 'all_post_repository/all_post_api_client.dart';

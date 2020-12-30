@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/search/search_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
@@ -63,8 +64,6 @@ class _SearchedAccountResultState extends State<SearchedAccountResult> {
           } else if (state is SearchAccountSuccess) {
             var data = state.accounts;
 
-            print(data.length);
-
             if (state.accounts.isEmpty) {
               return Center(
                 child: Text(
@@ -85,10 +84,16 @@ class _SearchedAccountResultState extends State<SearchedAccountResult> {
                   itemBuilder: (context, index) {
                     return ListTile(
                       onTap: () {
-                        print('visit page');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AccountPageInit(
+                              accountId: data[index].accountId,
+                            ),
+                          ),
+                        );
                       },
                       dense: true,
-                      trailing: Text('${data[index].accountId}'),
                       leading: Container(
                         width: 45,
                         height: 45,

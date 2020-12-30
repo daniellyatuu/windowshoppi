@@ -325,7 +325,6 @@ class _VendorUpdateProfileFormState extends State<VendorUpdateProfileForm> {
               if (state is VendorProfileUpdateSubmitting) {
                 return showDialog(
                   barrierDismissible: false,
-                  useRootNavigator: false,
                   context: context,
                   builder: (dialogContext) => Material(
                     type: MaterialType.transparency,
@@ -357,13 +356,13 @@ class _VendorUpdateProfileFormState extends State<VendorUpdateProfileForm> {
                 );
               } else if (state is VendorProfileUpdateFormError) {
                 await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                   _notification('Error occurred, please try again.', Colors.red,
                       Colors.white);
                 });
               } else if (state is VendorProfileUpdateUserExist) {
                 await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                 });
                 setState(() {
                   _isUserExists = true;

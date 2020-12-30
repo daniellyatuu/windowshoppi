@@ -76,8 +76,12 @@ class _ExploreState extends State<Explore> {
     } else {
       newUrl = url;
     }
+    print('get data');
+    print(newUrl);
 
     final response = await http.get(newUrl);
+
+    print(response.statusCode);
 
     if (response.statusCode == 200) {
       var productData = json.decode(response.body);

@@ -10,7 +10,7 @@ import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
 
 class CreatePostAPIClient {
-  Future createPost(accountId, caption, imageList) async {
+  Future createPost(accountId, caption, location, lat, long, imageList) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
@@ -48,9 +48,16 @@ class CreatePostAPIClient {
 
     request.fields['account'] = accountId.toString();
     request.fields['caption'] = caption;
+    if (location != null) request.fields['location_name'] = location;
+    if (lat != null) request.fields['latitude'] = lat;
+    if (long != null) request.fields['longitude'] = long;
 
     // send
     var response = await request.send();
+
+    if (response.statusCode == 501) {
+      throw Exception('Error on uploading post');
+    }
 
     if (response.statusCode == 201) {
       String result = await utf8.decoder.bind(response.stream).join();

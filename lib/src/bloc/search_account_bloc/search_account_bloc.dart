@@ -42,27 +42,22 @@ class SearchAccountBloc extends Bloc<SearchAccountEvents, SearchAccountStates> {
     if (event is InitSearchAccountFetched) newKeyword = event.accountKeyword;
 
     if (event is InitSearchAccountFetched && newKeyword != prevKeyword) {
-      print('GET INIT ACCOUNT');
       if (currentState is SearchAccountEmpty) yield SearchAccountInitial();
 
       try {
         final List<Account> _accounts = await searchAccountRepository
             .searchAccount(event.accountKeyword, 0, _limit);
 
-        print(_accounts.length);
         yield SearchAccountSuccess(
             accounts: _accounts,
             hasReachedMax: _accounts.length < _limit ? true : false,
             searchedKeyword: event.accountKeyword);
-        print('save keyword for account in here');
       } catch (_) {
         yield SearchAccountFailure();
       }
     }
 
     if (event is SearchAccountLoadMore && !_hasReachedMax(currentState)) {
-      print('LOAD MORE ACCOUNTS');
-      print(currentState);
       if (currentState is SearchAccountSuccess) {
         final List<Account> _accounts =
             await searchAccountRepository.searchAccount(

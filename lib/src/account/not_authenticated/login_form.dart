@@ -173,7 +173,6 @@ class _LoginState extends State<Login> {
         if (state is LoginFormSubmitting) {
           return showDialog(
             barrierDismissible: false,
-            useRootNavigator: false,
             context: context,
             builder: (dialogContext) => Material(
               type: MaterialType.transparency,
@@ -205,7 +204,7 @@ class _LoginState extends State<Login> {
           );
         } else if (state is LoginFormError) {
           await Future.delayed(Duration(milliseconds: 300), () {
-            Navigator.of(context).pop();
+            Navigator.of(context, rootNavigator: true).pop();
             _notification(
                 'Sorry, login failed. try again', Colors.red, Colors.black);
           });
@@ -215,7 +214,7 @@ class _LoginState extends State<Login> {
               isAlertDialogActive: {'status': true, 'activeDialog': 1}));
         } else if (state is InvalidAccount) {
           await Future.delayed(Duration(milliseconds: 300), () {
-            Navigator.of(context).pop();
+            Navigator.of(context, rootNavigator: true).pop();
             _notification(
                 'wrong username or password', Colors.black, Colors.red);
           });
@@ -248,6 +247,9 @@ class _LoginState extends State<Login> {
   }
 
   void _notification(String txt, Color bgColor, Color btnColor) {
+    // close active snackBar if any before open new one
+    Scaffold.of(context).hideCurrentSnackBar();
+
     final snackBar = SnackBar(
       content: Text(txt),
       backgroundColor: bgColor,

@@ -228,7 +228,6 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
               if (state is WindowshopperProfileUpdateSubmitting) {
                 return showDialog(
                   barrierDismissible: false,
-                  useRootNavigator: false,
                   context: context,
                   builder: (dialogContext) => Material(
                     type: MaterialType.transparency,
@@ -260,13 +259,13 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
                 );
               } else if (state is WindowshopperProfileUpdateFormError) {
                 await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                   _notification('Error occurred, please try again.', Colors.red,
                       Colors.white);
                 });
               } else if (state is WindowshopperProfileUpdateUserExist) {
                 await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                 });
                 setState(() {
                   _isUserExists = true;

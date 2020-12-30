@@ -1,8 +1,10 @@
-const SERVER_NAME = "http://192.168.1.10:8000";
+const SERVER_NAME = "http://192.168.43.155:8000";
 // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
+const kGoogleApiKey = "AIzaSyAQSCSiJMsoMca0n65p0vPv5Em8Uk8FjLQ";
 const REGISTER_USER = "$SERVER_NAME/register/";
-const USER_LOGIN = "$SERVER_NAME/login/";
+const USER_LOGIN = "$SERVER_NAME/user-login/";
+const USER_DATA = "$SERVER_NAME/user-data/";
 const UPDATE_WHATSAPP_NUMBER = "$SERVER_NAME/update-whatsapp-number/";
 const UPDATE_WINDOWSHOPPER_PROFILE =
     "$SERVER_NAME/update-windowshopper-profile/";
@@ -17,16 +19,18 @@ const CREATE_POST = "$SERVER_NAME/post/create/"; // will be removed
 const SEARCH_ACCOUNT_POST = "$SERVER_NAME/post/search-post/";
 const SEARCH_POST = "$SERVER_NAME/post/search/"; // will be removed
 const SEARCH_ACCOUNT = "$SERVER_NAME/account/search-account/";
+const UPDATE_POST = "$SERVER_NAME/post/update-post/";
+const BUSINESS_INFO = "$SERVER_NAME/business/"; // will be removed
+const ACCOUNT_INFO = "$SERVER_NAME/account/";
+const ACCOUNT_POST = "$SERVER_NAME/post/account/";
+const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/"; // will be removed
+const ALL_POST = "$SERVER_NAME/post/post-list/";
 
-const ALL_PRODUCT_URL = "$SERVER_NAME/post/all/";
 const FETCH_POST_API = "$SERVER_NAME/post/post-list/";
 const ALL_COUNTRY_URL = "$SERVER_NAME/master_data/country/";
 const TOP30_CATEGORY = "$SERVER_NAME/master_data/top30category/";
 const ALL_CATEGORY = "$SERVER_NAME/master_data/allCategory/";
 
-const BUSINESS_INFO = "$SERVER_NAME/business/";
 const VALIDATE_USERNAME = "$SERVER_NAME/validate/";
 // const USER_LOGIN = "$SERVER_NAME/user-login/";
 const UPDATE_PROFILE = "$SERVER_NAME/update/";
-const UPDATE_POST = "$SERVER_NAME/post/update-post/";
-const USER_DATA = "$SERVER_NAME/user-data/";

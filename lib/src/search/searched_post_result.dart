@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/search/search_files.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
@@ -66,8 +67,6 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
           } else if (state is SearchPostSuccess) {
             var data = state.posts;
 
-            print(data.length);
-
             if (state.posts.isEmpty) {
               return Center(
                 child: Text(
@@ -104,7 +103,13 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () {
-                                      print('view single post');
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => Detail(
+                                              post: data[index],
+                                            ),
+                                          ));
                                     },
                                     child: Column(
                                       children: [
@@ -215,7 +220,14 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    print('view profile');
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AccountPageInit(
+                                          accountId: data[index].accountId,
+                                        ),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     padding: EdgeInsets.all(5.0),

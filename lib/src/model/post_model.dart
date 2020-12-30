@@ -12,6 +12,7 @@ class Post extends Equatable {
   final String callNumber;
   final String whatsappNumber;
   final String caption;
+  final String taggedLocation;
   final String datePosted;
   final List<Images> productPhoto;
 
@@ -27,6 +28,7 @@ class Post extends Equatable {
     this.callNumber,
     this.whatsappNumber,
     this.caption,
+    this.taggedLocation,
     this.datePosted,
     this.productPhoto,
   });
@@ -44,6 +46,7 @@ class Post extends Equatable {
       callNumber: json['call_number'],
       whatsappNumber: json['whatsapp_number'],
       caption: json['caption'],
+      taggedLocation: json['location_name'],
       datePosted: json['date_posted'],
       productPhoto:
           (json['post_photos'] as List).map((i) => Images.fromJson(i)).toList(),
@@ -63,6 +66,7 @@ class Post extends Equatable {
         callNumber,
         whatsappNumber,
         caption,
+        taggedLocation,
         datePosted,
         productPhoto,
       ];

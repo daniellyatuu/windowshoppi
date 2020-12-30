@@ -239,12 +239,9 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
       width: double.infinity,
       child: BlocListener<ChangePasswordBloc, ChangePasswordStates>(
         listener: (context, state) async {
-          print('LISTENER = $state');
-
           if (state is ChangePasswordFormSubmitting) {
             return showDialog(
               barrierDismissible: false,
-              useRootNavigator: false,
               context: context,
               builder: (dialogContext) => Material(
                 type: MaterialType.transparency,
@@ -276,16 +273,15 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
             );
           } else if (state is InvalidCurrentPassword) {
             await Future.delayed(Duration(milliseconds: 300), () {
-              Navigator.of(context).pop();
+              Navigator.of(context, rootNavigator: true).pop();
               setState(() {
                 _isCurrentPasswordIncorrect = true;
               });
             });
           } else if (state is ChangePasswordFormSubmitted) {
-            int count = 0;
-            Navigator.popUntil(context, (route) {
-              return count++ == 2;
-            });
+            for (int x = 0; x < 2; x++) {
+              Navigator.of(context, rootNavigator: x == 0 ? true : false).pop();
+            }
             _notification('Password changed successfully', Colors.teal);
           } else if (state is ChangePasswordFormError) {
             await Future.delayed(Duration(milliseconds: 300), () {
@@ -340,6 +336,7 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
   }
 
   void _notification(String txt, Color bgColor) {
+    Scaffold.of(context).hideCurrentSnackBar();
     final snackBar = SnackBar(
       content: Text(txt),
       backgroundColor: bgColor,

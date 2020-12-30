@@ -1,14 +1,16 @@
+import 'package:custom_navigation_bar/custom_navigation_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:windowshoppi/auth/user_auth.dart';
 import 'package:windowshoppi/home_page/home_page.dart';
-import 'package:windowshoppi/managers/NavigationManager.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:windowshoppi/src/explore/explore_files.dart';
+import 'package:windowshoppi/src/search/search_files.dart';
 import 'package:custom_navigator/custom_navigation.dart';
-import 'package:windowshoppi/explore/explore.dart';
-import 'package:windowshoppi/Provider.dart';
+import 'package:windowshoppi/src/home/home_files.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:windowshoppi/src/search/search_files.dart';
 
 class AppNavigation extends StatefulWidget {
   @override
@@ -19,19 +21,17 @@ class _AppNavigationState extends State<AppNavigation> {
   int _currentIndex = 0;
   bool isLoggedIn = false;
 
+  // final List<Widget> _children = [
+  //   HomePage(),
+  //   Explore(),
+  //   Search(),
+  //   UserAuth(),
+  // ];
+
   final List<Widget> _children = [
-    // HomePage(),
-    Center(
-      child: Text('Homepage'),
-    ),
-    // Home(),
-    // Explore(),
-    Center(
-      child: Text('Explore page'),
-    ),
+    HomeInit(),
+    ExploreInit(),
     Search(),
-    // UserAuth(),
-    // LoginRegister(),
     Account(),
   ];
 
@@ -39,18 +39,20 @@ class _AppNavigationState extends State<AppNavigation> {
     if (navigatorKey.currentState.canPop()) {
       navigatorKey.currentState.popUntil((route) => route.isFirst);
     } else {
-      NavigationManager manager = Provider.of(context).fetch(NavigationManager);
-      String _top = '';
-      if (index == 0) {
-        _top = 'homeTop';
-      } else if (index == 1) {
-        _top = 'exploreTop';
-      } else if (index == 2) {
-        _top = 'searchTop';
-      } else if (index == 3) {
-        _top = 'accountTop';
-      }
-      manager.changePage(_top);
+      BlocProvider.of<ScrollToTopBloc>(context)..add(ScrollToTop(index: index));
+      // print('scroll page to top');
+      // NavigationManager manager = Provider.of(context).fetch(NavigationManager);
+      // String _top = '';
+      // if (index == 0) {
+      //   _top = 'homeTop';
+      // } else if (index == 1) {
+      //   _top = 'exploreTop';
+      // } else if (index == 2) {
+      //   _top = 'searchTop';
+      // } else if (index == 3) {
+      //   _top = 'accountTop';
+      // }
+      // manager.changePage(_top);
     }
 
     setState(() {
@@ -68,31 +70,31 @@ class _AppNavigationState extends State<AppNavigation> {
         home: _children[_currentIndex],
         pageRoute: PageRoutes.materialPageRoute,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        showUnselectedLabels: true,
-        onTap: _onTappedBar,
-        currentIndex: _currentIndex,
-        selectedFontSize: 12.0,
-        selectedItemColor: Colors.red,
-        unselectedItemColor: Colors.grey[600],
+      bottomNavigationBar: CustomNavigationBar(
+        selectedColor: Color(0xff040307),
+        strokeColor: Color(0x30040307),
+        unSelectedColor: Color(0xffacacac),
+        backgroundColor: Colors.white,
         items: [
-          BottomNavigationBarItem(
+          CustomNavigationBarItem(
             icon: Icon(Icons.home),
             title: Text('Home'),
           ),
-          BottomNavigationBarItem(
+          CustomNavigationBarItem(
             icon: Icon(Icons.explore),
             title: Text('Explore'),
           ),
-          BottomNavigationBarItem(
+          CustomNavigationBarItem(
             icon: FaIcon(FontAwesomeIcons.search),
             title: Text('Search'),
           ),
-          BottomNavigationBarItem(
+          CustomNavigationBarItem(
             icon: Icon(Icons.account_circle),
             title: Text('Account'),
           ),
         ],
+        currentIndex: _currentIndex,
+        onTap: _onTappedBar,
       ),
     );
   }

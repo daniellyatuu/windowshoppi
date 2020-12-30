@@ -271,11 +271,9 @@ class _SwitchToBusinessFormState extends State<SwitchToBusinessForm> {
           var data = state.user;
           return BlocListener<SwitchToBusinessBloc, SwitchToBusinessStates>(
             listener: (context, state) async {
-              print('LISTENER = $state');
               if (state is SwitchToBusinessSubmitting) {
                 return showDialog(
                   barrierDismissible: false,
-                  useRootNavigator: false,
                   context: context,
                   builder: (dialogContext) => Material(
                     type: MaterialType.transparency,
@@ -307,13 +305,13 @@ class _SwitchToBusinessFormState extends State<SwitchToBusinessForm> {
                 );
               } else if (state is SwitchToBusinessFormError) {
                 await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                   _notification('Error occurred, please try again.', Colors.red,
                       Colors.white);
                 });
               } else if (state is SwitchToBusinessUserExist) {
                 await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context, rootNavigator: true).pop();
                 });
                 setState(() {
                   _isUserExists = true;

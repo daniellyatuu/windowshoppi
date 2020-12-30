@@ -58,6 +58,18 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
       }
     }
 
+    if (event is UserPostRemove) {
+      yield UserPostInitial();
+      if (currentState is UserPostSuccess) {
+        currentState.posts.remove(event.post);
+
+        yield UserPostSuccess(
+          posts: currentState.posts,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
     if (event is UserPostFetched && !_hasReachedMax(currentState)) {
       try {
         if (currentState is UserPostInitial) {
