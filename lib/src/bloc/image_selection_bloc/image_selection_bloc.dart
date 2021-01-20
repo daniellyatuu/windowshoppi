@@ -12,7 +12,8 @@ class ImageSelectionBloc
       yield ImageNotSelected();
     } else if (event is SelectImage) {
       if (event.resultList.length != 0) {
-        yield ImageSelected(resultList: event.resultList);
+        yield ImageSelected(
+            resultList: event.resultList, imageUsedFor: event.imageUsedFor);
       } else {
         yield ImageNotSelected();
       }
@@ -21,6 +22,8 @@ class ImageSelectionBloc
       yield ImageNotSelected();
     } else if (event is ImageSelectionError) {
       yield ImageError(error: event.error);
+    } else if (event is EditPost) {
+      yield EditPostActive(post: event.post);
     }
   }
 }

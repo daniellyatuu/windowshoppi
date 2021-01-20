@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/search/search_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class SearchedAccountResult extends StatefulWidget {
   @override
@@ -49,7 +49,7 @@ class _SearchedAccountResultState extends State<SearchedAccountResult> {
       child: BlocBuilder<SearchAccountBloc, SearchAccountStates>(
         builder: (context, state) {
           if (state is SearchAccountEmpty) {
-            return SearchWelcomeText(txt: 'Search for Accounts');
+            return SearchWelcomeText(txt: 'Search Accounts');
           } else if (state is SearchAccountInitial) {
             return Center(
               child: CircularProgressIndicator(),
@@ -98,16 +98,36 @@ class _SearchedAccountResultState extends State<SearchedAccountResult> {
                         width: 45,
                         height: 45,
                         decoration: BoxDecoration(
-                          color: Colors.grey,
+                          color: Colors.grey[200],
                           shape: BoxShape.circle,
                         ),
-                        child: FittedBox(
-                          child: Icon(
-                            Icons.account_circle,
-                            color: Colors.grey[300],
-                          ),
-                        ),
+                        child: data[index].accountProfile != null &&
+                                data[index].accountProfile != ''
+                            ? CircleAvatar(
+                                backgroundColor: Colors.grey[200],
+                                radius: 60.0,
+                                backgroundImage: NetworkImage(
+                                    '${data[index].accountProfile}'),
+                              )
+                            : FittedBox(
+                                child: Icon(Icons.account_circle,
+                                    color: Colors.grey[400]),
+                              ),
                       ),
+                      // leading: Container(
+                      //   width: 45,
+                      //   height: 45,
+                      //   decoration: BoxDecoration(
+                      //     color: Colors.grey,
+                      //     shape: BoxShape.circle,
+                      //   ),
+                      //   child: FittedBox(
+                      //     child: Icon(
+                      //       Icons.account_circle,
+                      //       color: Colors.grey[300],
+                      //     ),
+                      //   ),
+                      // ),
                       title: Text('${data[index].username}'),
                       subtitle: Text('${data[index].accountName}'),
                     );

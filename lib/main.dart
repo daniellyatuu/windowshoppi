@@ -1,14 +1,12 @@
+import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:windowshoppi/navigation_page.dart';
+import 'package:windowshoppi/welcome_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:windowshoppi/Overseer.dart';
-import 'package:windowshoppi/Provider.dart';
+import 'package:windowshoppi/app_root.dart';
 import 'package:flutter/material.dart';
 import 'package:sentry/sentry.dart';
-import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'dart:async';
 import 'dsn.dart';
-import 'package:http/http.dart' as http;
 
 final SentryClient _sentry = new SentryClient(dsn: dsn);
 
@@ -59,9 +57,7 @@ Future<Null> main() async {
   };
 
   runZonedGuarded<Future<Null>>(() async {
-    runApp(
-      MyApp(),
-    );
+    runApp(MyApp());
   }, (error, stackTrace) async {
     await _reportError(error, stackTrace);
   });
@@ -72,30 +68,55 @@ class MyApp extends StatelessWidget {
       AuthenticationRepository(
     authenticationAPIClient: AuthenticationAPIClient(),
   );
-
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      data: Overseer(),
-      child: MultiBlocProvider(
-        providers: [
-          BlocProvider<AuthenticationBloc>(
-            create: (context) => AuthenticationBloc(
-                authenticationRepository: authenticationRepository)
-              ..add(CheckUserLoggedInStatus()),
-          ),
-          BlocProvider<ScrollToTopBloc>(
-            create: (context) => ScrollToTopBloc(),
-          ),
-        ],
-        child: MaterialApp(
-          theme: ThemeData(
-            primarySwatch: Colors.red,
-            brightness: Brightness.light,
-          ),
-          home: AppNavigation(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<UserAppVisitBloc>(
+          create: (context) => UserAppVisitBloc()..add(CheckUserAppVisit()),
         ),
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => AuthenticationBloc(
+              authenticationRepository: authenticationRepository)
+            ..add(CheckUserLoggedInStatus()),
+        ),
+        BlocProvider<ScrollToTopBloc>(
+          create: (context) => ScrollToTopBloc(),
+        ),
+        BlocProvider<CreateProfileBloc>(
+          create: (context) => CreateProfileBloc(),
+        ),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          brightness: Brightness.light,
+        ),
+        home: Root(),
       ),
+    );
+  }
+}
+
+class Root extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<UserAppVisitBloc, UserAppVisitStates>(
+      builder: (context, state) {
+        if (state is UserAppVisitInitial) {
+          return Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        } else if (state is IsNotFirstTime) {
+          return AppRoot();
+        } else if (state is IsFirstTime) {
+          return WelcomeScreen();
+        } else {
+          return Container();
+        }
+      },
     );
   }
 }

@@ -45,7 +45,7 @@ class _SelectImageButtonState extends State<SelectImageButton> {
     if (resultList.length != 0) {
       if (error == 'NoError') {
         BlocProvider.of<ImageSelectionBloc>(context)
-          ..add(SelectImage(resultList: resultList));
+          ..add(SelectImage(resultList: resultList, imageUsedFor: 'post'));
       } else {
         BlocProvider.of<ImageSelectionBloc>(context)
           ..add(ImageSelectionError(error: error));

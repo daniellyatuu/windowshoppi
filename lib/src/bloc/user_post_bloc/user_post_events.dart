@@ -33,6 +33,15 @@ class UserPostRemove extends UserPostEvents {
   List<Object> get props => [post];
 }
 
+class ReplacePost extends UserPostEvents {
+  final Post prevPost;
+  final Post newPost;
+  ReplacePost({this.prevPost, this.newPost});
+
+  @override
+  List<Object> get props => [prevPost, newPost];
+}
+
 class UserPostRefresh extends UserPostEvents {
   final int accountId;
   UserPostRefresh({@required this.accountId});

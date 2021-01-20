@@ -69,3 +69,12 @@ export 'account_post_repository/account_post_api_client.dart';
 // repo files for all posts
 export 'all_post_repository/all_post_repository.dart';
 export 'all_post_repository/all_post_api_client.dart';
+
+// repo files for update post
+export 'update_post_repository/update_post_api_client.dart';
+
+// repo files for create profile
+export 'create_profile_repository/create_profile_api_client.dart';
+
+// repo files for remove profile
+export 'remove_profile_repository/remove_profile_api_client.dart';

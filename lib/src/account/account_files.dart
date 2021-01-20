@@ -16,8 +16,6 @@ export 'not_authenticated/account_post_list_init.dart';
 export 'not_authenticated/account_post_list.dart';
 export 'not_authenticated/post/account_post_grid_view.dart';
 export 'not_authenticated/post/account_post_list_view.dart';
-export 'not_authenticated/post/account_post_detail.dart';
-export 'not_authenticated/post/account_post_button.dart';
 export 'not_authenticated/post/account_post_caption.dart';
 
 // files for authenticated account
@@ -41,10 +39,11 @@ export 'authenticated/post/post_grid_view.dart';
 export 'authenticated/post/post_list_view.dart';
 export 'authenticated/post/post_header.dart';
 export 'authenticated/post/post_image.dart';
-export 'authenticated/post/post_caption.dart';
 export 'authenticated/post_view.dart';
 export 'authenticated/post_create.dart';
 export 'authenticated/select_image_button.dart';
 export 'authenticated/post/post_detail.dart';
 export 'authenticated/post/post_action_button.dart';
 export 'authenticated/update/post/update_post_init.dart';
+export 'authenticated/update/post/update_post_form.dart';
+export 'authenticated/profile_create.dart';

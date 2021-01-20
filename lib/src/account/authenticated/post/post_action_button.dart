@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class PostActionButtonInit extends StatefulWidget {
   final Post post;
@@ -78,12 +77,13 @@ class _PostActionButtonInitState extends State<PostActionButtonInit> {
                 'Post deleted successfully.', Colors.teal, Colors.black);
           } else {
             Navigator.of(context, rootNavigator: true).pop();
-            Navigator.of(context).pop('success');
+            Navigator.of(context).pop('post_deleted_successfully');
           }
         }
       },
       child: PostActionButton(
         post: widget.post,
+        from: widget.from,
       ),
     );
   }
@@ -91,7 +91,8 @@ class _PostActionButtonInitState extends State<PostActionButtonInit> {
 
 class PostActionButton extends StatefulWidget {
   final Post post;
-  PostActionButton({@required this.post});
+  final String from;
+  PostActionButton({@required this.post, @required this.from});
 
   @override
   _PostActionButtonState createState() => _PostActionButtonState();
@@ -101,6 +102,15 @@ class _PostActionButtonState extends State<PostActionButton> {
   _deletePost() async {
     BlocProvider.of<DeletePostBloc>(context)
       ..add(DeletePost(postId: widget.post.id));
+  }
+
+  _editPost() async {
+    if (widget.from == 'post_detail') {
+      Navigator.of(context).pop('edit_post');
+    } else if (widget.from == 'post_list') {
+      BlocProvider.of<ImageSelectionBloc>(context)
+        ..add(EditPost(post: widget.post));
+    }
   }
 
   @override
@@ -123,12 +133,20 @@ class _PostActionButtonState extends State<PostActionButton> {
                       shrinkWrap: true,
                       children: [
                         ListTile(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => UpdatePostInit()));
-                          },
+                          onTap: () => Navigator.of(context).pop('edit'),
+                          // onTap: () {
+                          //   BlocProvider.of<ImageSelectionBloc>(context)
+                          //     ..add(CheckImage());
+                          //   // BlocProvider.of<UserPostBloc>(context)
+                          //   //   ..add(UserPostRefresh(accountId: 94));
+                          //   // Navigator.push(
+                          //   //   context,
+                          //   //   MaterialPageRoute(
+                          //   //     builder: (context) =>
+                          //   //         UpdatePostInit(post: widget.post),
+                          //   //   ),
+                          //   // );
+                          // },
                           dense: true,
                           leading: Icon(Icons.edit),
                           title: Text('Edit'),
@@ -216,6 +234,8 @@ class _PostActionButtonState extends State<PostActionButton> {
                 _deletePost();
               }
             }
+          } else if (postAction == 'edit') {
+            _editPost();
           }
         }
       },

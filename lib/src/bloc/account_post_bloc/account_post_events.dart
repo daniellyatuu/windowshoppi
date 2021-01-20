@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
 
 abstract class AccountPostEvents extends Equatable {
   @override

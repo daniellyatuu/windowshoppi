@@ -41,12 +41,15 @@ class _AccountLoaderState extends State<AccountLoader> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      height: 70,
-                      width: 70,
+                      width: 120,
+                      height: 120,
                       decoration: BoxDecoration(
-                        color: _baseColor,
-                        borderRadius: BorderRadius.circular(8.0),
-                        shape: BoxShape.rectangle,
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: FittedBox(
+                        child:
+                            Icon(Icons.account_circle, color: Colors.grey[400]),
                       ),
                     ),
                   ),

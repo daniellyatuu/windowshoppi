@@ -55,7 +55,7 @@ class DatabaseHelper {
         "CREATE TABLE $table_2($table_2ColumnId INTEGER PRIMARY KEY, $table_2ColumnCountryId INTEGER NOT NULL, $table_2ColumnCountryName TEXT NOT NULL, $table_2ColumnCountryFlag TEXT NOT NULL, $table_2ColumnCountryIos2 NOT NULL, $table_2ColumnCountryLanguage TEXT NOT NULL, $table_2ColumnCountryCode TEXT NOT NULL, $table_2ColumnCountryTimezone TEXT NOT NULL)");
     batch.execute(
         "CREATE TABLE $table_1($table_1ColumnId INTEGER PRIMARY KEY, $table_1ColumnName TEXT NOT NULL, $table_1ColumnCountryId INTEGER NOT NULL, FOREIGN KEY ($table_1ColumnCountryId) REFERENCES $table_2($table_2ColumnId))");
-    List<dynamic> result = await batch.commit();
+    // List<dynamic> result = await batch.commit();
   }
 
   /// save data

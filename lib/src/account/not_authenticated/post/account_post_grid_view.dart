@@ -98,8 +98,7 @@ class _AccountPostGridViewState extends State<AccountPostGridView> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                AccountPostDetail(post: data[index]),
+                            builder: (context) => Detail(post: data[index]),
                           ),
                         );
                       },

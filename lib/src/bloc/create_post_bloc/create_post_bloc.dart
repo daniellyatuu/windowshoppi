@@ -12,12 +12,14 @@ class CreatePostBloc extends Bloc<CreatePostEvents, CreatePostStates> {
     if (event is CreatePost) {
       try {
         final Post _post = await CreatePostAPIClient().createPost(
-          event.accountId,
-          event.caption,
-          event.location,
-          event.lat,
-          event.long,
-          event.resultList,
+          accountId: event.accountId,
+          caption: event.caption,
+          location: event.location,
+          lat: event.lat,
+          long: event.long,
+          url: event.url,
+          urlText: event.urlText,
+          imageList: event.resultList,
         );
 
         if (_post is Post) {
@@ -26,7 +28,6 @@ class CreatePostBloc extends Bloc<CreatePostEvents, CreatePostStates> {
           yield CreatePostError();
         }
       } catch (_) {
-        print(_);
         yield CreatePostError();
       }
     }

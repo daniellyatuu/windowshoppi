@@ -1,6 +1,5 @@
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rxdart/rxdart.dart';
 
 class ScrollToTopBloc extends Bloc<ScrollToTopEvents, ScrollToTopStates> {
   ScrollToTopBloc() : super(ScrollToTopInitial());

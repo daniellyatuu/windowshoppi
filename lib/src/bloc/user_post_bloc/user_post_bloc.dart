@@ -70,6 +70,24 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
       }
     }
 
+    if (event is ReplacePost) {
+      if (currentState is UserPostSuccess) {
+        var prevPostIndex = currentState.posts.indexOf(event.prevPost);
+
+        //remove prevPost
+        currentState.posts.remove(event.prevPost);
+
+        //insert newPost on the index of prevPost
+        currentState.posts.insert(prevPostIndex, event.newPost);
+
+        yield UserPostInitial();
+        yield UserPostSuccess(
+          posts: currentState.posts,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
     if (event is UserPostFetched && !_hasReachedMax(currentState)) {
       try {
         if (currentState is UserPostInitial) {

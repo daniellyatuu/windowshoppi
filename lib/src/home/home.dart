@@ -142,20 +142,22 @@ class _HomeState extends State<Home> {
                                         child: Column(
                                           children: [
                                             if (data[index].group == 'vendor')
-                                              Container(
-                                                alignment: Alignment.centerLeft,
-                                                padding: EdgeInsets.all(5.0),
-                                                color: Colors.black87,
-                                                child: ExpandableText(
-                                                  text:
-                                                      '${data[index].businessBio}',
-                                                  widgetColor: Colors.white,
-                                                  textBold: true,
-                                                  trimLines: 2,
-                                                  readMore: false,
-                                                  readLess: false,
+                                              if (data[index].businessBio != '')
+                                                Container(
+                                                  alignment:
+                                                      Alignment.centerLeft,
+                                                  padding: EdgeInsets.all(5.0),
+                                                  color: Colors.black87,
+                                                  child: ExpandableText(
+                                                    text:
+                                                        '${data[index].businessBio}',
+                                                    widgetColor: Colors.white,
+                                                    textBold: true,
+                                                    trimLines: 2,
+                                                    readMore: false,
+                                                    readLess: false,
+                                                  ),
                                                 ),
-                                              ),
                                             Expanded(
                                               child: Stack(
                                                 fit: StackFit.expand,
@@ -237,66 +239,6 @@ class _HomeState extends State<Home> {
                                                 ],
                                               ),
                                             ),
-                                            Container(
-                                              color: Colors.grey[200],
-                                              alignment: Alignment.centerLeft,
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 5.0),
-                                              child: ExpandableText(
-                                                text: '${data[index].caption}',
-                                                trimLines: 2,
-                                                readMore: false,
-                                                readLess: false,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) =>
-                                                AccountPageInit(
-                                              accountId: data[index].accountId,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(5.0),
-                                        alignment: Alignment.centerLeft,
-                                        color: Colors.grey[200],
-                                        child: Row(
-                                          children: <Widget>[
-                                            Container(
-                                              width: 25,
-                                              height: 25,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: FittedBox(
-                                                child: Icon(
-                                                  Icons.account_circle,
-                                                  color: Colors.grey[300],
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 4.0,
-                                            ),
-                                            Flexible(
-                                              child: Text(
-                                                '${data[index].username}',
-                                                overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
                                           ],
                                         ),
                                       ),
@@ -308,7 +250,7 @@ class _HomeState extends State<Home> {
                           },
                           staggeredTileBuilder: (index) {
                             return StaggeredTile.count(
-                                1, index.isEven ? 1.6 : 1.8);
+                                1, index.isEven ? 1.4 : 1.6);
                           }),
                     ),
                     if (_showLoadMoreIndicator) BottomLoader(),

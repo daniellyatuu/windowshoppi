@@ -135,11 +135,14 @@ class _PostGridViewState extends State<PostGridView> {
                                     PostDetail(post: data[index]),
                               ),
                             );
-                            if (result == 'success') {
+                            if (result == 'post_deleted_successfully') {
                               BlocProvider.of<UserPostBloc>(context)
                                 ..add(UserPostRemove(post: data[index]));
                               _notification('Post deleted successfully.',
                                   Colors.teal, Colors.black);
+                            } else if (result == 'edit_post') {
+                              BlocProvider.of<ImageSelectionBloc>(context)
+                                ..add(EditPost(post: data[index]));
                             }
                           },
                           child: Stack(
