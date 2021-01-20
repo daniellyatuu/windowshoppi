@@ -92,3 +92,18 @@ export 'all_post_bloc/all_post_states.dart';
 export 'scroll_to_top_bloc/scroll_to_top_events.dart';
 export 'scroll_to_top_bloc/scroll_to_top_bloc.dart';
 export 'scroll_to_top_bloc/scroll_to_top_states.dart';
+
+// bloc files for update post
+export 'update_post_bloc/update_post_events.dart';
+export 'update_post_bloc/update_post_bloc.dart';
+export 'update_post_bloc/update_post_states.dart';
+
+// bloc files for user app visit
+export 'user_app_visit/user_app_visit_events.dart';
+export 'user_app_visit/user_app_visit_bloc.dart';
+export 'user_app_visit/user_app_visit_states.dart';
+
+// bloc files for create profile
+export 'create_profile_bloc/create_profile_events.dart';
+export 'create_profile_bloc/create_profile_bloc.dart';
+export 'create_profile_bloc/create_profile_states.dart';

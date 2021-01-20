@@ -19,16 +19,23 @@ class AccountPageProfile extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
+                    width: 120,
+                    height: 120,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey[300], width: 2.0),
-                      borderRadius: BorderRadius.circular(8.0),
-                      shape: BoxShape.rectangle,
+                      color: Colors.grey[200],
+                      shape: BoxShape.circle,
                     ),
-                    child: Icon(
-                      Icons.account_box,
-                      color: Colors.grey[300],
-                      size: 70,
-                    ),
+                    child: data.accountProfile == null
+                        ? FittedBox(
+                            child: Icon(Icons.account_circle,
+                                color: Colors.grey[400]),
+                          )
+                        : CircleAvatar(
+                            backgroundColor: Colors.grey[200],
+                            radius: 60.0,
+                            backgroundImage:
+                                NetworkImage('${data.accountProfile}'),
+                          ),
                   ),
                 ),
                 Text(

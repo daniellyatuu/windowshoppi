@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
 
 abstract class DeletePostStates extends Equatable {
   const DeletePostStates();

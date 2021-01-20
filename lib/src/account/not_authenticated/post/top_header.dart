@@ -30,12 +30,21 @@ class TopHeader extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.grey,
+                    color: Colors.grey[200],
                     shape: BoxShape.circle,
                   ),
-                  child: FittedBox(
-                    child: Icon(Icons.account_circle, color: Colors.grey[300]),
-                  ),
+                  child:
+                      post.accountProfile != null && post.accountProfile != ''
+                          ? CircleAvatar(
+                              backgroundColor: Colors.grey[200],
+                              radius: 60.0,
+                              backgroundImage:
+                                  NetworkImage('${post.accountProfile}'),
+                            )
+                          : FittedBox(
+                              child: Icon(Icons.account_circle,
+                                  color: Colors.grey[400]),
+                            ),
                 ),
                 SizedBox(
                   width: 10.0,

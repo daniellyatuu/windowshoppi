@@ -1,7 +1,7 @@
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountDetailBloc extends Bloc<AccountDetailEvents, AccountDetailStates> {
   AccountDetailBloc() : super(AccountDetailLoading());

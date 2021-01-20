@@ -34,7 +34,7 @@ class Account extends Equatable {
       email: json['email'],
       call: json['call_number'],
       whatsapp: json['whatsapp_number'],
-      accountProfile: json['account_profile'],
+      accountProfile: json['profile_image'],
       accountBio: json['account_bio'],
       businessBio: json['business_bio'],
     );

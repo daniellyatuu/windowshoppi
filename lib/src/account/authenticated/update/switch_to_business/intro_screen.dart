@@ -35,7 +35,7 @@ class _IntroScreenState extends State<IntroScreen> {
         PageViewModel(
           title: 'Get Free Business Account',
           body:
-              'With business account, you get special badge on every Post you create on Windowshoppi that tells people about your business',
+              'With business account you get special badge on every Post you create that tells people about your business.',
           decoration: pageDecoration,
           image: Align(
             child: Image.asset(
@@ -47,7 +47,7 @@ class _IntroScreenState extends State<IntroScreen> {
         PageViewModel(
           title: 'Reach More Customers',
           body:
-              'Create good post on Windowshoppi to help reach more customers and make your business grow.',
+              'People visit Windowshoppi to discover new ideas to try and interesting things for them. Create great contents and reach more customers.',
           decoration: pageDecoration,
           image: Align(
             child: Image.asset(
@@ -59,7 +59,7 @@ class _IntroScreenState extends State<IntroScreen> {
         PageViewModel(
           title: 'Contact Options',
           body:
-              'Your contacts will be public inorder for customer to reach you by phone call or whatsapp chart easy.',
+              'Your contacts will be made public and will be embedded to each post you make for customers to reach you easily.',
           decoration: pageDecoration,
           image: Align(
             child: Image.asset(

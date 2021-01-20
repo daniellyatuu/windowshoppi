@@ -1,9 +1,8 @@
-import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
+import 'package:windowshoppi/api.dart';
+import 'dart:convert';
 
 class AccountPostAPIClient {
   Future<List<Post>> accountPost(int offset, int limit, int accountId) async {
@@ -17,8 +16,6 @@ class AccountPostAPIClient {
       _url,
       headers: headers,
     );
-
-    var _post = json.decode(response.body);
 
     if (response.statusCode == 200) {
       return compute(_parsePost, response.body);

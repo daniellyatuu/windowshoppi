@@ -8,10 +8,7 @@ abstract class AccountDetailStates extends Equatable {
   List<Object> get props => [];
 }
 
-class AccountDetailLoading extends AccountDetailStates {
-  final String group;
-  AccountDetailLoading({@required this.group});
-}
+class AccountDetailLoading extends AccountDetailStates {}
 
 class AccountDetailError extends AccountDetailStates {}
 

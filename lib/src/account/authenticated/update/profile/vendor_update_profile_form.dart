@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class VendorUpdateProfileForm extends StatefulWidget {
   @override
@@ -21,6 +22,11 @@ class _VendorUpdateProfileFormState extends State<VendorUpdateProfileForm> {
       _whatsappNumber,
       _accountBio,
       _emailAddress;
+
+  // String initialCountry = 'TZ';
+  PhoneNumber callNumber = PhoneNumber(isoCode: 'TZ');
+  String _enteredCallNumber;
+  String _selectedCallIsoCode;
 
   Widget _divider() {
     return SizedBox(
@@ -213,6 +219,46 @@ class _VendorUpdateProfileFormState extends State<VendorUpdateProfileForm> {
         ),
       ],
     );
+
+    // return Column(
+    //   crossAxisAlignment: CrossAxisAlignment.start,
+    //   children: <Widget>[
+    //     InternationalPhoneNumberInput(
+    //       inputDecoration: InputDecoration(
+    //         labelText: 'Phone number*',
+    //         border: OutlineInputBorder(),
+    //         isDense: true,
+    //       ),
+    //       onInputChanged: (PhoneNumber number) {
+    //         print(number.phoneNumber);
+    //         setState(() {
+    //           _enteredCallNumber = number.phoneNumber;
+    //           _selectedCallIsoCode = number.isoCode;
+    //         });
+    //       },
+    //       // onInputValidated: (bool value) {
+    //       //   // print(value);
+    //       // },
+    //       // onSaved: (value) => _phoneNumber = _enteredPhoneNumber,
+    //       selectorConfig: SelectorConfig(
+    //         selectorType: PhoneInputSelectorType.DIALOG,
+    //       ),
+    //       ignoreBlank: false,
+    //       autoValidateMode: AutovalidateMode.disabled,
+    //       selectorTextStyle: TextStyle(color: Colors.black),
+    //       initialValue: callNumber,
+    //       inputBorder: OutlineInputBorder(),
+    //     ),
+    //     if (_enteredCallNumber != null)
+    //       Align(
+    //         alignment: Alignment.centerRight,
+    //         child: Text(
+    //           '$_enteredCallNumber',
+    //           style: Theme.of(context).textTheme.bodyText1,
+    //         ),
+    //       ),
+    //   ],
+    // );
   }
 
   Widget _buildWhatsappNumberTF(initValue) {

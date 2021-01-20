@@ -1,6 +1,7 @@
-import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:flutter/material.dart';
 
 class PostDetail extends StatefulWidget {
   final Post post;
@@ -23,14 +24,26 @@ class _PostDetailState extends State<PostDetail> {
             post: widget.post,
             from: 'post_detail',
           ),
+          if (widget.post.group == 'vendor')
+            if (widget.post.businessBio != '')
+              Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.all(5.0),
+                color: Colors.black87,
+                child: ExpandableText(
+                  text: '${widget.post.businessBio}',
+                  widgetColor: Colors.white,
+                  textBold: true,
+                  trimLines: 2,
+                  readMore: false,
+                  readLess: false,
+                ),
+              ),
           PostImage(
             postImage: widget.post.productPhoto,
           ),
-          AccountPostButton(
+          AccountPostCaption(
             post: widget.post,
-          ),
-          PostCaption(
-            caption: widget.post.caption,
           ),
         ],
       ),

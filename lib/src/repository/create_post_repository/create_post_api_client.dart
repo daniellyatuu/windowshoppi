@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,7 +9,16 @@ import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
 
 class CreatePostAPIClient {
-  Future createPost(accountId, caption, location, lat, long, imageList) async {
+  Future createPost({
+    @required accountId,
+    @required caption,
+    @required location,
+    @required lat,
+    @required long,
+    @required url,
+    @required urlText,
+    @required imageList,
+  }) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
@@ -51,9 +59,13 @@ class CreatePostAPIClient {
     if (location != null) request.fields['location_name'] = location;
     if (lat != null) request.fields['latitude'] = lat;
     if (long != null) request.fields['longitude'] = long;
+    if (url != '') request.fields['url'] = url;
+    if (url != '') request.fields['url_action_text'] = urlText;
 
     // send
     var response = await request.send();
+
+    print(response.statusCode);
 
     if (response.statusCode == 501) {
       throw Exception('Error on uploading post');
@@ -75,7 +87,7 @@ class CreatePostAPIClient {
       );
 
       if (getPostResponse.statusCode == 200) {
-        return compute(_parseUser, getPostResponse.body);
+        return compute(_parsePost, getPostResponse.body);
       } else {
         throw Exception('Error fetching data from server');
       }
@@ -83,7 +95,7 @@ class CreatePostAPIClient {
   }
 }
 
-Post _parseUser(String responseData) {
+Post _parsePost(String responseData) {
   final parsed = jsonDecode(responseData);
 
   return Post.fromJson(parsed);

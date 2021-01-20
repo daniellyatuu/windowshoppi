@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class PostListView extends StatefulWidget {
   final ScrollController _primaryScrollController;
@@ -109,14 +110,26 @@ class _PostListViewState extends State<PostListView> {
                             post: data[index],
                             from: 'post_list',
                           ),
+                          if (data[index].group == 'vendor')
+                            if (data[index].businessBio != '')
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                padding: EdgeInsets.all(5.0),
+                                color: Colors.black87,
+                                child: ExpandableText(
+                                  text: '${data[index].businessBio}',
+                                  widgetColor: Colors.white,
+                                  textBold: true,
+                                  trimLines: 2,
+                                  readMore: false,
+                                  readLess: false,
+                                ),
+                              ),
                           PostImage(
                             postImage: data[index].productPhoto,
                           ),
-                          AccountPostButton(
+                          AccountPostCaption(
                             post: data[index],
-                          ),
-                          PostCaption(
-                            caption: data[index].caption,
                           ),
                           Divider(),
                         ],

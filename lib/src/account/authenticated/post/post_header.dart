@@ -36,13 +36,20 @@ class PostHeader extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.grey,
+                          color: Colors.grey[200],
                           shape: BoxShape.circle,
                         ),
-                        child: FittedBox(
-                          child: Icon(Icons.account_circle,
-                              color: Colors.grey[300]),
-                        ),
+                        child: state.user.profileImage == null
+                            ? FittedBox(
+                                child: Icon(Icons.account_circle,
+                                    color: Colors.grey[400]),
+                              )
+                            : CircleAvatar(
+                                backgroundColor: Colors.grey[200],
+                                radius: 60.0,
+                                backgroundImage:
+                                    NetworkImage('${state.user.profileImage}'),
+                              ),
                       ),
                       SizedBox(
                         width: 10.0,
@@ -75,8 +82,12 @@ class PostHeader extends StatelessWidget {
                     ],
                   ),
                 ),
-                BlocProvider<DeletePostBloc>(
-                  create: (context) => DeletePostBloc(),
+                MultiBlocProvider(
+                  providers: [
+                    BlocProvider<DeletePostBloc>(
+                      create: (context) => DeletePostBloc(),
+                    ),
+                  ],
                   child: PostActionButtonInit(
                     post: post,
                     from: from,

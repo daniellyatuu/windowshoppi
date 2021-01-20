@@ -1,4 +1,3 @@
-import 'package:international_phone_input/international_phone_input.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,7 +19,7 @@ class _RegisterFormState extends State<RegisterForm> {
   String _passWord;
   String _emailAddress;
 
-  String initialCountry = 'TZ';
+  // String initialCountry = 'TZ';
   PhoneNumber number = PhoneNumber(isoCode: 'TZ');
   String _enteredPhoneNumber;
   String _selectedIsoCode;
@@ -78,7 +77,7 @@ class _RegisterFormState extends State<RegisterForm> {
         InternationalPhoneNumberInput(
           inputDecoration: InputDecoration(
             labelText: 'Phone number*',
-              border: OutlineInputBorder(),
+            border: OutlineInputBorder(),
             isDense: true,
           ),
           onInputChanged: (PhoneNumber number) {

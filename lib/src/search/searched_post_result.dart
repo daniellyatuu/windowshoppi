@@ -52,7 +52,7 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
       child: BlocBuilder<SearchPostBloc, SearchPostStates>(
         builder: (context, state) {
           if (state is SearchPostEmpty) {
-            return SearchWelcomeText(txt: 'Search for Posts');
+            return SearchWelcomeText(txt: 'Search Posts');
           } else if (state is SearchPostInitial) {
             return Center(
               child: CircularProgressIndicator(),
@@ -114,20 +114,21 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
                                     child: Column(
                                       children: [
                                         if (data[index].group == 'vendor')
-                                          Container(
-                                            alignment: Alignment.centerLeft,
-                                            padding: EdgeInsets.all(5.0),
-                                            color: Colors.black87,
-                                            child: ExpandableText(
-                                              text:
-                                                  '${data[index].businessBio}',
-                                              widgetColor: Colors.white,
-                                              textBold: true,
-                                              trimLines: 2,
-                                              readMore: false,
-                                              readLess: false,
+                                          if (data[index].businessBio != '')
+                                            Container(
+                                              alignment: Alignment.centerLeft,
+                                              padding: EdgeInsets.all(5.0),
+                                              color: Colors.black87,
+                                              child: ExpandableText(
+                                                text:
+                                                    '${data[index].businessBio}',
+                                                widgetColor: Colors.white,
+                                                textBold: true,
+                                                trimLines: 2,
+                                                readMore: false,
+                                                readLess: false,
+                                              ),
                                             ),
-                                          ),
                                         Expanded(
                                           child: Stack(
                                             fit: StackFit.expand,
@@ -239,15 +240,25 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
                                           width: 25,
                                           height: 25,
                                           decoration: BoxDecoration(
-                                            color: Colors.grey,
+                                            color: Colors.grey[200],
                                             shape: BoxShape.circle,
                                           ),
-                                          child: FittedBox(
-                                            child: Icon(
-                                              Icons.account_circle,
-                                              color: Colors.grey[300],
-                                            ),
-                                          ),
+                                          child: data[index].accountProfile !=
+                                                      null &&
+                                                  data[index].accountProfile !=
+                                                      ''
+                                              ? CircleAvatar(
+                                                  backgroundColor:
+                                                      Colors.grey[200],
+                                                  radius: 60.0,
+                                                  backgroundImage: NetworkImage(
+                                                      '${data[index].accountProfile}'),
+                                                )
+                                              : FittedBox(
+                                                  child: Icon(
+                                                      Icons.account_circle,
+                                                      color: Colors.grey[400]),
+                                                ),
                                         ),
                                         SizedBox(
                                           width: 4.0,

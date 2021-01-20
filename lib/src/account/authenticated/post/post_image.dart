@@ -60,7 +60,7 @@ class _PostImageState extends State<PostImage> {
                       //return state.completedWidget;
                       case LoadState.completed:
                         return ExtendedRawImage(
-                          fit: BoxFit.cover,
+                          fit: _imageCover ? BoxFit.cover : BoxFit.contain,
                           image: state.extendedImageInfo?.image,
                         );
                         break;
