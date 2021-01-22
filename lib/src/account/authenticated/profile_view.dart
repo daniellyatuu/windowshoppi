@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -192,8 +193,8 @@ class _ProfileViewState extends State<ProfileView> {
                       child: Stack(
                         children: [
                           Container(
-                            width: 120,
-                            height: 120,
+                            width: MediaQuery.of(context).size.width / 4,
+                            height: MediaQuery.of(context).size.width / 4,
                             decoration: BoxDecoration(
                               color: Colors.grey[200],
                               shape: BoxShape.circle,
@@ -203,11 +204,43 @@ class _ProfileViewState extends State<ProfileView> {
                                     child: Icon(Icons.account_circle,
                                         color: Colors.grey[400]),
                                   )
-                                : CircleAvatar(
-                                    backgroundColor: Colors.grey[200],
-                                    radius: 60.0,
-                                    backgroundImage:
-                                        NetworkImage('${data.profileImage}'),
+                                : ClipOval(
+                                    child: ExtendedImage.network(
+                                      '${data.profileImage}',
+                                      cache: true,
+                                      loadStateChanged:
+                                          (ExtendedImageState state) {
+                                        switch (state.extendedImageLoadState) {
+                                          case LoadState.loading:
+                                            return CupertinoActivityIndicator();
+                                            break;
+
+                                          ///if you don't want override completed widget
+                                          ///please return null or state.completedWidget
+                                          //return null;
+                                          //return state.completedWidget;
+                                          case LoadState.completed:
+                                            return ExtendedRawImage(
+                                              fit: BoxFit.cover,
+                                              image: state
+                                                  .extendedImageInfo?.image,
+                                            );
+                                            break;
+                                          case LoadState.failed:
+                                            // _controller.reset();
+                                            return GestureDetector(
+                                              child: Center(
+                                                child: Icon(Icons.refresh),
+                                              ),
+                                              onTap: () {
+                                                state.reLoadImage();
+                                              },
+                                            );
+                                            break;
+                                        }
+                                        return null;
+                                      },
+                                    ),
                                   ),
                           ),
                           Positioned(

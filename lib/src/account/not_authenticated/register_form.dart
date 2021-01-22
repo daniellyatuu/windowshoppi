@@ -2,6 +2,7 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class RegisterForm extends StatefulWidget {
   @override
@@ -122,6 +123,9 @@ class _RegisterFormState extends State<RegisterForm> {
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
           child: TextFormField(
+            inputFormatters: [
+              LowerCaseTextFormatter(),
+            ],
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.alternate_email, color: Colors.black54),
               labelText: 'Username*',

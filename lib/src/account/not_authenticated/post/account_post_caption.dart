@@ -36,185 +36,105 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
             trimLines: 5,
             readLess: false,
           ),
-
           BlocBuilder<AuthenticationBloc, AuthenticationStates>(
             builder: (context, state) {
               if (state is IsAuthenticated) {
                 return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    state.user.accountId == widget.post.accountId
-                        ? widget.post.isUrlValid == false
-                            ? Text(
-                                'invalid url, please correct it. ',
-                                style: Theme.of(context).textTheme.caption,
-                              )
-                            : Container()
-                        : Container(),
-                    if (widget.post.url != null &&
-                            widget.post.isUrlValid == true ||
-                        state.user.accountId == widget.post.accountId)
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: OutlineButton(
-                          onPressed: () => _launchURL('${widget.post.url}'),
-                          child: Row(
-                            children: [
-                              Text('${widget.post.urlText} '),
-                              BlocBuilder<AuthenticationBloc,
-                                  AuthenticationStates>(
-                                builder: (context, state) {
-                                  if (state is IsAuthenticated) {
-                                    if (state.user.accountId ==
-                                        widget.post.accountId) {
-                                      if (widget.post.isUrlValid == true) {
-                                        return Icon(
-                                          Icons.verified_outlined,
-                                          size: 16,
-                                          color: Colors.teal,
-                                        );
-                                      } else if (widget.post.isUrlValid ==
-                                          false) {
-                                        return Icon(
-                                          Icons.warning_outlined,
-                                          size: 16,
-                                          color: Colors.red,
-                                        );
+                    Column(
+                      children: [
+                        if ((widget.post.url != null &&
+                                widget.post.isUrlValid == true) ||
+                            (state.user.accountId == widget.post.accountId &&
+                                widget.post.url != null))
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: FlatButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                                side: BorderSide(color: Colors.teal, width: 3),
+                              ),
+                              onPressed: () => _launchURL('${widget.post.url}'),
+                              child: Row(
+                                children: [
+                                  Text('${widget.post.urlText} '),
+                                  BlocBuilder<AuthenticationBloc,
+                                      AuthenticationStates>(
+                                    builder: (context, state) {
+                                      if (state is IsAuthenticated) {
+                                        if (state.user.accountId ==
+                                            widget.post.accountId) {
+                                          if (widget.post.isUrlValid == true) {
+                                            return Icon(
+                                              Icons.verified_outlined,
+                                              size: 16,
+                                              color: Colors.teal,
+                                            );
+                                          } else if (widget.post.isUrlValid ==
+                                              false) {
+                                            return Icon(
+                                              Icons.warning_outlined,
+                                              size: 16,
+                                              color: Colors.red,
+                                            );
+                                          } else {
+                                            return Container();
+                                          }
+                                        } else {
+                                          return Container();
+                                        }
                                       } else {
                                         return Container();
                                       }
-                                    } else {
-                                      return Container();
-                                    }
-                                  } else {
-                                    return Container();
-                                  }
-                                },
+                                    },
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
+                        state.user.accountId == widget.post.accountId
+                            ? widget.post.isUrlValid == false
+                                ? Text(
+                                    'invalid url, please correct it. ',
+                                    style: Theme.of(context).textTheme.caption,
+                                  )
+                                : Container()
+                            : Container(),
+                      ],
+                    ),
                   ],
                 );
               } else {
                 return Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (widget.post.url != null &&
-                        widget.post.isUrlValid == true)
-                      Container(
-                        alignment: Alignment.centerRight,
-                        child: OutlineButton(
-                          onPressed: () => _launchURL('${widget.post.url}'),
-                          child: Row(
-                            children: [
-                              Text('${widget.post.urlText} '),
-                              BlocBuilder<AuthenticationBloc,
-                                  AuthenticationStates>(
-                                builder: (context, state) {
-                                  if (state is IsAuthenticated) {
-                                    if (state.user.accountId ==
-                                        widget.post.accountId) {
-                                      if (widget.post.isUrlValid == true) {
-                                        return Icon(
-                                          Icons.verified_outlined,
-                                          size: 16,
-                                          color: Colors.teal,
-                                        );
-                                      } else if (widget.post.isUrlValid ==
-                                          false) {
-                                        return Icon(
-                                          Icons.warning_outlined,
-                                          size: 16,
-                                          color: Colors.red,
-                                        );
-                                      } else {
-                                        return Container();
-                                      }
-                                    } else {
-                                      return Container();
-                                    }
-                                  } else {
-                                    return Container();
-                                  }
-                                },
+                    Column(
+                      children: [
+                        if (widget.post.url != null &&
+                            widget.post.isUrlValid == true)
+                          Container(
+                            alignment: Alignment.centerRight,
+                            child: FlatButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                                side: BorderSide(color: Colors.teal, width: 3),
                               ),
-                            ],
+                              onPressed: () => _launchURL('${widget.post.url}'),
+                              child: Row(
+                                children: [
+                                  Text('${widget.post.urlText}'),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
+                      ],
+                    ),
                   ],
                 );
               }
             },
           ),
-
-          // Row(
-          //   mainAxisAlignment: MainAxisAlignment.end,
-          //   children: [
-          //     BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-          //       builder: (context, state) {
-          //         if (state is IsAuthenticated) {
-          //           if (state.user.accountId == widget.post.accountId) {
-          //             if (widget.post.isUrlValid == false) {
-          //               return Text(
-          //                 'invalid url, please correct it. ',
-          //                 style: Theme.of(context).textTheme.caption,
-          //               );
-          //             } else {
-          //               return Container();
-          //             }
-          //           } else {
-          //             return Container();
-          //           }
-          //         } else {
-          //           return Container();
-          //         }
-          //       },
-          //     ),
-          //     if (widget.post.url != null)
-          //       Container(
-          //         alignment: Alignment.centerRight,
-          //         child: OutlineButton(
-          //           onPressed: () => _launchURL('${widget.post.url}'),
-          //           child: Row(
-          //             children: [
-          //               Text('${widget.post.urlText} '),
-          //               BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-          //                 builder: (context, state) {
-          //                   if (state is IsAuthenticated) {
-          //                     if (state.user.accountId ==
-          //                         widget.post.accountId) {
-          //                       if (widget.post.isUrlValid == true) {
-          //                         return Icon(
-          //                           Icons.verified_outlined,
-          //                           size: 16,
-          //                           color: Colors.teal,
-          //                         );
-          //                       } else if (widget.post.isUrlValid == false) {
-          //                         return Icon(
-          //                           Icons.warning_outlined,
-          //                           size: 16,
-          //                           color: Colors.red,
-          //                         );
-          //                       } else {
-          //                         return Container();
-          //                       }
-          //                     } else {
-          //                       return Container();
-          //                     }
-          //                   } else {
-          //                     return Container();
-          //                   }
-          //                 },
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //       ),
-          //   ],
-          // ),
         ],
       ),
     );
