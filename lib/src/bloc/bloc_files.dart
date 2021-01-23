@@ -1,3 +1,8 @@
+// bloc files for network connection
+export 'network_bloc/network_events.dart';
+export 'network_bloc/network_bloc.dart';
+export 'network_bloc/network_states.dart';
+
 // bloc files for authentication
 export 'authentication_bloc/authentication_events.dart';
 export 'authentication_bloc/authentication_bloc.dart';

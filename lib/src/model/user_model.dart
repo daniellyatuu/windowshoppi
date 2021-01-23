@@ -16,8 +16,10 @@ class User extends Equatable {
   final String businessLocation;
   final String call;
   final String callIsoCode;
+  final String callDialCode;
   final String whatsapp;
   final String whatsappIsoCode;
+  final String whatsappDialCode;
 
   const User({
     this.userId,
@@ -35,8 +37,10 @@ class User extends Equatable {
     this.businessLocation,
     this.call,
     this.callIsoCode,
+    this.callDialCode,
     this.whatsapp,
     this.whatsappIsoCode,
+    this.whatsappDialCode,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -56,8 +60,10 @@ class User extends Equatable {
       businessLocation: json['location_name'],
       call: json['call'],
       callIsoCode: json['call_iso_code'],
+      callDialCode: json['call_dial_code'],
       whatsapp: json['whatsapp'],
       whatsappIsoCode: json['whatsapp_iso_code'],
+      whatsappDialCode: json['whatsapp_dial_code'],
     );
   }
 
@@ -78,7 +84,9 @@ class User extends Equatable {
         businessLocation,
         call,
         callIsoCode,
+        callDialCode,
         whatsapp,
         whatsappIsoCode,
+        whatsappDialCode,
       ];
 }

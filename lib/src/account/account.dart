@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
@@ -28,6 +29,21 @@ class _AccountState extends State<Account> {
     Scaffold.of(context).showSnackBar(snackBar);
   }
 
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<AuthenticationBloc, AuthenticationStates>(
@@ -44,8 +60,8 @@ class _AccountState extends State<Account> {
 
           if (state.notification == 'login') {
             Future.delayed(Duration(milliseconds: 300), () {
-              _notification(
-                  'Welcome to windowshoppi', Colors.black, Colors.red);
+              _toastNotification('Welcome to windowshoppi', Colors.black,
+                  Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
 
@@ -57,7 +73,8 @@ class _AccountState extends State<Account> {
         } else if (state is IsNotAuthenticated) {
           if (state.logout == true) {
             Future.delayed(Duration(milliseconds: 300), () {
-              _notification('logout successfully', Colors.teal, Colors.black);
+              _toastNotification('logout successfully', Colors.teal,
+                  Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
         }

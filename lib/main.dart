@@ -86,6 +86,9 @@ class MyApp extends StatelessWidget {
         BlocProvider<CreateProfileBloc>(
           create: (context) => CreateProfileBloc(),
         ),
+        BlocProvider<NetworkBloc>(
+          create: (context) => NetworkBloc()..add(ListenConnection()),
+        ),
       ],
       child: MaterialApp(
         theme: ThemeData(
