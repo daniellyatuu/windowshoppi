@@ -22,6 +22,8 @@ class CreateProfileSuccess extends CreateProfileStates {
   List<Object> get props => [user];
 }
 
+class CreateProfileNoInternet extends CreateProfileStates {}
+
 class CreateProfileError extends CreateProfileStates {}
 
 // remove profile events
@@ -35,5 +37,7 @@ class RemoveProfileSuccess extends CreateProfileStates {
   @override
   List<Object> get props => [user];
 }
+
+class RemoveProfileNoInternet extends CreateProfileStates {}
 
 class RemoveProfileError extends CreateProfileStates {}

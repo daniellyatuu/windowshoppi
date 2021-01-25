@@ -10,6 +10,8 @@ abstract class AuthenticationStates extends Equatable {
 
 class AuthenticationLoading extends AuthenticationStates {}
 
+class AuthNoInternet extends AuthenticationStates {}
+
 class AuthenticationError extends AuthenticationStates {}
 
 class IsAuthenticated extends AuthenticationStates {

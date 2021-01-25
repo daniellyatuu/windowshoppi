@@ -10,54 +10,57 @@ import 'dart:io';
 
 class CreateProfileAPIClient {
   Future createProfile(accountId, contactId, picture) async {
-    SharedPreferences localStorage = await SharedPreferences.getInstance();
-    var token = localStorage.getString('token');
+    try {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      var token = localStorage.getString('token');
 
-    var _url = UPDATE_PROFILE_PICTURE + '$accountId' + '/';
+      var _url = UPDATE_PROFILE_PICTURE + '$accountId' + '/';
 
-    Uri uri = Uri.parse(_url);
+      Uri uri = Uri.parse(_url);
 
-    // create multipart request
-    MultipartRequest request = http.MultipartRequest("POST", uri);
+      // create multipart request
+      MultipartRequest request = http.MultipartRequest("POST", uri);
 
-    String fileName = 'profile_picture_' + accountId.toString() + '_' + '.jpg';
+      String fileName =
+          'profile_picture_' + accountId.toString() + '_' + '.jpg';
 
-    ByteData byteData = await picture.getByteData(quality: 60);
+      ByteData byteData = await picture.getByteData(quality: 60);
 
-    List<int> imageData = byteData.buffer.asUint8List();
+      List<int> imageData = byteData.buffer.asUint8List();
 
-    MultipartFile multipartFile = MultipartFile.fromBytes(
-      'profile_picture',
-      imageData,
-      filename: fileName,
-      // contentType: MediaType("image", "jpg"),
-    );
-    request.files.add(multipartFile);
-
-    Map<String, String> headers = {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Token $token',
-    };
-
-    // add headers
-    request.headers.addAll(headers);
-
-    // send
-    var response = await request.send();
-
-    print(response.statusCode);
-
-    if (response.statusCode == 200) {
-      final getUserResponse = await http.get(
-        USER_DATA,
-        headers: {HttpHeaders.authorizationHeader: "Token $token"},
+      MultipartFile multipartFile = MultipartFile.fromBytes(
+        'profile_picture',
+        imageData,
+        filename: fileName,
+        // contentType: MediaType("image", "jpg"),
       );
+      request.files.add(multipartFile);
 
-      if (getUserResponse.statusCode == 200) {
-        return compute(_parseUser, getUserResponse.body);
-      } else {
-        throw Exception('Error fetching data from server');
+      Map<String, String> headers = {
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Token $token',
+      };
+
+      // add headers
+      request.headers.addAll(headers);
+
+      // send
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        final getUserResponse = await http.get(
+          USER_DATA,
+          headers: {HttpHeaders.authorizationHeader: "Token $token"},
+        );
+
+        if (getUserResponse.statusCode == 200) {
+          return compute(_parseUser, getUserResponse.body);
+        } else {
+          throw Exception('Error fetching data from server');
+        }
       }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

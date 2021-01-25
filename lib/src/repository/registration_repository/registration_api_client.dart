@@ -4,34 +4,39 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'dart:io';
 
 class RegistrationAPIClient {
   Future registerUser(data) async {
-    final response = await http.post(
-      REGISTER_USER,
-      headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(data),
-    );
+    try {
+      final response = await http.post(
+        REGISTER_USER,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(data),
+      );
 
-    var _user = json.decode(response.body);
+      var _user = json.decode(response.body);
 
-    if (_user['username'] != null) {
-      if (_user['username'][0] == 'user with this username already exists.') {
-        return 'user_exists';
+      if (_user['username'] != null) {
+        if (_user['username'][0] == 'user with this username already exists.') {
+          return 'user_exists';
+        }
       }
-    }
 
-    if (response.statusCode == 201) {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
+      if (response.statusCode == 201) {
+        SharedPreferences localStorage = await SharedPreferences.getInstance();
 
-      localStorage.setBool('isRegistered', true);
-      localStorage.setString('token', _user['token']);
+        localStorage.setBool('isRegistered', true);
+        localStorage.setString('token', _user['token']);
 
-      return compute(_parseUser, response.body);
-    } else {
-      throw Exception('Failed to register user.');
+        return compute(_parseUser, response.body);
+      } else {
+        throw Exception('Failed to register user.');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'dart:io';
 
 class WindowshopperProfileUpdateAPIClient {
   Future updateProfile(accountId, contactId, data) async {
@@ -17,24 +18,28 @@ class WindowshopperProfileUpdateAPIClient {
       'Authorization': 'Token $token',
     };
 
-    final response = await http.put(
-      _url,
-      headers: headers,
-      body: jsonEncode(data),
-    );
+    try {
+      final response = await http.put(
+        _url,
+        headers: headers,
+        body: jsonEncode(data),
+      );
 
-    var _user = json.decode(response.body);
+      var _user = json.decode(response.body);
 
-    if (_user['username'] != null) {
-      if (_user['username'][0] == 'user with this username already exists.') {
-        return 'user_exists';
+      if (_user['username'] != null) {
+        if (_user['username'][0] == 'user with this username already exists.') {
+          return 'user_exists';
+        }
       }
-    }
 
-    if (response.statusCode == 200) {
-      return compute(_parseUser, response.body);
-    } else {
-      throw Exception('Failed to update user data.');
+      if (response.statusCode == 200) {
+        return compute(_parseUser, response.body);
+      } else {
+        throw Exception('Failed to update user data.');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

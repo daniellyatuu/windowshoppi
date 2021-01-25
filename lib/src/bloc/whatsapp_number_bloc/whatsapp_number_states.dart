@@ -21,4 +21,6 @@ class WhatsappNumberFormSubmitted extends WhatsappNumberStates {
   List<Object> get props => [user];
 }
 
+class WhatsappNumberNoInternet extends WhatsappNumberStates {}
+
 class WhatsappNumberFormError extends WhatsappNumberStates {}

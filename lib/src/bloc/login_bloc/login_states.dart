@@ -23,4 +23,6 @@ class ValidAccount extends LoginStates {
 
 class InvalidAccount extends LoginStates {}
 
+class LoginNoInternet extends LoginStates {}
+
 class LoginFormError extends LoginStates {}

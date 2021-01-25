@@ -2,6 +2,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProfileCreate extends StatefulWidget {
   @override
@@ -11,19 +12,19 @@ class ProfileCreate extends StatefulWidget {
 class _ProfileCreateState extends State<ProfileCreate> {
   final _profileFormKey = GlobalKey<FormState>();
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override
@@ -108,13 +109,22 @@ class _ProfileCreateState extends State<ProfileCreate> {
                                       ),
                                     ),
                                   );
+                                } else if (state is CreateProfileNoInternet) {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                  _toastNotification(
+                                      'No internet connection',
+                                      Colors.red,
+                                      Toast.LENGTH_SHORT,
+                                      ToastGravity.CENTER);
                                 } else if (state is CreateProfileError) {
                                   Navigator.of(context, rootNavigator: true)
                                       .pop();
-                                  _notification(
-                                      'Error occurred, please try again.',
+                                  _toastNotification(
+                                      'Error occurred, please try again',
                                       Colors.red,
-                                      Colors.white);
+                                      Toast.LENGTH_LONG,
+                                      ToastGravity.SNACKBAR);
                                 } else if (state is CreateProfileSuccess) {
                                   Navigator.of(context, rootNavigator: true)
                                       .pop();

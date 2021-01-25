@@ -17,7 +17,9 @@ class RegistrationBloc extends Bloc<RegistrationEvents, RegistrationStates> {
       try {
         final _user = await registrationRepository.registerUser(event.data);
 
-        if (_user == 'user_exists') {
+        if (_user == 'no_internet') {
+          yield RegistrationNoInternet();
+        } else if (_user == 'user_exists') {
           yield UserExist();
         } else if (_user is User) {
           final User user = _user;

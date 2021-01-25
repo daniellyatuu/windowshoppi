@@ -6,16 +6,20 @@ import 'dart:convert';
 import 'dart:io';
 
 class AuthenticationAPIClient {
-  Future<User> getUser(token) async {
-    final response = await http.get(
-      USER_DATA,
-      headers: {HttpHeaders.authorizationHeader: "Token $token"},
-    );
+  Future getUser(token) async {
+    try {
+      final response = await http.get(
+        USER_DATA,
+        headers: {HttpHeaders.authorizationHeader: "Token $token"},
+      );
 
-    if (response.statusCode == 200) {
-      return compute(parseUser, response.body);
-    } else {
-      throw Exception('Error fetching data from server');
+      if (response.statusCode == 200) {
+        return compute(parseUser, response.body);
+      } else {
+        throw Exception('Error fetching data from server');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

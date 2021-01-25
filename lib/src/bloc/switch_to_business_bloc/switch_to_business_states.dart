@@ -23,4 +23,6 @@ class SwitchToBusinessFormSubmitted extends SwitchToBusinessStates {
 
 class SwitchToBusinessUserExist extends SwitchToBusinessStates {}
 
+class SwitchAccountNoInternet extends SwitchToBusinessStates {}
+
 class SwitchToBusinessFormError extends SwitchToBusinessStates {}

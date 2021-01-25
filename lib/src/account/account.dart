@@ -11,24 +11,6 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    Scaffold.of(context)
-        .hideCurrentSnackBar(); // hide current snackBar if is active before open new one
-
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
-  }
-
   void _toastNotification(
       String txt, Color color, Toast length, ToastGravity gravity) {
     // close active toast if any before open new one
@@ -67,7 +49,8 @@ class _AccountState extends State<Account> {
 
           if (state.notification == 'update') {
             Future.delayed(Duration(milliseconds: 300), () {
-              _notification('update successfully', Colors.teal, Colors.black);
+              _toastNotification('update successfully', Colors.teal,
+                  Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
         } else if (state is IsNotAuthenticated) {
@@ -77,6 +60,9 @@ class _AccountState extends State<Account> {
                   Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
+        } else if (state is AuthNoInternet) {
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         }
       },
       builder: (context, AuthenticationStates state) {
@@ -84,6 +70,8 @@ class _AccountState extends State<Account> {
           return Center(
             child: CircularProgressIndicator(),
           );
+        } else if (state is AuthNoInternet) {
+          return NoInternet();
         } else if (state is AuthenticationError) {
           return AuthenticationErrorMessage();
         } else if (state is IsAuthenticated) {

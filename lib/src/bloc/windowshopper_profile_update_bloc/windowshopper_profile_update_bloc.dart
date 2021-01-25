@@ -18,7 +18,9 @@ class WindowshopperProfileUpdateBloc extends Bloc<
         final _user = await WindowshopperProfileUpdateAPIClient()
             .updateProfile(event.accountId, event.contactId, event.data);
 
-        if (_user == 'user_exists') {
+        if (_user == 'no_internet') {
+          yield WindowshopperProfileUpdateNoInternet();
+        } else if (_user == 'user_exists') {
           yield WindowshopperProfileUpdateUserExist();
         } else if (_user is User) {
           yield WindowshopperProfileUpdateFormSubmitted(user: _user);

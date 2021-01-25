@@ -5,6 +5,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -64,19 +65,19 @@ class _ProfileViewState extends State<ProfileView> {
   // images selection .end
   // #####################
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override
@@ -120,11 +121,15 @@ class _ProfileViewState extends State<ProfileView> {
                     ),
                   ),
                 );
+              } else if (state is RemoveProfileNoInternet) {
+                Navigator.of(context, rootNavigator: true).pop();
+                _toastNotification('No internet connection', Colors.red,
+                    Toast.LENGTH_SHORT, ToastGravity.CENTER);
               } else if (state is RemoveProfileError) {
                 Navigator.of(context, rootNavigator: true).pop();
                 Navigator.of(context, rootNavigator: true).pop();
-                _notification('Error occurred, please try again.', Colors.red,
-                    Colors.white);
+                _toastNotification('Error occurred, please try again',
+                    Colors.red, Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
               } else if (state is RemoveProfileSuccess) {
                 Navigator.of(context, rootNavigator: true).pop();
 
@@ -292,7 +297,8 @@ class _ProfileViewState extends State<ProfileView> {
                                     color: Colors.white,
                                   ),
                                 ),
-                                title: Text('${data.call}'),
+                                title:
+                                    Text('(${data.callDialCode})${data.call}'),
                                 dense: true,
                               ),
                             ),
@@ -308,7 +314,8 @@ class _ProfileViewState extends State<ProfileView> {
                                   ),
                                 ),
                                 title: data.whatsapp != null
-                                    ? Text('${data.whatsapp}')
+                                    ? Text(
+                                        '(${data.whatsappDialCode})${data.whatsapp}')
                                     : WhatsappNumberPopUp(),
                                 dense: true,
                               ),
@@ -386,7 +393,8 @@ class _ProfileViewState extends State<ProfileView> {
                               Expanded(
                                 child: RichText(
                                   text: TextSpan(
-                                    text: ' ${data.call}',
+                                    text:
+                                        ' (${data.callDialCode}) ${data.call}',
                                     style:
                                         Theme.of(context).textTheme.bodyText1,
                                     children: <TextSpan>[
@@ -423,13 +431,14 @@ class _ProfileViewState extends State<ProfileView> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => data.group ==
-                                        'windowshopper'
-                                    ? UpdateProfileInit()
-                                    : VendorUpdateProfileInit(
-                                        callIsoCode: data.callIsoCode,
-                                        whatsappIsoCode: data.whatsappIsoCode,
-                                      ),
+                                builder: (context) =>
+                                    data.group == 'windowshopper'
+                                        ? UpdateProfileInit(
+                                            user: data,
+                                          )
+                                        : VendorUpdateProfileInit(
+                                            user: data,
+                                          ),
                               ),
                             );
                           },
@@ -448,7 +457,9 @@ class _ProfileViewState extends State<ProfileView> {
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => IntroScreen(),
+                                  builder: (context) => IntroScreen(
+                                    user: data,
+                                  ),
                                 ),
                               );
                             },

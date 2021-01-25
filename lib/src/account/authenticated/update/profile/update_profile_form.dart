@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class UpdateProfileForm extends StatefulWidget {
+  final User user;
+  UpdateProfileForm({@required this.user}) : super();
+
   @override
   _UpdateProfileFormState createState() => _UpdateProfileFormState();
 }
@@ -11,12 +17,17 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   final _formKey = GlobalKey<FormState>();
 
   // form data
-  String _firstName,
-      _lastName,
-      _phoneNumber,
-      _userName,
-      _accountBio,
-      _emailAddress;
+  String _firstName;
+  String _lastName;
+  String _phoneNumber;
+  String _userName;
+  String _accountBio;
+  String _emailAddress;
+
+  PhoneNumber number = PhoneNumber();
+  String _enteredPhoneNumber;
+  String _selectedIsoCode;
+  String _selectedDialCode;
 
   Widget _divider() {
     return SizedBox(
@@ -24,7 +35,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
     );
   }
 
-  Widget _buildFirstNameTF(initValue) {
+  Widget _buildFirstNameTF() {
     return Expanded(
       child: TextFormField(
         decoration: InputDecoration(
@@ -39,13 +50,13 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
           }
           return null;
         },
-        initialValue: initValue,
+        initialValue: widget.user.firstName,
         onSaved: (value) => _firstName = value,
       ),
     );
   }
 
-  Widget _buildLastNameTF(initValue) {
+  Widget _buildLastNameTF() {
     return Expanded(
       child: TextFormField(
         decoration: InputDecoration(
@@ -60,48 +71,59 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
           }
           return null;
         },
-        initialValue: initValue,
+        initialValue: widget.user.lastName,
         onSaved: (value) => _lastName = value,
       ),
     );
   }
 
-  Widget _buildPhoneNumberTF(initValue) {
+  Widget _buildPhoneNumberTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(0.0),
-          alignment: Alignment.centerLeft,
-          child: TextFormField(
-            keyboardType: TextInputType.phone,
-            decoration: InputDecoration(
-              prefixIcon: Icon(Icons.phone, color: Colors.black54),
-              labelText: 'Phone number*',
-              border: OutlineInputBorder(),
-              isDense: true,
-            ),
-            validator: (value) {
-              String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
-              RegExp regExp = new RegExp(pattern);
-              if (value.isEmpty) {
-                return 'phone number is required';
-              } else if (!regExp.hasMatch(value)) {
-                return 'Please enter valid phone number';
-              }
-              return null;
-            },
-            initialValue: initValue,
-            onSaved: (value) => _phoneNumber = value,
+        InternationalPhoneNumberInput(
+          inputDecoration: InputDecoration(
+            labelText: 'Phone number*',
+            border: OutlineInputBorder(),
+            isDense: true,
           ),
+          onInputChanged: (PhoneNumber number) {
+            setState(() {
+              _enteredPhoneNumber = number.phoneNumber;
+              _selectedIsoCode = number.isoCode;
+              _selectedDialCode = number.dialCode;
+            });
+            _phoneNumber =
+                _enteredPhoneNumber.replaceFirst('${number.dialCode}', '');
+          },
+          // onInputValidated: (bool value) {
+          //   // print(value);
+          // },
+          // onSaved: (value) => _phoneNumber = _enteredPhoneNumber,
+          selectorConfig: SelectorConfig(
+            selectorType: PhoneInputSelectorType.DIALOG,
+          ),
+          ignoreBlank: false,
+          autoValidateMode: AutovalidateMode.disabled,
+          selectorTextStyle: TextStyle(color: Colors.black),
+          initialValue: number,
+          inputBorder: OutlineInputBorder(),
         ),
+        if (_enteredPhoneNumber != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '$_enteredPhoneNumber',
+              style: Theme.of(context).textTheme.bodyText1,
+            ),
+          ),
       ],
     );
   }
 
   bool _isUserExists = false;
 
-  Widget _buildUsernameTF(initValue) {
+  Widget _buildUsernameTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -134,7 +156,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
               }
               return null;
             },
-            initialValue: initValue,
+            initialValue: widget.user.username,
             onSaved: (value) => _userName = value,
           ),
         ),
@@ -152,7 +174,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
     );
   }
 
-  Widget _buildAccountBioTF(initValue) {
+  Widget _buildAccountBioTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -169,16 +191,16 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
               contentPadding: EdgeInsets.all(10.0),
               border: OutlineInputBorder(),
             ),
-            initialValue: initValue,
+            initialValue: widget.user.accountBio,
             onSaved: (value) =>
-                value != null ? _accountBio = value : _accountBio = null,
+                value != '' ? _accountBio = value : _accountBio = null,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildEmailTF(initValue) {
+  Widget _buildEmailTF() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -208,7 +230,7 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
               }
               return null;
             },
-            initialValue: initValue,
+            initialValue: widget.user.email,
             onSaved: (value) =>
                 value != '' ? _emailAddress = value : _emailAddress = null,
           ),
@@ -218,129 +240,137 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
   }
 
   Widget _buildUpdateBtn() {
-    return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-      builder: (context, state) {
-        if (state is IsAuthenticated) {
-          var data = state.user;
-          return BlocListener<WindowshopperProfileUpdateBloc,
-              WindowshopperProfileUpdateStates>(
-            listener: (context, state) async {
-              if (state is WindowshopperProfileUpdateSubmitting) {
-                return showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (dialogContext) => Material(
-                    type: MaterialType.transparency,
-                    child: Center(
-                      // Aligns the container to center
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: CircularProgressIndicator(),
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            'Saving..',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+    return BlocListener<WindowshopperProfileUpdateBloc,
+        WindowshopperProfileUpdateStates>(
+      listener: (context, state) async {
+        if (state is WindowshopperProfileUpdateSubmitting) {
+          return showDialog(
+            barrierDismissible: false,
+            context: context,
+            builder: (dialogContext) => Material(
+              type: MaterialType.transparency,
+              child: Center(
+                // Aligns the container to center
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      'Saving..',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ),
-                );
-              } else if (state is WindowshopperProfileUpdateFormError) {
-                await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context, rootNavigator: true).pop();
-                  _notification('Error occurred, please try again.', Colors.red,
-                      Colors.white);
-                });
-              } else if (state is WindowshopperProfileUpdateUserExist) {
-                await Future.delayed(Duration(milliseconds: 300), () {
-                  Navigator.of(context, rootNavigator: true).pop();
-                });
-                setState(() {
-                  _isUserExists = true;
-                });
-              } else if (state is WindowshopperProfileUpdateFormSubmitted) {
-                BlocProvider.of<AuthenticationBloc>(context).add(
-                  UserUpdated(
-                    user: state.user,
-                    isAlertDialogActive: {'status': true, 'activeDialog': 2},
-                  ),
-                );
-              }
-            },
-            child: Container(
-              width: double.infinity,
-              child: OutlineButton(
-                splashColor: Colors.red,
-                onPressed: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-
-                  if (_formKey.currentState.validate()) {
-                    _formKey.currentState.save();
-
-                    if (data.firstName != _firstName ||
-                        data.lastName != _lastName ||
-                        data.call != _phoneNumber ||
-                        data.username != _userName ||
-                        data.accountBio != _accountBio ||
-                        data.email != _emailAddress) {
-                      dynamic userData = {
-                        'first_name': _firstName,
-                        'last_name': _lastName,
-                        'call': _phoneNumber,
-                        if (_accountBio != null) 'account_bio': _accountBio,
-                        'username': _userName,
-                        if (_emailAddress != null) 'email': _emailAddress,
-                      };
-
-                      BlocProvider.of<WindowshopperProfileUpdateBloc>(context)
-                        ..add(UpdateWindowshopperProfile(
-                            accountId: data.accountId,
-                            contactId: data.contactId,
-                            data: userData));
-                    } else {
-                      _notification('Change data and click update',
-                          Colors.black, Colors.red);
-                    }
-                  }
-                },
-                child: Text('UPDATE'),
+                  ],
+                ),
               ),
             ),
           );
-        } else {
-          return Container();
+        } else if (state is WindowshopperProfileUpdateNoInternet) {
+          Navigator.of(context, rootNavigator: true).pop();
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
+        } else if (state is WindowshopperProfileUpdateFormError) {
+          await Future.delayed(Duration(milliseconds: 300), () {
+            Navigator.of(context, rootNavigator: true).pop();
+            _toastNotification('Error occurred, please try again.', Colors.red,
+                Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
+          });
+        } else if (state is WindowshopperProfileUpdateUserExist) {
+          await Future.delayed(Duration(milliseconds: 300), () {
+            Navigator.of(context, rootNavigator: true).pop();
+          });
+          setState(() {
+            _isUserExists = true;
+          });
+        } else if (state is WindowshopperProfileUpdateFormSubmitted) {
+          BlocProvider.of<AuthenticationBloc>(context).add(
+            UserUpdated(
+              user: state.user,
+              isAlertDialogActive: {'status': true, 'activeDialog': 2},
+            ),
+          );
         }
       },
+      child: Container(
+        width: double.infinity,
+        child: OutlineButton(
+          splashColor: Colors.red,
+          onPressed: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+
+            if (_formKey.currentState.validate()) {
+              _formKey.currentState.save();
+
+              if (widget.user.firstName != _firstName ||
+                  widget.user.lastName != _lastName ||
+                  widget.user.call != _phoneNumber ||
+                  widget.user.username != _userName ||
+                  widget.user.accountBio != _accountBio ||
+                  widget.user.email != _emailAddress ||
+                  widget.user.callDialCode != _selectedDialCode) {
+                dynamic userData = {
+                  'first_name': _firstName,
+                  'last_name': _lastName,
+                  'call': _phoneNumber,
+                  'call_iso_code': _selectedIsoCode,
+                  'call_dial_code': _selectedDialCode,
+                  if (_accountBio != null) 'account_bio': _accountBio,
+                  'username': _userName,
+                  if (_emailAddress != null) 'email': _emailAddress,
+                };
+
+                BlocProvider.of<WindowshopperProfileUpdateBloc>(context)
+                  ..add(UpdateWindowshopperProfile(
+                      accountId: widget.user.accountId,
+                      contactId: widget.user.contactId,
+                      data: userData));
+              } else {
+                _toastNotification('Change data and click update', Colors.black,
+                    Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
+              }
+            }
+          },
+          child: Text('UPDATE'),
+        ),
+      ),
     );
   }
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    Scaffold.of(context)
-        .hideCurrentSnackBar(); // hide current snackBar if is active before open new one
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
+  }
+
+  void _setCallNumber() {
+    number = PhoneNumber(
+        isoCode: '${widget.user.callIsoCode}',
+        phoneNumber: '${widget.user.call}');
+  }
+
+  @override
+  void initState() {
+    _setCallNumber();
+    super.initState();
   }
 
   @override
@@ -371,44 +401,35 @@ class _UpdateProfileFormState extends State<UpdateProfileForm> {
               ),
             ),
             _divider(),
-            BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-              builder: (context, state) {
-                if (state is IsAuthenticated) {
-                  var data = state.user;
-                  return Container(
-                    padding: EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Row(
-                            children: [
-                              _buildFirstNameTF(data.firstName),
-                              SizedBox(
-                                width: 3.0,
-                              ),
-                              _buildLastNameTF(data.lastName),
-                            ],
-                          ),
-                          _divider(),
-                          _buildUsernameTF(data.username),
-                          _divider(),
-                          _buildPhoneNumberTF(data.call),
-                          _divider(),
-                          _buildAccountBioTF(data.accountBio),
-                          _divider(),
-                          _buildEmailTF(data.email),
-                          _divider(),
-                          _buildUpdateBtn(),
-                        ],
-                      ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Row(
+                      children: [
+                        _buildFirstNameTF(),
+                        SizedBox(
+                          width: 3.0,
+                        ),
+                        _buildLastNameTF(),
+                      ],
                     ),
-                  );
-                } else {
-                  return Container();
-                }
-              },
+                    _divider(),
+                    _buildUsernameTF(),
+                    _divider(),
+                    _buildPhoneNumberTF(),
+                    _divider(),
+                    _buildAccountBioTF(),
+                    _divider(),
+                    _buildEmailTF(),
+                    _divider(),
+                    _buildUpdateBtn(),
+                  ],
+                ),
+              ),
             ),
           ],
         ),

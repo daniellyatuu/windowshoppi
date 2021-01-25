@@ -60,7 +60,7 @@ class AccountPageProfile extends StatelessWidget {
                           Expanded(
                             child: OutlineButton(
                               onPressed: () {
-                                call(data.call);
+                                call(data.callDialCode + data.call);
                               },
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -89,7 +89,7 @@ class AccountPageProfile extends StatelessWidget {
                             Expanded(
                               child: OutlineButton(
                                 onPressed: () {
-                                  chat(data.whatsapp,
+                                  chat(data.whatsappDialCode + data.whatsapp,
                                       "Hi there! I have seen your post on windowshoppi");
                                 },
                                 child: Row(

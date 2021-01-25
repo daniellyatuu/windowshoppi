@@ -21,6 +21,8 @@ class FormSubmitted extends RegistrationStates {
   List<Object> get props => [user];
 }
 
+class RegistrationNoInternet extends RegistrationStates {}
+
 class FormError extends RegistrationStates {
   final dynamic error;
   FormError({@required this.error}) : assert(error != null);

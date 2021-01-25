@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
+import 'package:windowshoppi/src/model/model_files.dart';
 
 class IntroScreen extends StatefulWidget {
+  final User user;
+  IntroScreen({@required this.user}) : super();
   @override
   _IntroScreenState createState() => _IntroScreenState();
 }
@@ -12,7 +15,11 @@ class _IntroScreenState extends State<IntroScreen> {
 
   void _onIntroEnd(context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => SwitchToBusinessInit()),
+      MaterialPageRoute(
+        builder: (_) => SwitchToBusinessInit(
+          user: widget.user,
+        ),
+      ),
     );
   }
 

@@ -1,12 +1,10 @@
 import 'dart:async';
-
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
-import 'package:data_connection_checker/data_connection_checker.dart';
 
 class RegisterForm extends StatefulWidget {
   @override
@@ -357,11 +355,13 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ),
           );
+        } else if (state is RegistrationNoInternet) {
+          Navigator.of(context, rootNavigator: true).pop();
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         } else if (state is FormError) {
           await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context, rootNavigator: true).pop();
-            // _notification(
-            //     'Error occurred, please try again.', Colors.red, Colors.white);
             _toastNotification('Error occurred, please try again.', Colors.red,
                 Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
           });
@@ -379,55 +379,33 @@ class _RegisterFormState extends State<RegisterForm> {
         }
       },
       builder: (context, RegistrationStates state) {
-        return BlocConsumer<NetworkBloc, NetworkStates>(
-          listener: (context, state) {
-            if (state is ConnectionSuccess) {
-              if (state.prevState is ConnectionFailure) {
-                _toastNotification('Back online', Colors.teal,
-                    Toast.LENGTH_SHORT, ToastGravity.CENTER);
+        return Container(
+          width: double.infinity,
+          child: OutlineButton(
+            splashColor: Colors.red,
+            onPressed: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
+
+              if (_formKey.currentState.validate()) {
+                _formKey.currentState.save();
+                dynamic userData = {
+                  'first_name': _firstName,
+                  'last_name': _lastName,
+                  'call': _phoneNumber,
+                  'call_iso_code': _selectedIsoCode,
+                  'call_dial_code': _selectedDialCode,
+                  'username': _userName,
+                  'password': _passWord,
+                  if (_emailAddress != '') 'email': _emailAddress,
+                  'group': 'windowshopper',
+                };
+
+                BlocProvider.of<RegistrationBloc>(context)
+                    .add(SaveUserData(data: userData));
               }
-            } else if (state is ConnectionFailure) {
-              _toastNotification('No internet connection', Colors.red,
-                  Toast.LENGTH_SHORT, ToastGravity.CENTER);
-            }
-          },
-          builder: (context, state) {
-            return Container(
-              width: double.infinity,
-              child: OutlineButton(
-                splashColor: Colors.red,
-                onPressed: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
-
-                  if (_formKey.currentState.validate()) {
-                    if (state is ConnectionSuccess) {
-                      _formKey.currentState.save();
-                      dynamic userData = {
-                        'first_name': _firstName,
-                        'last_name': _lastName,
-                        'call': _phoneNumber,
-                        'call_iso_code': _selectedIsoCode,
-                        'call_dial_code': _selectedDialCode,
-                        'username': _userName,
-                        'password': _passWord,
-                        if (_emailAddress != '') 'email': _emailAddress,
-                        'group': 'windowshopper',
-                      };
-
-                      BlocProvider.of<RegistrationBloc>(context)
-                          .add(SaveUserData(data: userData));
-                    } else if (state is ConnectionFailure) {
-                      _toastNotification('No internet connection.', Colors.red,
-                          Toast.LENGTH_SHORT, ToastGravity.CENTER);
-                    } else {
-                      return Container();
-                    }
-                  }
-                },
-                child: Text('REGISTER'),
-              ),
-            );
-          },
+            },
+            child: Text('REGISTER'),
+          ),
         );
       },
     );
@@ -446,17 +424,6 @@ class _RegisterFormState extends State<RegisterForm> {
         backgroundColor: color,
         textColor: Colors.white,
         fontSize: 14.0);
-  }
-
-  // void _setNumbers() {
-  //   print('set number');
-  //   number = PhoneNumber(isoCode: 'KE', phoneNumber: '653900085');
-  // }
-
-  @override
-  void initState() {
-    // _setNumbers();
-    super.initState();
   }
 
   @override
