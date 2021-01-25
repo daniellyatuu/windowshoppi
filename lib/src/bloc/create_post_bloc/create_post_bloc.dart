@@ -11,7 +11,7 @@ class CreatePostBloc extends Bloc<CreatePostEvents, CreatePostStates> {
     yield CreatePostSubmitting();
     if (event is CreatePost) {
       try {
-        final Post _post = await CreatePostAPIClient().createPost(
+        final _post = await CreatePostAPIClient().createPost(
           accountId: event.accountId,
           caption: event.caption,
           location: event.location,
@@ -22,7 +22,9 @@ class CreatePostBloc extends Bloc<CreatePostEvents, CreatePostStates> {
           imageList: event.resultList,
         );
 
-        if (_post is Post) {
+        if (_post == 'no_internet') {
+          yield CreatePostNoInternet();
+        } else if (_post is Post) {
           yield CreatePostSuccess(post: _post);
         } else {
           yield CreatePostError();

@@ -28,5 +28,8 @@ class WindowshopperProfileUpdateFormSubmitted
 class WindowshopperProfileUpdateUserExist
     extends WindowshopperProfileUpdateStates {}
 
+class WindowshopperProfileUpdateNoInternet
+    extends WindowshopperProfileUpdateStates {}
+
 class WindowshopperProfileUpdateFormError
     extends WindowshopperProfileUpdateStates {}

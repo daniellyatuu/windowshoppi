@@ -3,6 +3,7 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:google_maps_webservice/places.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:windowshoppi/api.dart';
 import 'package:flutter/material.dart';
 
@@ -252,6 +253,16 @@ class _PostCreateState extends State<PostCreate> {
                       ),
                       Container(
                         child: RadioListTile(
+                          title: Text('Watch it'),
+                          value: 'watch it',
+                          groupValue: _buttonSelected,
+                          onChanged: (value) {
+                            setSelectedRadio(value);
+                          },
+                        ),
+                      ),
+                      Container(
+                        child: RadioListTile(
                           title: Text('Buy'),
                           value: 'buy',
                           groupValue: _buttonSelected,
@@ -312,19 +323,19 @@ class _PostCreateState extends State<PostCreate> {
   }
   // LOCATION .END
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override
@@ -381,10 +392,20 @@ class _PostCreateState extends State<PostCreate> {
                                 ),
                               ),
                             );
+                          } else if (state is CreatePostNoInternet) {
+                            Navigator.of(context, rootNavigator: true).pop();
+                            _toastNotification(
+                                'No internet connection',
+                                Colors.red,
+                                Toast.LENGTH_SHORT,
+                                ToastGravity.CENTER);
                           } else if (state is CreatePostError) {
                             Navigator.of(context, rootNavigator: true).pop();
-                            _notification('Error occurred, please try again.',
-                                Colors.red, Colors.white);
+                            _toastNotification(
+                                'Error occurred, please try again.',
+                                Colors.red,
+                                Toast.LENGTH_LONG,
+                                ToastGravity.SNACKBAR);
                           } else if (state is CreatePostSuccess) {
                             Navigator.of(context, rootNavigator: true).pop();
 

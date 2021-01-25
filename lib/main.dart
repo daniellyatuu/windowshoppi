@@ -1,6 +1,7 @@
 import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/welcome_screen.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/app_root.dart';
 import 'package:flutter/material.dart';
@@ -72,6 +73,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<NetworkBloc>(
+          create: (context) => NetworkBloc()..add(ListenConnection()),
+        ),
         BlocProvider<UserAppVisitBloc>(
           create: (context) => UserAppVisitBloc()..add(CheckUserAppVisit()),
         ),
@@ -98,25 +102,58 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Root extends StatelessWidget {
+class Root extends StatefulWidget {
+  @override
+  _RootState createState() => _RootState();
+}
+
+class _RootState extends State<Root> {
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UserAppVisitBloc, UserAppVisitStates>(
-      builder: (context, state) {
-        if (state is UserAppVisitInitial) {
-          return Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        } else if (state is IsNotFirstTime) {
-          return AppRoot();
-        } else if (state is IsFirstTime) {
-          return WelcomeScreen();
-        } else {
-          return Container();
+    return BlocListener<NetworkBloc, NetworkStates>(
+      listener: (context, state) {
+        if (state is ConnectionSuccess) {
+          if (state.prevState is ConnectionFailure) {
+            _toastNotification('Back online', Colors.teal, Toast.LENGTH_SHORT,
+                ToastGravity.CENTER);
+          }
+        } else if (state is ConnectionFailure) {
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         }
       },
+      child: BlocBuilder<UserAppVisitBloc, UserAppVisitStates>(
+        builder: (context, state) {
+          if (state is UserAppVisitInitial) {
+            return Scaffold(
+              body: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else if (state is IsNotFirstTime) {
+            return AppRoot();
+          } else if (state is IsFirstTime) {
+            return WelcomeScreen();
+          } else {
+            return Container();
+          }
+        },
+      ),
     );
   }
 }

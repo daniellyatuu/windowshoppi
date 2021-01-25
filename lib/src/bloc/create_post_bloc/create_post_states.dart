@@ -21,4 +21,6 @@ class CreatePostSuccess extends CreatePostStates {
   List<Object> get props => [post];
 }
 
+class CreatePostNoInternet extends CreatePostStates {}
+
 class CreatePostError extends CreatePostStates {}

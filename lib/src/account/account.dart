@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
@@ -10,22 +11,19 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    Scaffold.of(context)
-        .hideCurrentSnackBar(); // hide current snackBar if is active before open new one
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
 
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override
@@ -44,22 +42,27 @@ class _AccountState extends State<Account> {
 
           if (state.notification == 'login') {
             Future.delayed(Duration(milliseconds: 300), () {
-              _notification(
-                  'Welcome to windowshoppi', Colors.black, Colors.red);
+              _toastNotification('Welcome to windowshoppi', Colors.black,
+                  Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
 
           if (state.notification == 'update') {
             Future.delayed(Duration(milliseconds: 300), () {
-              _notification('update successfully', Colors.teal, Colors.black);
+              _toastNotification('update successfully', Colors.teal,
+                  Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
         } else if (state is IsNotAuthenticated) {
           if (state.logout == true) {
             Future.delayed(Duration(milliseconds: 300), () {
-              _notification('logout successfully', Colors.teal, Colors.black);
+              _toastNotification('logout successfully', Colors.teal,
+                  Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
             });
           }
+        } else if (state is AuthNoInternet) {
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         }
       },
       builder: (context, AuthenticationStates state) {
@@ -67,6 +70,8 @@ class _AccountState extends State<Account> {
           return Center(
             child: CircularProgressIndicator(),
           );
+        } else if (state is AuthNoInternet) {
+          return NoInternet();
         } else if (state is AuthenticationError) {
           return AuthenticationErrorMessage();
         } else if (state is IsAuthenticated) {

@@ -35,19 +35,17 @@ class AuthenticationBloc
         var token = localStorage.getString('token');
 
         if (token != null) {
-          try {
-            // get user
-            final User user = await authenticationRepository.getUser(token);
+          // get user
+          final _user = await authenticationRepository.getUser(token);
 
+          if (_user == 'no_internet') {
+            yield AuthNoInternet();
+          } else if (_user is User) {
+            final User user = _user;
             yield IsAuthenticated(
                 user: user, isAlertDialogActive: {'status': false});
-          } catch (error) {
+          } else {
             yield AuthenticationError();
-
-            // if any error happen on authentication, Logout user
-            // localStorage.remove('token');
-            // yield IsNotAuthenticated(
-            //     isAlreadyCreateAccount: isRegistered, logout: false);
           }
         } else {
           yield IsNotAuthenticated(

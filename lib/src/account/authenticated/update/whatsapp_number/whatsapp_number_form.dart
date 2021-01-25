@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class WhatsappNumberForm extends StatefulWidget {
   @override
@@ -12,6 +14,27 @@ class _WhatsappNumberFormState extends State<WhatsappNumberForm> {
 
   // form data
   String _whatsappNumber;
+
+  // String initialCountry = 'TZ';
+  PhoneNumber number = PhoneNumber(isoCode: 'TZ');
+  String _enteredPhoneNumber;
+  String _selectedIsoCode;
+  String _selectedDialCode;
+
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,30 +56,67 @@ class _WhatsappNumberFormState extends State<WhatsappNumberForm> {
               ListView(
                 shrinkWrap: true,
                 children: [
-                  Container(
-                    padding: EdgeInsets.all(0.0),
-                    alignment: Alignment.centerLeft,
-                    child: TextFormField(
-                      keyboardType: TextInputType.phone,
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.phone, color: Colors.black54),
-                        labelText: 'Whatsapp number*',
-                        border: OutlineInputBorder(),
-                        isDense: true,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      InternationalPhoneNumberInput(
+                        inputDecoration: InputDecoration(
+                          labelText: 'Phone number*',
+                          border: OutlineInputBorder(),
+                          isDense: true,
+                        ),
+                        onInputChanged: (PhoneNumber number) {
+                          setState(() {
+                            _enteredPhoneNumber = number.phoneNumber;
+                            _selectedIsoCode = number.isoCode;
+                            _selectedDialCode = number.dialCode;
+                          });
+                          _whatsappNumber = _enteredPhoneNumber.replaceFirst(
+                              '${number.dialCode}', '');
+                        },
+                        selectorConfig: SelectorConfig(
+                          selectorType: PhoneInputSelectorType.DIALOG,
+                        ),
+                        ignoreBlank: false,
+                        autoValidateMode: AutovalidateMode.disabled,
+                        selectorTextStyle: TextStyle(color: Colors.black),
+                        initialValue: number,
+                        inputBorder: OutlineInputBorder(),
                       ),
-                      validator: (value) {
-                        String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
-                        RegExp regExp = new RegExp(pattern);
-                        if (value.isEmpty) {
-                          return null;
-                        } else if (!regExp.hasMatch(value)) {
-                          return 'Please enter valid whatsapp number';
-                        }
-                        return null;
-                      },
-                      onSaved: (value) => _whatsappNumber = value,
-                    ),
+                      if (_enteredPhoneNumber != null)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Text(
+                            '$_enteredPhoneNumber',
+                            style: Theme.of(context).textTheme.bodyText1,
+                          ),
+                        ),
+                    ],
                   ),
+                  // Container(
+                  //   padding: EdgeInsets.all(0.0),
+                  //   alignment: Alignment.centerLeft,
+                  //   child: TextFormField(
+                  //     keyboardType: TextInputType.phone,
+                  //     decoration: InputDecoration(
+                  //       prefixIcon: Icon(Icons.phone, color: Colors.black54),
+                  //       labelText: 'Whatsapp number*',
+                  //       border: OutlineInputBorder(),
+                  //       isDense: true,
+                  //     ),
+                  //     validator: (value) {
+                  //       String pattern = r'(^(?:[+0]9)?[0-9]{10,12}$)';
+                  //       RegExp regExp = new RegExp(pattern);
+                  //       if (value.isEmpty) {
+                  //         return null;
+                  //       } else if (!regExp.hasMatch(value)) {
+                  //         return 'Please enter valid whatsapp number';
+                  //       }
+                  //       return null;
+                  //     },
+                  //     onSaved: (value) => _whatsappNumber = value,
+                  //   ),
+                  // ),
                 ],
               ),
               SizedBox(
@@ -108,6 +168,13 @@ class _WhatsappNumberFormState extends State<WhatsappNumberForm> {
                                   ),
                                 ),
                               );
+                            } else if (state is WhatsappNumberNoInternet) {
+                              Navigator.of(context, rootNavigator: true).pop();
+                              _toastNotification(
+                                  'No internet connection',
+                                  Colors.red,
+                                  Toast.LENGTH_SHORT,
+                                  ToastGravity.CENTER);
                             } else if (state is WhatsappNumberFormSubmitted) {
                               BlocProvider.of<AuthenticationBloc>(context).add(
                                 UserUpdated(
@@ -131,7 +198,10 @@ class _WhatsappNumberFormState extends State<WhatsappNumberForm> {
 
                                   dynamic whatsappNumber = {
                                     'whatsapp': _whatsappNumber,
+                                    'whatsapp_iso_code': _selectedIsoCode,
+                                    'whatsapp_dial_code': _selectedDialCode,
                                   };
+
                                   BlocProvider.of<WhatsappNumberBloc>(context)
                                     ..add(SaveUserWhatsappNumber(
                                         contactId: state.user.contactId,

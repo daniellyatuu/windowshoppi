@@ -23,4 +23,6 @@ class VendorProfileUpdateFormSubmitted extends VendorProfileUpdateStates {
 
 class VendorProfileUpdateUserExist extends VendorProfileUpdateStates {}
 
+class VendorProfileUpdateNoInternet extends VendorProfileUpdateStates {}
+
 class VendorProfileUpdateFormError extends VendorProfileUpdateStates {}

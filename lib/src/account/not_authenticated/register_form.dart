@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class RegisterForm extends StatefulWidget {
   @override
@@ -23,6 +26,7 @@ class _RegisterFormState extends State<RegisterForm> {
   PhoneNumber number = PhoneNumber(isoCode: 'TZ');
   String _enteredPhoneNumber;
   String _selectedIsoCode;
+  String _selectedDialCode;
 
   Widget _divider() {
     return SizedBox(
@@ -81,16 +85,18 @@ class _RegisterFormState extends State<RegisterForm> {
             isDense: true,
           ),
           onInputChanged: (PhoneNumber number) {
-            print(number.phoneNumber);
             setState(() {
               _enteredPhoneNumber = number.phoneNumber;
               _selectedIsoCode = number.isoCode;
+              _selectedDialCode = number.dialCode;
             });
+            _phoneNumber =
+                _enteredPhoneNumber.replaceFirst('${number.dialCode}', '');
           },
           // onInputValidated: (bool value) {
           //   // print(value);
           // },
-          onSaved: (value) => _phoneNumber = _enteredPhoneNumber,
+          // onSaved: (value) => _phoneNumber = _enteredPhoneNumber,
           selectorConfig: SelectorConfig(
             selectorType: PhoneInputSelectorType.DIALOG,
           ),
@@ -122,6 +128,9 @@ class _RegisterFormState extends State<RegisterForm> {
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
           child: TextFormField(
+            inputFormatters: [
+              LowerCaseTextFormatter(),
+            ],
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.alternate_email, color: Colors.black54),
               labelText: 'Username*',
@@ -346,11 +355,15 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ),
           );
+        } else if (state is RegistrationNoInternet) {
+          Navigator.of(context, rootNavigator: true).pop();
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         } else if (state is FormError) {
           await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context, rootNavigator: true).pop();
-            _notification(
-                'Error occurred, please try again.', Colors.red, Colors.white);
+            _toastNotification('Error occurred, please try again.', Colors.red,
+                Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
           });
         } else if (state is UserExist) {
           await Future.delayed(Duration(milliseconds: 300), () {
@@ -370,8 +383,9 @@ class _RegisterFormState extends State<RegisterForm> {
           width: double.infinity,
           child: OutlineButton(
             splashColor: Colors.red,
-            onPressed: () {
+            onPressed: () async {
               FocusScope.of(context).requestFocus(FocusNode());
+
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
                 dynamic userData = {
@@ -379,6 +393,7 @@ class _RegisterFormState extends State<RegisterForm> {
                   'last_name': _lastName,
                   'call': _phoneNumber,
                   'call_iso_code': _selectedIsoCode,
+                  'call_dial_code': _selectedDialCode,
                   'username': _userName,
                   'password': _passWord,
                   if (_emailAddress != '') 'email': _emailAddress,
@@ -396,21 +411,19 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    Scaffold.of(context).hideCurrentSnackBar();
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
 
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'dart:io';
 
 class WhatsappNumberAPIClient {
   Future saveNumber(id, data) async {
@@ -17,16 +18,20 @@ class WhatsappNumberAPIClient {
       'Authorization': 'Token $token',
     };
 
-    final response = await http.put(
-      _url,
-      headers: headers,
-      body: jsonEncode(data),
-    );
+    try {
+      final response = await http.put(
+        _url,
+        headers: headers,
+        body: jsonEncode(data),
+      );
 
-    if (response.statusCode == 200) {
-      return compute(_parseUser, response.body);
-    } else {
-      throw Exception('Failed to update whatsapp number.');
+      if (response.statusCode == 200) {
+        return compute(_parseUser, response.body);
+      } else {
+        throw Exception('Failed to update whatsapp number.');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

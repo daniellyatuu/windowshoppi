@@ -13,12 +13,14 @@ class WhatsappNumberBloc
     yield WhatsappNumberFormSubmitting();
 
     if (event is SaveUserWhatsappNumber) {
-      try {
-        final User _user = await WhatsappNumberAPIClient()
-            .saveNumber(event.contactId, event.data);
+      final _user = await WhatsappNumberAPIClient()
+          .saveNumber(event.contactId, event.data);
 
+      if (_user == 'no_internet') {
+        yield WhatsappNumberNoInternet();
+      } else if (_user is User) {
         yield WhatsappNumberFormSubmitted(user: _user);
-      } catch (error) {
+      } else {
         yield WhatsappNumberFormError();
       }
     }

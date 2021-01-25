@@ -39,7 +39,8 @@ dependencies:
   flushbar: ^1.10.4
   international_phone_input: ^1.0.4
   intl_phone_number_input: ^0.5.2+2
-
+  data_connection_checker: ^0.3.4
+  fluttertoast: ^7.1.6
 
 
 dev_dependencies:

@@ -7,7 +7,9 @@ class Account extends Equatable {
   final String group;
   final String email;
   final String call;
+  final String callDialCode;
   final String whatsapp;
+  final String whatsappDialCode;
   final String accountProfile;
   final String accountBio;
   final String businessBio;
@@ -19,7 +21,9 @@ class Account extends Equatable {
     this.group,
     this.email,
     this.call,
+    this.callDialCode,
     this.whatsapp,
+    this.whatsappDialCode,
     this.accountProfile,
     this.accountBio,
     this.businessBio,
@@ -33,7 +37,9 @@ class Account extends Equatable {
       group: json['group'],
       email: json['email'],
       call: json['call_number'],
+      callDialCode: json['call_dial_code'],
       whatsapp: json['whatsapp_number'],
+      whatsappDialCode: json['whatsapp_dial_code'],
       accountProfile: json['profile_image'],
       accountBio: json['account_bio'],
       businessBio: json['business_bio'],
@@ -48,7 +54,9 @@ class Account extends Equatable {
         group,
         email,
         call,
+        callDialCode,
         whatsapp,
+        whatsappDialCode,
         accountProfile,
         accountBio,
         businessBio,

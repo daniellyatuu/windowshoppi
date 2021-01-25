@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -202,11 +203,15 @@ class _LoginState extends State<Login> {
               ),
             ),
           );
+        } else if (state is LoginNoInternet) {
+          Navigator.of(context, rootNavigator: true).pop();
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         } else if (state is LoginFormError) {
           await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context, rootNavigator: true).pop();
-            _notification(
-                'Sorry, login failed. try again', Colors.red, Colors.black);
+            _toastNotification('Sorry, login failed. try again', Colors.red,
+                Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
           });
         } else if (state is ValidAccount) {
           BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedIn(
@@ -215,8 +220,8 @@ class _LoginState extends State<Login> {
         } else if (state is InvalidAccount) {
           await Future.delayed(Duration(milliseconds: 300), () {
             Navigator.of(context, rootNavigator: true).pop();
-            _notification(
-                'wrong username or password', Colors.black, Colors.red);
+            _toastNotification('wrong username or password', Colors.red,
+                Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
           });
         }
       },
@@ -246,22 +251,19 @@ class _LoginState extends State<Login> {
     );
   }
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    // close active snackBar if any before open new one
-    Scaffold.of(context).hideCurrentSnackBar();
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
 
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override

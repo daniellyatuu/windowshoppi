@@ -11,20 +11,18 @@ class CreateProfileBloc extends Bloc<CreateProfileEvents, CreateProfileStates> {
       CreateProfileEvents event) async* {
     if (event is SaveProfilePicture) {
       yield CreateProfileSubmitting();
-      try {
-        final User _user = await CreateProfileAPIClient().createProfile(
-          event.accountId,
-          event.contactId,
-          event.picture,
-        );
 
-        if (_user is User) {
-          yield CreateProfileSuccess(user: _user);
-        } else {
-          yield CreateProfileError();
-        }
-      } catch (_) {
-        print(_);
+      final _user = await CreateProfileAPIClient().createProfile(
+        event.accountId,
+        event.contactId,
+        event.picture,
+      );
+
+      if (_user == 'no_internet') {
+        yield CreateProfileNoInternet();
+      } else if (_user is User) {
+        yield CreateProfileSuccess(user: _user);
+      } else {
         yield CreateProfileError();
       }
     }
@@ -32,21 +30,15 @@ class CreateProfileBloc extends Bloc<CreateProfileEvents, CreateProfileStates> {
     if (event is RemoveProfile) {
       yield RemoveProfileLoading();
 
-      try {
-        final User _user = await RemoveProfileAPIClient()
-            .removeProfile(event.accountId, event.contactId);
+      final _user = await RemoveProfileAPIClient()
+          .removeProfile(event.accountId, event.contactId);
 
-        print('back to bloc');
-        print(_user);
-
-        if (_user is User) {
-          yield RemoveProfileSuccess(user: _user);
-        } else {
-          yield RemoveProfileError();
-        }
-      } catch (_) {
-        // print(_);
-        // yield CreateProfileError();
+      if (_user == 'no_internet') {
+        yield RemoveProfileNoInternet();
+      } else if (_user is User) {
+        yield RemoveProfileSuccess(user: _user);
+      } else {
+        yield RemoveProfileError();
       }
     }
   }

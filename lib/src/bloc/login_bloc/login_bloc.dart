@@ -15,29 +15,18 @@ class LoginBloc extends Bloc<LoginEvents, LoginStates> {
     if (event is UserLogin) {
       yield LoginFormSubmitting();
 
-      try {
-        final _user = await loginRepository.userLogin(event.data);
+      final _user = await loginRepository.userLogin(event.data);
 
-        if (_user == 'invalid_account') {
-          yield InvalidAccount();
-        } else if (_user is User) {
-          final User user = _user;
-          yield ValidAccount(user: user);
-        } else {
-          yield LoginFormError();
-        }
-      } catch (error) {
+      if (_user == 'invalid_account') {
+        yield InvalidAccount();
+      } else if (_user == 'no_internet') {
+        yield LoginNoInternet();
+      } else if (_user is User) {
+        final User user = _user;
+        yield ValidAccount(user: user);
+      } else {
         yield LoginFormError();
       }
-
-      // yield LoginFormSubmitting();
-      // final userData = await loginRepository.userLogin(event.data);
-      // print('inside bloc $userData');
-      // if (userData == 'invalid_account') {
-      //   yield InvalidAccount();
-      // } else if (userData == 'success') {
-      //   yield ValidAccount();
-      // }
     }
   }
 }
