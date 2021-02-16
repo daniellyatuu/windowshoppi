@@ -3,6 +3,7 @@ import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 
 class PostListView extends StatefulWidget {
@@ -17,6 +18,9 @@ class PostListView extends StatefulWidget {
 
 class _PostListViewState extends State<PostListView> {
   final _scrollThreshold = 300.0;
+
+  bool _showLoadMoreIndicator = false;
+  bool _showFailedToLoadMore = false;
 
   void _scrollListener() {
     if (context != null) {
@@ -44,6 +48,21 @@ class _PostListViewState extends State<PostListView> {
     await Future.delayed(Duration(milliseconds: 700));
   }
 
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
+  }
+
   void _scrollOnTop() async {
     if (widget._primaryScrollController.hasClients) {
       await widget._primaryScrollController.animateTo(0,
@@ -61,8 +80,31 @@ class _PostListViewState extends State<PostListView> {
   Widget build(BuildContext context) {
     return BlocConsumer<UserPostBloc, UserPostStates>(
       listener: (context, state) {
-        if (state is InvalidToken) {
+        if (state is UserPostInitNoInternet) {
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
+        } else if (state is InvalidToken) {
           BlocProvider.of<AuthenticationBloc>(context)..add(DeleteToken());
+        } else if (state is UserPostSuccess) {
+          if (state.hasFailedToLoadMore) {
+            setState(() {
+              _showFailedToLoadMore = true;
+            });
+          }
+
+          if (!state.hasFailedToLoadMore && !state.hasReachedMax) {
+            setState(() {
+              _showFailedToLoadMore = false;
+              _showLoadMoreIndicator = true;
+            });
+          }
+
+          if ((!state.hasFailedToLoadMore && state.hasReachedMax) ||
+              (state.hasFailedToLoadMore && !state.hasReachedMax)) {
+            setState(() {
+              _showLoadMoreIndicator = false;
+            });
+          }
         }
       },
       builder: (context, state) {
@@ -70,12 +112,21 @@ class _PostListViewState extends State<PostListView> {
           return Center(
             child: CircularProgressIndicator(),
           );
+        } else if (state is UserPostInitNoInternet) {
+          return GestureDetector(
+            onTap: () {
+              BlocProvider.of<UserPostBloc>(context)
+                ..add(UserPostRefresh(accountId: this.widget.accountId));
+            },
+            child: NoInternet2(),
+          );
         } else if (state is UserPostFailure) {
-          return Center(
-            child: Text(
-              'Failed to fetch posts',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
+          return GestureDetector(
+            onTap: () {
+              BlocProvider.of<UserPostBloc>(context)
+                ..add(UserPostRefresh(accountId: this.widget.accountId));
+            },
+            child: FailedToFetchPost(),
           );
         } else if (state is UserPostSuccess) {
           var data = state.posts;
@@ -136,7 +187,28 @@ class _PostListViewState extends State<PostListView> {
                       );
                     },
                   ),
-                  if (!state.hasReachedMax) BottomLoader(),
+                  if (_showLoadMoreIndicator ||
+                      !state.hasFailedToLoadMore && !state.hasReachedMax)
+                    BottomLoader(),
+                  if (_showFailedToLoadMore || state.hasFailedToLoadMore)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0),
+                      child: FlatButton(
+                        onPressed: () {
+                          setState(() {
+                            _showLoadMoreIndicator = true;
+                            _showFailedToLoadMore = false;
+                          });
+                          BlocProvider.of<UserPostBloc>(context)
+                            ..add(UserPostFetched(
+                                accountId: this.widget.accountId));
+                        },
+                        child: Text(
+                          "Couldn't load posts.Tap to try again",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

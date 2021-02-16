@@ -112,3 +112,8 @@ export 'user_app_visit/user_app_visit_states.dart';
 export 'create_profile_bloc/create_profile_events.dart';
 export 'create_profile_bloc/create_profile_bloc.dart';
 export 'create_profile_bloc/create_profile_states.dart';
+
+// bloc files for navigation bloc
+export 'navigation_bloc/navigation_events.dart';
+export 'navigation_bloc/navigation_bloc.dart';
+export 'navigation_bloc/navigation_states.dart';

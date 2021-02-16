@@ -15,7 +15,7 @@ class Detail extends StatelessWidget {
       ),
       body: ListView(
         children: [
-          TopHeader(
+          PostHeader(
             post: post,
           ),
           if (post.group == 'vendor')

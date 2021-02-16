@@ -7,6 +7,14 @@ abstract class UserPostEvents extends Equatable {
   List<Object> get props => [];
 }
 
+class UserPostFetchedInit extends UserPostEvents {
+  final int accountId;
+  UserPostFetchedInit({@required this.accountId});
+
+  @override
+  List<Object> get props => [accountId];
+}
+
 class UserPostFetched extends UserPostEvents {
   final int accountId;
   UserPostFetched({@required this.accountId});

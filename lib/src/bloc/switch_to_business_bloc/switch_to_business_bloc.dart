@@ -13,31 +13,20 @@ class SwitchToBusinessBloc
     yield SwitchToBusinessSubmitting();
 
     if (event is SwitchToBusinessAccount) {
-      final _user = await SwitchToBusinessAPIClient()
-          .switchAccount(event.accountId, event.contactId, event.data);
+      try {
+        final _user = await SwitchToBusinessAPIClient()
+            .switchAccount(event.accountId, event.contactId, event.data);
 
-      if (_user == 'no_internet') {
-        yield SwitchAccountNoInternet();
-      } else if (_user == 'user_exists') {
-        yield SwitchToBusinessUserExist();
-      } else if (_user is User) {
-        yield SwitchToBusinessFormSubmitted(user: _user);
-      } else {
+        if (_user == 'no_internet') {
+          yield SwitchAccountNoInternet();
+        } else if (_user == 'user_exists') {
+          yield SwitchToBusinessUserExist();
+        } else if (_user is User) {
+          yield SwitchToBusinessFormSubmitted(user: _user);
+        }
+      } catch (_) {
         yield SwitchToBusinessFormError();
       }
-
-      // try {
-      //   final _user = await SwitchToBusinessAPIClient()
-      //       .switchAccount(event.accountId, event.contactId, event.data);
-      //
-      //   if (_user == 'user_exists') {
-      //     yield SwitchToBusinessUserExist();
-      //   } else if (_user is User) {
-      //     yield SwitchToBusinessFormSubmitted(user: _user);
-      //   }
-      // } catch (error) {
-      //   yield SwitchToBusinessFormError();
-      // }
     }
   }
 }

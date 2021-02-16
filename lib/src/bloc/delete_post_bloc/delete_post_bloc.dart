@@ -13,11 +13,11 @@ class DeletePostBloc extends Bloc<DeletePostEvents, DeletePostStates> {
       try {
         final _result = await DeletePostAPIClient().deletePost(event.postId);
 
-        if (_result == 200) {
+        if (_result == 'no_internet') {
+          yield DeletePostNoInternet();
+        } else if (_result == 200) {
           await Future.delayed(Duration(milliseconds: 500));
           yield DeletePostSuccess();
-        } else {
-          yield DeletePostError();
         }
       } catch (_) {
         yield DeletePostError();

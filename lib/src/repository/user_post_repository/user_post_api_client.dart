@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:windowshoppi/api.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'dart:io';
 
 class UserPostAPIClient {
   Future userPost(int offset, int limit, int accountId) async {
@@ -17,21 +18,25 @@ class UserPostAPIClient {
       'Authorization': 'Token $token',
     };
 
-    final response = await http.get(
-      _url,
-      headers: headers,
-    );
+    try {
+      final response = await http.get(
+        _url,
+        headers: headers,
+      );
 
-    var _post = json.decode(response.body);
+      var _post = json.decode(response.body);
 
-    if (_post['detail'] == 'Invalid token.') {
-      return 'invalid_token';
-    }
+      if (_post['detail'] == 'Invalid token.') {
+        return 'invalid_token';
+      }
 
-    if (response.statusCode == 200) {
-      return compute(_parsePost, response.body);
-    } else {
-      throw Exception('Error on server');
+      if (response.statusCode == 200) {
+        return compute(_parsePost, response.body);
+      } else {
+        throw Exception('Error on server');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

@@ -1,4 +1,3 @@
-import 'package:windowshoppi/src/account/not_authenticated/account_page_init.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:windowshoppi/src/account/not_authenticated/post/detail.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
@@ -84,7 +83,12 @@ class _HomeState extends State<Home> {
               child: CircularProgressIndicator(),
             );
           } else if (state is AllPostFailure) {
-            return FailedToFetchPost();
+            return GestureDetector(
+              onTap: () {
+                BlocProvider.of<AllPostBloc>(context)..add(AllPostRefresh());
+              },
+              child: FailedToFetchPost(),
+            );
           } else if (state is AllPostSuccess) {
             var data = state.posts;
 
@@ -253,8 +257,10 @@ class _HomeState extends State<Home> {
                                 1, index.isEven ? 1.4 : 1.6);
                           }),
                     ),
-                    if (_showLoadMoreIndicator) BottomLoader(),
-                    if (_showFailedToLoadMore)
+                    if (_showLoadMoreIndicator ||
+                        !state.hasFailedToLoadMore && !state.hasReachedMax)
+                      BottomLoader(),
+                    if (_showFailedToLoadMore || state.hasFailedToLoadMore)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5.0),
                         child: FlatButton(

@@ -1,28 +1,32 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:windowshoppi/src/location/flutter_google_places.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:google_maps_webservice/places.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/api.dart';
 import 'package:flutter/material.dart';
 
 // to get places detail (lat/lng)
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
 
-class PostCreate extends StatefulWidget {
+class CreatePostPage extends StatefulWidget {
+  final List<Asset> imageList;
+  CreatePostPage({@required this.imageList});
+
   @override
-  _PostCreateState createState() => _PostCreateState();
+  _CreatePostPageState createState() => _CreatePostPageState();
 }
 
-class _PostCreateState extends State<PostCreate> {
+class _CreatePostPageState extends State<CreatePostPage> {
   final _postFormKey = GlobalKey<FormState>();
   final homeScaffoldKey = GlobalKey<ScaffoldState>();
+
   String _postCaptionText;
   bool _showButtonSelection = false;
   String _url = '';
   String _link;
-  String daniel;
   String _buttonSelected = 'visit';
   bool _linkError = false;
 
@@ -33,16 +37,65 @@ class _PostCreateState extends State<PostCreate> {
   Widget _buildPostCaption() {
     return Row(
       children: <Widget>[
-        Container(
-          width: 30,
-          height: 30,
-          decoration: BoxDecoration(
-            color: Colors.grey,
-            shape: BoxShape.circle,
-          ),
-          child: FittedBox(
-            child: Icon(Icons.account_circle, color: Colors.grey[300]),
-          ),
+        BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+          builder: (context, state) {
+            if (state is IsAuthenticated) {
+              return Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  shape: BoxShape.circle,
+                ),
+                child: state.user.profileImage == null
+                    ? FittedBox(
+                        child:
+                            Icon(Icons.account_circle, color: Colors.grey[400]),
+                      )
+                    : ClipOval(
+                        child: ExtendedImage.network(
+                          '${state.user.profileImage}',
+                          cache: true,
+                          loadStateChanged: (ExtendedImageState state) {
+                            switch (state.extendedImageLoadState) {
+                              case LoadState.loading:
+                                return FittedBox(
+                                  child: Icon(Icons.account_circle,
+                                      color: Colors.grey[400]),
+                                );
+                                break;
+
+                              ///if you don't want override completed widget
+                              ///please return null or state.completedWidget
+                              //return null;
+                              //return state.completedWidget;
+                              case LoadState.completed:
+                                return ExtendedRawImage(
+                                  fit: BoxFit.cover,
+                                  image: state.extendedImageInfo?.image,
+                                );
+                                break;
+                              case LoadState.failed:
+                                // _controller.reset();
+                                return GestureDetector(
+                                  child: Center(
+                                    child: Icon(Icons.refresh),
+                                  ),
+                                  onTap: () {
+                                    state.reLoadImage();
+                                  },
+                                );
+                                break;
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
+              );
+            } else {
+              return Container();
+            }
+          },
         ),
         SizedBox(width: 10.0),
         Expanded(
@@ -50,13 +103,15 @@ class _PostCreateState extends State<PostCreate> {
             maxLines: null,
             keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
-              hintText: 'Write Caption*',
+              labelText: 'Write Caption*',
+              labelStyle: TextStyle(
+                color: Colors.grey[700],
+                fontWeight: FontWeight.bold,
+              ),
               border: InputBorder.none,
             ),
             style: TextStyle(
               color: Colors.grey[700],
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
             ),
             validator: (value) {
               if (value.isEmpty) {
@@ -71,16 +126,16 @@ class _PostCreateState extends State<PostCreate> {
     );
   }
 
-  Widget _buildPostView(data) {
+  Widget _buildPostView() {
     return Container(
       child: GridView.count(
         physics: ScrollPhysics(),
         shrinkWrap: true,
         crossAxisCount: 3,
         children: List.generate(
-          data.length,
+          widget.imageList.length,
           (index) {
-            Asset asset = data[index];
+            Asset asset = widget.imageList[index];
             return Padding(
               padding: const EdgeInsets.all(2.0),
               child: AssetThumb(
@@ -122,7 +177,7 @@ class _PostCreateState extends State<PostCreate> {
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
-                      _activeLocation ?? 'Add location',
+                      _activeLocation ?? 'Add Location',
                       style: TextStyle(
                         color: Colors.grey[700],
                         fontSize: 16.0,
@@ -166,7 +221,7 @@ class _PostCreateState extends State<PostCreate> {
               Focus(
                 onFocusChange: (hasFocus) {
                   int _urlLength = _url.length;
-                  print(_urlLength);
+
                   setState(() {
                     if (hasFocus) {
                       _showButtonSelection = true;
@@ -186,13 +241,15 @@ class _PostCreateState extends State<PostCreate> {
                     Expanded(
                       child: TextFormField(
                         decoration: InputDecoration(
-                          hintText: 'Add link',
+                          labelText: 'Add Link',
+                          labelStyle: TextStyle(
+                            color: Colors.grey[700],
+                            fontWeight: FontWeight.bold,
+                          ),
                           border: InputBorder.none,
                         ),
                         style: TextStyle(
                           color: Colors.grey[700],
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
                         ),
                         onChanged: (value) {
                           setState(() {
@@ -281,6 +338,7 @@ class _PostCreateState extends State<PostCreate> {
     );
   }
 
+  // LOCATION .START
   void onError(PlacesAutocompleteResponse response) {
     homeScaffoldKey.currentState.showSnackBar(
       SnackBar(content: Text(response.errorMessage)),
@@ -340,167 +398,145 @@ class _PostCreateState extends State<PostCreate> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ImageSelectionBloc, ImageSelectionStates>(
-      builder: (context, state) {
-        if (state is ImageSelected) {
-          if (state.imageUsedFor == 'post') {
-            var data = state.resultList;
-            return Scaffold(
-              key: homeScaffoldKey,
-              appBar: AppBar(
-                leading: IconButton(
-                  onPressed: () => BlocProvider.of<ImageSelectionBloc>(context)
-                    ..add(ClearImage(resultList: data)),
-                  icon: Icon(Icons.clear),
-                ),
-                title: Text('new post'),
-                actions: <Widget>[
-                  BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-                      builder: (context, state) {
-                    if (state is IsAuthenticated) {
-                      return BlocListener<CreatePostBloc, CreatePostStates>(
-                        listener: (context, state) {
-                          if (state is CreatePostSubmitting) {
-                            return showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (dialogContext) => Material(
-                                type: MaterialType.transparency,
-                                child: Center(
-                                  // Aligns the container to center
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 40,
-                                        height: 40,
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                      SizedBox(
-                                        height: 10.0,
-                                      ),
-                                      Text(
-                                        'Posting..',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ],
+    return Scaffold(
+      key: homeScaffoldKey,
+      appBar: AppBar(
+        title: Text('new post'),
+        actions: <Widget>[
+          BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+            builder: (context, state) {
+              if (state is IsAuthenticated) {
+                return BlocListener<CreatePostBloc, CreatePostStates>(
+                  listener: (context, state) {
+                    if (state is CreatePostSubmitting) {
+                      return showDialog(
+                        barrierDismissible: false,
+                        context: context,
+                        builder: (dialogContext) => Material(
+                          type: MaterialType.transparency,
+                          child: Center(
+                            // Aligns the container to center
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 40,
+                                  height: 40,
+                                  child: CircularProgressIndicator(),
+                                ),
+                                SizedBox(
+                                  height: 10.0,
+                                ),
+                                Text(
+                                  'Posting..',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                            );
-                          } else if (state is CreatePostNoInternet) {
-                            Navigator.of(context, rootNavigator: true).pop();
-                            _toastNotification(
-                                'No internet connection',
-                                Colors.red,
-                                Toast.LENGTH_SHORT,
-                                ToastGravity.CENTER);
-                          } else if (state is CreatePostError) {
-                            Navigator.of(context, rootNavigator: true).pop();
-                            _toastNotification(
-                                'Error occurred, please try again.',
-                                Colors.red,
-                                Toast.LENGTH_LONG,
-                                ToastGravity.SNACKBAR);
-                          } else if (state is CreatePostSuccess) {
-                            Navigator.of(context, rootNavigator: true).pop();
-
-                            // add post
-                            BlocProvider.of<UserPostBloc>(context)
-                              ..add(UserPostInsert(post: state.post));
-
-                            // remove selected image
-                            BlocProvider.of<ImageSelectionBloc>(context)
-                              ..add(ClearImage(resultList: data));
-                          }
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
-                          child: GestureDetector(
-                            onTap: () async {
-                              if (_postFormKey.currentState.validate()) {
-                                _postFormKey.currentState.save();
-
-                                // validate link
-                                if (_link != '') {
-                                  bool _validURL = Uri.parse(_link).isAbsolute;
-
-                                  if (_validURL == false) {
-                                    setState(() {
-                                      _linkError = true;
-                                    });
-                                  }
-                                }
-
-                                FocusScope.of(context)
-                                    .requestFocus(FocusNode());
-
-                                BlocProvider.of<CreatePostBloc>(context)
-                                  ..add(
-                                    CreatePost(
-                                      accountId: state.user.accountId,
-                                      caption: _postCaptionText,
-                                      location: _activeLocation,
-                                      lat: latitude,
-                                      long: longitude,
-                                      url: _link,
-                                      urlText: _buttonSelected,
-                                      resultList: data,
-                                    ),
-                                  );
-                              }
-                            },
-                            child: Row(
-                              children: <Widget>[
-                                Text(
-                                  'POST ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18),
-                                ),
-                                Icon(Icons.send, size: 20),
                               ],
                             ),
                           ),
                         ),
                       );
-                    } else {
-                      return Container();
+                    } else if (state is CreatePostNoInternet) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                      _toastNotification('No internet connection', Colors.red,
+                          Toast.LENGTH_SHORT, ToastGravity.CENTER);
+                    } else if (state is CreatePostError) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                      _toastNotification('Error occurred, please try again.',
+                          Colors.red, Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
+                    } else if (state is CreatePostSuccess) {
+                      Navigator.of(context, rootNavigator: true).pop();
+
+                      // add post
+                      BlocProvider.of<UserPostBloc>(context)
+                        ..add(UserPostInsert(post: state.post));
+
+                      BlocProvider.of<AllPostBloc>(context)
+                        ..add(AllPostInsert(post: state.post));
+
+                      // close create post page
+                      Navigator.of(context).pop();
                     }
-                  }),
-                ],
-              ),
-              body: Center(
-                child: Form(
-                  key: _postFormKey,
+                  },
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView(
-                      children: <Widget>[
-                        _buildPostCaption(),
-                        Divider(),
-                        _buildPostView(data),
-                        Divider(),
-                        _buildPostTagLocation(),
-                        Divider(),
-                        _buildAddLink(),
-                      ],
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (_postFormKey.currentState.validate()) {
+                          _postFormKey.currentState.save();
+
+                          // validate link
+                          if (_link != '') {
+                            bool _validURL = Uri.parse(_link).isAbsolute;
+
+                            if (_validURL == false) {
+                              setState(() {
+                                _linkError = true;
+                              });
+                            }
+                          } else {
+                            FocusScope.of(context).requestFocus(FocusNode());
+
+                            BlocProvider.of<CreatePostBloc>(context)
+                              ..add(
+                                CreatePost(
+                                  accountId: state.user.accountId,
+                                  caption: _postCaptionText,
+                                  location: _activeLocation,
+                                  lat: latitude,
+                                  long: longitude,
+                                  url: _link,
+                                  urlText: _buttonSelected,
+                                  resultList: widget.imageList,
+                                  postType: 1,
+                                ),
+                              );
+                          }
+                        }
+                      },
+                      child: Row(
+                        children: <Widget>[
+                          Text(
+                            'POST ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          Icon(Icons.send, size: 20),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              ),
-            );
-          } else {
-            return Container();
-          }
-        } else {
-          return Container();
-        }
-      },
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
+        ],
+      ),
+      body: Center(
+        child: Form(
+          key: _postFormKey,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView(
+              children: <Widget>[
+                _buildPostCaption(),
+                Divider(),
+                _buildPostView(),
+                Divider(),
+                _buildPostTagLocation(),
+                Divider(),
+                _buildAddLink(),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

@@ -1,7 +1,7 @@
 name: windowshoppi
 description: A new Flutter application.
 
-version: 1.0.5+7
+version: 1.0.5+8
 
 environment:
   sdk: ">=2.7.0 <3.0.0"

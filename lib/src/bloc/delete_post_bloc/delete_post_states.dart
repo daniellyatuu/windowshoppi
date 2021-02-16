@@ -11,4 +11,6 @@ class DeletePostLoading extends DeletePostStates {}
 
 class DeletePostError extends DeletePostStates {}
 
+class DeletePostNoInternet extends DeletePostStates {}
+
 class DeletePostSuccess extends DeletePostStates {}

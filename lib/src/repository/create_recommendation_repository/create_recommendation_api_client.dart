@@ -8,10 +8,15 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:io';
 
-class CreatePostAPIClient {
-  Future createPost({
+class CreateRecommendationAPIClient {
+  Future createRecommendation({
     @required accountId,
     @required caption,
+    @required recommendationName,
+    @required recommendationType,
+    @required recommendationPhoneIsoCode,
+    @required recommendationPhoneDialCode,
+    @required recommendationPhoneNumber,
     @required location,
     @required lat,
     @required long,
@@ -58,6 +63,17 @@ class CreatePostAPIClient {
 
       request.fields['account'] = accountId.toString();
       request.fields['caption'] = caption;
+      request.fields['recommendation_name'] = recommendationName;
+      request.fields['recommendation_type'] = recommendationType.toString();
+      if (recommendationPhoneNumber != null)
+        request.fields['recommendation_phone_iso_code'] =
+            recommendationPhoneIsoCode;
+      if (recommendationPhoneNumber != null)
+        request.fields['recommendation_phone_dial_code'] =
+            recommendationPhoneDialCode;
+      if (recommendationPhoneNumber != null)
+        request.fields['recommendation_phone_number'] =
+            recommendationPhoneNumber;
       if (location != null) request.fields['location_name'] = location;
       if (lat != null) request.fields['latitude'] = lat;
       if (long != null) request.fields['longitude'] = long;
@@ -67,6 +83,8 @@ class CreatePostAPIClient {
 
       // send
       var response = await request.send();
+
+      print('respond = ${response.statusCode}');
 
       if (response.statusCode == 201) {
         String result = await utf8.decoder.bind(response.stream).join();

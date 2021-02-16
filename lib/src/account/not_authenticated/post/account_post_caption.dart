@@ -50,15 +50,19 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                                 widget.post.url != null))
                           Container(
                             alignment: Alignment.centerRight,
-                            child: FlatButton(
+                            child: RaisedButton(
+                              color: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
-                                side: BorderSide(color: Colors.teal, width: 3),
+                                // side: BorderSide(color: Colors.teal, width: 3),
                               ),
                               onPressed: () => _launchURL('${widget.post.url}'),
                               child: Row(
                                 children: [
-                                  Text('${widget.post.urlText} '),
+                                  Text(
+                                    '${widget.post.urlText} ',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                   BlocBuilder<AuthenticationBloc,
                                       AuthenticationStates>(
                                     builder: (context, state) {
@@ -69,14 +73,14 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                                             return Icon(
                                               Icons.verified_outlined,
                                               size: 16,
-                                              color: Colors.teal,
+                                              // color: Colors.teal,
                                             );
                                           } else if (widget.post.isUrlValid ==
                                               false) {
                                             return Icon(
                                               Icons.warning_outlined,
                                               size: 16,
-                                              color: Colors.red,
+                                              // color: Colors.red,
                                             );
                                           } else {
                                             return Container();
@@ -111,20 +115,22 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                   children: [
                     Column(
                       children: [
-                        if (widget.post.url != null &&
-                            widget.post.isUrlValid == true)
+                        if ((widget.post.url != null &&
+                                widget.post.isUrlValid == true) ||
+                            (widget.post.url != null &&
+                                widget.post.isUrlValid == null))
                           Container(
                             alignment: Alignment.centerRight,
-                            child: FlatButton(
+                            child: RaisedButton(
+                              color: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
-                                side: BorderSide(color: Colors.teal, width: 3),
+                                // side: BorderSide(color: Colors.teal, width: 3),
                               ),
                               onPressed: () => _launchURL('${widget.post.url}'),
-                              child: Row(
-                                children: [
-                                  Text('${widget.post.urlText}'),
-                                ],
+                              child: Text(
+                                '${widget.post.urlText}',
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
                           ),

@@ -27,16 +27,22 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
     final currentState = state;
 
     if (event is UserPostRefresh) {
-      if (currentState is UserPostSuccess) {
+      if (currentState is UserPostInitNoInternet ||
+          currentState is UserPostFailure) yield UserPostInitial();
+
+      try {
         // get new posts
         final _posts =
             await userPostRepository.userPost(0, _limit, event.accountId);
 
-        if (_posts == 'invalid_token') {
+        if (_posts == 'no_internet') {
+          yield UserPostInitNoInternet();
+        } else if (_posts == 'invalid_token') {
           yield InvalidToken();
         } else if (_posts is List<Post>) {
-          // remove current posts
-          currentState.posts.clear();
+          if (currentState is UserPostSuccess)
+            // remove current posts
+            currentState.posts.clear();
 
           final List<Post> posts = _posts;
 
@@ -44,6 +50,8 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
               posts: posts,
               hasReachedMax: posts.length < _limit ? true : false);
         }
+      } catch (_) {
+        yield UserPostFailure();
       }
     }
 
@@ -88,13 +96,15 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
       }
     }
 
-    if (event is UserPostFetched && !_hasReachedMax(currentState)) {
-      try {
-        if (currentState is UserPostInitial) {
+    if (event is UserPostFetchedInit && !_hasReachedMax(currentState)) {
+      if (currentState is UserPostInitial) {
+        try {
           final _posts =
               await userPostRepository.userPost(0, _limit, event.accountId);
 
-          if (_posts == 'invalid_token') {
+          if (_posts == 'no_internet') {
+            yield UserPostInitNoInternet();
+          } else if (_posts == 'invalid_token') {
             yield InvalidToken();
           } else if (_posts is List<Post>) {
             final List<Post> posts = _posts;
@@ -103,12 +113,26 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
                 posts: posts,
                 hasReachedMax: posts.length < _limit ? true : false);
           }
+        } catch (_) {
+          yield UserPostFailure();
         }
-        if (currentState is UserPostSuccess) {
+      }
+    }
+
+    if (event is UserPostFetched && !_hasReachedMax(currentState)) {
+      if (currentState is UserPostSuccess) {
+        try {
           final _posts = await userPostRepository.userPost(
               currentState.posts.length, _limit, event.accountId);
 
-          if (_posts == 'invalid_token') {
+          if (_posts == 'no_internet') {
+            yield UserPostInitial();
+            yield UserPostSuccess(
+              posts: currentState.posts,
+              hasReachedMax: false,
+              hasFailedToLoadMore: true,
+            );
+          } else if (_posts == 'invalid_token') {
             yield InvalidToken();
           } else if (_posts is List<Post>) {
             final List<Post> posts = _posts;
@@ -117,9 +141,14 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
               hasReachedMax: posts.length < _limit ? true : false,
             );
           }
+        } catch (_) {
+          yield UserPostInitial();
+          yield UserPostSuccess(
+            posts: currentState.posts,
+            hasReachedMax: false,
+            hasFailedToLoadMore: true,
+          );
         }
-      } catch (_) {
-        yield UserPostFailure();
       }
     }
   }

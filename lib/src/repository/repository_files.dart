@@ -78,3 +78,6 @@ export 'create_profile_repository/create_profile_api_client.dart';
 
 // repo files for remove profile
 export 'remove_profile_repository/remove_profile_api_client.dart';
+
+// repo files for create recommendation post
+export 'create_recommendation_repository/create_recommendation_api_client.dart';

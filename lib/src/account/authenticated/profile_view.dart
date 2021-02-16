@@ -52,11 +52,17 @@ class _ProfileViewState extends State<ProfileView> {
       // close cupertino action sheet
       Navigator.of(context, rootNavigator: true).pop();
       if (error == 'NoError') {
-        BlocProvider.of<ImageSelectionBloc>(context)
-          ..add(SelectImage(resultList: resultList, imageUsedFor: 'profile'));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProfileCreate(
+              imageList: resultList,
+            ),
+          ),
+        );
       } else {
-        BlocProvider.of<ImageSelectionBloc>(context)
-          ..add(ImageSelectionError(error: error));
+        _toastNotification('Error occurred, please try again.', Colors.red,
+            Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
       }
     }
   }
@@ -479,17 +485,6 @@ class _ProfileViewState extends State<ProfileView> {
           return Container();
         }
       },
-    );
-  }
-}
-
-class ProfilePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('change profile photo'),
-      ),
     );
   }
 }

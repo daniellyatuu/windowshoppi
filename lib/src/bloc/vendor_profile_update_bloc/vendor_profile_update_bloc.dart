@@ -13,16 +13,18 @@ class VendorProfileUpdateBloc
     yield VendorProfileUpdateSubmitting();
 
     if (event is UpdateVendorProfile) {
-      final _user = await VendorProfileUpdateAPIClient()
-          .vendorUpdateProfile(event.accountId, event.contactId, event.data);
+      try {
+        final _user = await VendorProfileUpdateAPIClient()
+            .vendorUpdateProfile(event.accountId, event.contactId, event.data);
 
-      if (_user == 'no_internet') {
-        yield VendorProfileUpdateNoInternet();
-      } else if (_user == 'user_exists') {
-        yield VendorProfileUpdateUserExist();
-      } else if (_user is User) {
-        yield VendorProfileUpdateFormSubmitted(user: _user);
-      } else {
+        if (_user == 'no_internet') {
+          yield VendorProfileUpdateNoInternet();
+        } else if (_user == 'user_exists') {
+          yield VendorProfileUpdateUserExist();
+        } else if (_user is User) {
+          yield VendorProfileUpdateFormSubmitted(user: _user);
+        }
+      } catch (_) {
         yield VendorProfileUpdateFormError();
       }
     }

@@ -185,7 +185,7 @@ class _UpdatePostFormState extends State<UpdatePostForm> {
         title: Text('update post'),
         leading: IconButton(
           onPressed: () {
-            BlocProvider.of<ImageSelectionBloc>(context)..add(CheckImage());
+            // BlocProvider.of<ImageSelectionBloc>(context)..add(CheckImage());
           },
           icon: Icon(Icons.arrow_back),
         ),
@@ -240,8 +240,8 @@ class _UpdatePostFormState extends State<UpdatePostForm> {
                           prevPost: widget.post, newPost: state.newPost));
 
                     // remove selected image
-                    BlocProvider.of<ImageSelectionBloc>(context)
-                      ..add(CheckImage());
+                    // BlocProvider.of<ImageSelectionBloc>(context)
+                    //   ..add(CheckImage());
                   }
                 },
                 child: Padding(

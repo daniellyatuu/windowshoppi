@@ -71,7 +71,7 @@ class _AccountState extends State<Account> {
             child: CircularProgressIndicator(),
           );
         } else if (state is AuthNoInternet) {
-          return NoInternet();
+          return NoInternet1();
         } else if (state is AuthenticationError) {
           return AuthenticationErrorMessage();
         } else if (state is IsAuthenticated) {
