@@ -25,6 +25,10 @@ class AuthenticationBloc
           user: event.user,
           notification: 'update',
           isAlertDialogActive: event.isAlertDialogActive);
+    } else if (event is UserVisitLoginRegister) {
+      yield IsNotAuthenticated(
+          isAlreadyCreateAccount: event.redirectTo == 'register' ? false : true,
+          logout: false);
     } else {
       yield AuthenticationLoading();
 
@@ -35,16 +39,18 @@ class AuthenticationBloc
         var token = localStorage.getString('token');
 
         if (token != null) {
-          // get user
-          final _user = await authenticationRepository.getUser(token);
+          try {
+            // get user
+            final _user = await authenticationRepository.getUser(token);
 
-          if (_user == 'no_internet') {
-            yield AuthNoInternet();
-          } else if (_user is User) {
-            final User user = _user;
-            yield IsAuthenticated(
-                user: user, isAlertDialogActive: {'status': false});
-          } else {
+            if (_user == 'no_internet') {
+              yield AuthNoInternet();
+            } else if (_user is User) {
+              final User user = _user;
+              yield IsAuthenticated(
+                  user: user, isAlertDialogActive: {'status': false});
+            }
+          } catch (_) {
             yield AuthenticationError();
           }
         } else {
@@ -58,6 +64,7 @@ class AuthenticationBloc
             isAlreadyCreateAccount: isRegistered, logout: true);
       } else if (event is DeleteToken) {
         localStorage.remove('token');
+
         yield IsNotAuthenticated(
             isAlreadyCreateAccount: isRegistered, logout: false);
       }

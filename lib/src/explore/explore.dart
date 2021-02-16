@@ -80,7 +80,12 @@ class _ExploreState extends State<Explore> {
               child: CircularProgressIndicator(),
             );
           } else if (state is AllPostFailure) {
-            return FailedToFetchPost();
+            return GestureDetector(
+              onTap: () {
+                BlocProvider.of<AllPostBloc>(context)..add(AllPostRefresh());
+              },
+              child: FailedToFetchPost(),
+            );
           } else if (state is AllPostSuccess) {
             var data = state.posts;
             if (state.posts.isEmpty) {
@@ -111,8 +116,9 @@ class _ExploreState extends State<Explore> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            TopHeader(
+                            PostHeader(
                               post: data[index],
+                              from: 'post_list',
                             ),
                             if (data[index].group == 'vendor')
                               if (data[index].businessBio != '')
@@ -143,8 +149,10 @@ class _ExploreState extends State<Explore> {
                         );
                       },
                     ),
-                    if (_showLoadMoreIndicator) BottomLoader(),
-                    if (_showFailedToLoadMore)
+                    if (_showLoadMoreIndicator ||
+                        !state.hasFailedToLoadMore && !state.hasReachedMax)
+                      BottomLoader(),
+                    if (_showFailedToLoadMore || state.hasFailedToLoadMore)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 5.0),
                         child: FlatButton(

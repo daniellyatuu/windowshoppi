@@ -69,12 +69,24 @@ class MyApp extends StatelessWidget {
       AuthenticationRepository(
     authenticationAPIClient: AuthenticationAPIClient(),
   );
+
+  final UserPostRepository userPostRepository = UserPostRepository(
+    userPostAPIClient: UserPostAPIClient(),
+  );
+
+  final AllPostRepository allPostRepository = AllPostRepository(
+    allPostAPIClient: AllPostAPIClient(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<NetworkBloc>(
           create: (context) => NetworkBloc()..add(ListenConnection()),
+        ),
+        BlocProvider<NavigationBloc>(
+          create: (context) => NavigationBloc()..add(ChangeIndex(index: 0)),
         ),
         BlocProvider<UserAppVisitBloc>(
           create: (context) => UserAppVisitBloc()..add(CheckUserAppVisit()),
@@ -89,6 +101,17 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<CreateProfileBloc>(
           create: (context) => CreateProfileBloc(),
+        ),
+        BlocProvider<CreatePostBloc>(
+          create: (context) => CreatePostBloc(),
+        ),
+        BlocProvider(
+          create: (context) =>
+              UserPostBloc(userPostRepository: userPostRepository),
+        ),
+        BlocProvider<AllPostBloc>(
+          create: (context) => AllPostBloc(allPostRepository: allPostRepository)
+            ..add(AllPostFetched()),
         ),
       ],
       child: MaterialApp(

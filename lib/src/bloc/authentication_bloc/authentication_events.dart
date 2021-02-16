@@ -33,4 +33,12 @@ class UserUpdated extends AuthenticationEvents {
 
 class UserLoggedOut extends AuthenticationEvents {}
 
+class UserVisitLoginRegister extends AuthenticationEvents {
+  final String redirectTo;
+  UserVisitLoginRegister({@required this.redirectTo});
+
+  @override
+  List<Object> get props => [redirectTo];
+}
+
 class DeleteToken extends AuthenticationEvents {}

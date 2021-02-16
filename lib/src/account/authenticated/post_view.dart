@@ -68,7 +68,6 @@ class PostView extends StatelessWidget {
                 ),
               ),
             ),
-            floatingActionButton: SelectImageButton(),
           );
         } else {
           return Container();

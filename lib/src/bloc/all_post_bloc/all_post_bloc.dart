@@ -27,19 +27,19 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
     final currentState = state;
 
     if (event is AllPostRefresh) {
+      if (currentState is AllPostFailure) yield AllPostInitial();
+
       try {
-        if (currentState is AllPostSuccess) {
-          // get new posts
-          final List<Post> _posts = await allPostRepository.userPost(0, _limit);
+        // get new posts
+        final List<Post> _posts = await allPostRepository.userPost(0, _limit);
 
-          // remove current posts
-          currentState.posts.clear();
+        // remove current posts
+        if (currentState is AllPostSuccess) currentState.posts.clear();
 
-          yield AllPostSuccess(
-            posts: _posts,
-            hasReachedMax: _posts.length < _limit ? true : false,
-          );
-        }
+        yield AllPostSuccess(
+          posts: _posts,
+          hasReachedMax: _posts.length < _limit ? true : false,
+        );
       } catch (_) {
         yield AllPostFailure();
       }
@@ -62,18 +62,40 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
       }
     }
 
+    if (event is AllPostInsert) {
+      yield AllPostInitial();
+      if (currentState is AllPostSuccess) {
+        currentState.posts.insert(0, event.post);
+        yield AllPostSuccess(
+          posts: currentState.posts,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
+    if (event is PostRemove) {
+      yield AllPostInitial();
+      if (currentState is AllPostSuccess) {
+        currentState.posts.remove(event.post);
+        yield AllPostSuccess(
+          posts: currentState.posts,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
     if (event is AllPostFetched && !_hasReachedMax(currentState)) {
-      try {
-        if (currentState is AllPostInitial) {
+      if (currentState is AllPostInitial) {
+        try {
           final List<Post> _posts = await allPostRepository.userPost(0, _limit);
 
           yield AllPostSuccess(
             posts: _posts,
             hasReachedMax: _posts.length < _limit ? true : false,
           );
+        } catch (_) {
+          yield AllPostFailure();
         }
-      } catch (_) {
-        yield AllPostFailure();
       }
 
       if (currentState is AllPostSuccess) {

@@ -92,7 +92,7 @@ class _AccountPostListViewState extends State<AccountPostListView> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        TopHeader(
+                        PostHeader(
                           post: data[index],
                         ),
                         if (data[index].group == 'vendor')

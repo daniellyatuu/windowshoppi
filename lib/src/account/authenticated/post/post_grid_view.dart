@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PostGridView extends StatefulWidget {
   final ScrollController _primaryScrollController;
@@ -19,6 +20,9 @@ class PostGridView extends StatefulWidget {
 
 class _PostGridViewState extends State<PostGridView> {
   final _scrollThreshold = 200.0;
+
+  bool _showLoadMoreIndicator = false;
+  bool _showFailedToLoadMore = false;
 
   void _scrollListener() {
     if (context != null) {
@@ -46,22 +50,19 @@ class _PostGridViewState extends State<PostGridView> {
     await Future.delayed(Duration(milliseconds: 700));
   }
 
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    // close active snackBar if any before open new one
-    Scaffold.of(context).hideCurrentSnackBar();
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
 
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   void _scrollOnTop() async {
@@ -81,8 +82,31 @@ class _PostGridViewState extends State<PostGridView> {
   Widget build(BuildContext context) {
     return BlocConsumer<UserPostBloc, UserPostStates>(
       listener: (context, state) {
-        if (state is InvalidToken) {
+        if (state is UserPostInitNoInternet) {
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
+        } else if (state is InvalidToken) {
           BlocProvider.of<AuthenticationBloc>(context)..add(DeleteToken());
+        } else if (state is UserPostSuccess) {
+          if (state.hasFailedToLoadMore) {
+            setState(() {
+              _showFailedToLoadMore = true;
+            });
+          }
+
+          if (!state.hasFailedToLoadMore && !state.hasReachedMax) {
+            setState(() {
+              _showFailedToLoadMore = false;
+              _showLoadMoreIndicator = true;
+            });
+          }
+
+          if ((!state.hasFailedToLoadMore && state.hasReachedMax) ||
+              (state.hasFailedToLoadMore && !state.hasReachedMax)) {
+            setState(() {
+              _showLoadMoreIndicator = false;
+            });
+          }
         }
       },
       builder: (context, state) {
@@ -90,12 +114,21 @@ class _PostGridViewState extends State<PostGridView> {
           return Center(
             child: CircularProgressIndicator(),
           );
+        } else if (state is UserPostInitNoInternet) {
+          return GestureDetector(
+            onTap: () {
+              BlocProvider.of<UserPostBloc>(context)
+                ..add(UserPostRefresh(accountId: this.widget.accountId));
+            },
+            child: NoInternet2(),
+          );
         } else if (state is UserPostFailure) {
-          return Center(
-            child: Text(
-              'Failed to fetch posts',
-              style: Theme.of(context).textTheme.bodyText1,
-            ),
+          return GestureDetector(
+            onTap: () {
+              BlocProvider.of<UserPostBloc>(context)
+                ..add(UserPostRefresh(accountId: this.widget.accountId));
+            },
+            child: FailedToFetchPost(),
           );
         } else if (state is UserPostSuccess) {
           var data = state.posts;
@@ -127,23 +160,14 @@ class _PostGridViewState extends State<PostGridView> {
                     itemBuilder: (context, index) {
                       if (data[index].productPhoto.length > 0) {
                         return GestureDetector(
-                          onTap: () async {
-                            var result = await Navigator.push(
+                          onTap: () {
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     PostDetail(post: data[index]),
                               ),
                             );
-                            if (result == 'post_deleted_successfully') {
-                              BlocProvider.of<UserPostBloc>(context)
-                                ..add(UserPostRemove(post: data[index]));
-                              _notification('Post deleted successfully.',
-                                  Colors.teal, Colors.black);
-                            } else if (result == 'edit_post') {
-                              BlocProvider.of<ImageSelectionBloc>(context)
-                                ..add(EditPost(post: data[index]));
-                            }
                           },
                           child: Stack(
                             fit: StackFit.expand,
@@ -219,7 +243,28 @@ class _PostGridViewState extends State<PostGridView> {
                       }
                     },
                   ),
-                  if (!state.hasReachedMax) BottomLoader(),
+                  if (_showLoadMoreIndicator ||
+                      !state.hasFailedToLoadMore && !state.hasReachedMax)
+                    BottomLoader(),
+                  if (_showFailedToLoadMore || state.hasFailedToLoadMore)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 5.0),
+                      child: FlatButton(
+                        onPressed: () {
+                          setState(() {
+                            _showLoadMoreIndicator = true;
+                            _showFailedToLoadMore = false;
+                          });
+                          BlocProvider.of<UserPostBloc>(context)
+                            ..add(UserPostFetched(
+                                accountId: this.widget.accountId));
+                        },
+                        child: Text(
+                          "Couldn't load posts.Tap to try again",
+                          style: Theme.of(context).textTheme.bodyText1,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),

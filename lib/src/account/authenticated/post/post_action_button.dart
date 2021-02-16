@@ -1,6 +1,7 @@
 import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/material.dart';
 
 class PostActionButtonInit extends StatefulWidget {
@@ -13,19 +14,19 @@ class PostActionButtonInit extends StatefulWidget {
 }
 
 class _PostActionButtonInitState extends State<PostActionButtonInit> {
-  void _notification(String txt, Color bgColor, Color btnColor) {
-    final snackBar = SnackBar(
-      content: Text(txt),
-      backgroundColor: bgColor,
-      action: SnackBarAction(
-        label: 'Hide',
-        textColor: btnColor,
-        onPressed: () {
-          Scaffold.of(context).hideCurrentSnackBar();
-        },
-      ),
-    );
-    Scaffold.of(context).showSnackBar(snackBar);
+  void _toastNotification(
+      String txt, Color color, Toast length, ToastGravity gravity) {
+    // close active toast if any before open new one
+    Fluttertoast.cancel();
+
+    Fluttertoast.showToast(
+        msg: '$txt',
+        toastLength: length,
+        gravity: gravity,
+        timeInSecForIosWeb: 1,
+        backgroundColor: color,
+        textColor: Colors.white,
+        fontSize: 14.0);
   }
 
   @override
@@ -64,21 +65,26 @@ class _PostActionButtonInitState extends State<PostActionButtonInit> {
               ),
             ),
           );
+        } else if (state is DeletePostNoInternet) {
+          Navigator.of(context, rootNavigator: true).pop();
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.CENTER);
         } else if (state is DeletePostError) {
           Navigator.of(context, rootNavigator: true).pop();
-          _notification(
-              'Error occurred, please try again.', Colors.red, Colors.white);
+          _toastNotification('Error occurred, please try again', Colors.red,
+              Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
         } else if (state is DeletePostSuccess) {
-          if (widget.from == 'post_list') {
-            BlocProvider.of<UserPostBloc>(context)
-              ..add(UserPostRemove(post: widget.post));
-            Navigator.of(context, rootNavigator: true).pop();
-            _notification(
-                'Post deleted successfully.', Colors.teal, Colors.black);
-          } else {
-            Navigator.of(context, rootNavigator: true).pop();
-            Navigator.of(context).pop('post_deleted_successfully');
-          }
+          // remove post
+          BlocProvider.of<UserPostBloc>(context)
+            ..add(UserPostRemove(post: widget.post));
+
+          BlocProvider.of<AllPostBloc>(context)
+            ..add(PostRemove(post: widget.post));
+
+          Navigator.of(context, rootNavigator: true).pop();
+          if (widget.from != 'post_list') Navigator.of(context).pop();
+          _toastNotification('post deleted successfully', Colors.teal,
+              Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
         }
       },
       child: PostActionButton(
@@ -105,12 +111,13 @@ class _PostActionButtonState extends State<PostActionButton> {
   }
 
   _editPost() async {
-    if (widget.from == 'post_detail') {
-      Navigator.of(context).pop('edit_post');
-    } else if (widget.from == 'post_list') {
-      BlocProvider.of<ImageSelectionBloc>(context)
-        ..add(EditPost(post: widget.post));
-    }
+    print('open page to edit post');
+    // if (widget.from == 'post_detail') {
+    //   Navigator.of(context).pop('edit_post');
+    // } else if (widget.from == 'post_list') {
+    //   // BlocProvider.of<ImageSelectionBloc>(context)
+    //   //   ..add(EditPost(post: widget.post));
+    // }
   }
 
   @override

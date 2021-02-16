@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/api.dart';
 import 'dart:convert';
+import 'dart:io';
 
 class DeletePostAPIClient {
   Future deletePost(id) async {
@@ -19,16 +20,20 @@ class DeletePostAPIClient {
       'active': 0,
     };
 
-    final response = await http.put(
-      _url,
-      headers: headers,
-      body: jsonEncode(data),
-    );
+    try {
+      final response = await http.put(
+        _url,
+        headers: headers,
+        body: jsonEncode(data),
+      );
 
-    if (response.statusCode == 200) {
-      return response.statusCode;
-    } else {
-      throw Exception('Error on server');
+      if (response.statusCode == 200) {
+        return response.statusCode;
+      } else {
+        throw Exception('Error on server');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }
