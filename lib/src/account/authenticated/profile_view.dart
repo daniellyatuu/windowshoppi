@@ -200,20 +200,23 @@ class _ProfileViewState extends State<ProfileView> {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: Stack(
                         children: [
                           Container(
                             width: MediaQuery.of(context).size.width / 4,
                             height: MediaQuery.of(context).size.width / 4,
                             decoration: BoxDecoration(
-                              color: Colors.grey[200],
+                              // color: Colors.grey[200],
+                              color: Colors.grey[400],
                               shape: BoxShape.circle,
                             ),
                             child: data.profileImage == null
                                 ? FittedBox(
-                                    child: Icon(Icons.account_circle,
-                                        color: Colors.grey[400]),
+                                    child: Icon(
+                                      Icons.account_circle,
+                                      color: Colors.white,
+                                    ),
                                   )
                                 : ClipOval(
                                     child: ExtendedImage.network(
@@ -240,8 +243,11 @@ class _ProfileViewState extends State<ProfileView> {
                                           case LoadState.failed:
                                             // _controller.reset();
                                             return GestureDetector(
-                                              child: Center(
-                                                child: Icon(Icons.refresh),
+                                              child: FittedBox(
+                                                child: Icon(
+                                                  Icons.account_circle,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                               onTap: () {
                                                 state.reLoadImage();
@@ -255,8 +261,8 @@ class _ProfileViewState extends State<ProfileView> {
                                   ),
                           ),
                           Positioned(
-                            bottom: 10.0,
-                            right: 0.0,
+                            bottom: 5.0,
+                            right: 5.0,
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(5.0),

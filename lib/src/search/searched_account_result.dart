@@ -4,6 +4,7 @@ import 'package:windowshoppi/src/widget/widget_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:extended_image/extended_image.dart';
 
 class SearchedAccountResult extends StatefulWidget {
   @override
@@ -98,36 +99,59 @@ class _SearchedAccountResultState extends State<SearchedAccountResult> {
                         width: 45,
                         height: 45,
                         decoration: BoxDecoration(
-                          color: Colors.grey[200],
+                          color: Colors.grey[400],
                           shape: BoxShape.circle,
                         ),
-                        child: data[index].accountProfile != null &&
-                                data[index].accountProfile != ''
-                            ? CircleAvatar(
-                                backgroundColor: Colors.grey[200],
-                                radius: 60.0,
-                                backgroundImage: NetworkImage(
-                                    '${data[index].accountProfile}'),
-                              )
-                            : FittedBox(
+                        child: data[index].accountProfile == null
+                            ? FittedBox(
                                 child: Icon(Icons.account_circle,
-                                    color: Colors.grey[400]),
+                                    color: Colors.white),
+                              )
+                            : ClipOval(
+                                child: ExtendedImage.network(
+                                  '${data[index].accountProfile}',
+                                  cache: true,
+                                  loadStateChanged: (ExtendedImageState state) {
+                                    switch (state.extendedImageLoadState) {
+                                      case LoadState.loading:
+                                        return FittedBox(
+                                          child: Icon(
+                                            Icons.account_circle,
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                        break;
+
+                                      ///if you don't want override completed widget
+                                      ///please return null or state.completedWidget
+                                      //return null;
+                                      //return state.completedWidget;
+                                      case LoadState.completed:
+                                        return ExtendedRawImage(
+                                          fit: BoxFit.cover,
+                                          image: state.extendedImageInfo?.image,
+                                        );
+                                        break;
+                                      case LoadState.failed:
+                                        // _controller.reset();
+                                        return GestureDetector(
+                                          child: FittedBox(
+                                            child: Icon(
+                                              Icons.account_circle,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          onTap: () {
+                                            state.reLoadImage();
+                                          },
+                                        );
+                                        break;
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                       ),
-                      // leading: Container(
-                      //   width: 45,
-                      //   height: 45,
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.grey,
-                      //     shape: BoxShape.circle,
-                      //   ),
-                      //   child: FittedBox(
-                      //     child: Icon(
-                      //       Icons.account_circle,
-                      //       color: Colors.grey[300],
-                      //     ),
-                      //   ),
-                      // ),
                       title: Text('${data[index].username}'),
                       subtitle: Text('${data[index].accountName}'),
                     );

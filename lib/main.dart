@@ -1,5 +1,6 @@
 import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:windowshoppi/welcome_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,7 +59,11 @@ Future<Null> main() async {
   };
 
   runZonedGuarded<Future<Null>>(() async {
-    runApp(MyApp());
+    runApp(
+      Phoenix(
+        child: MyApp(),
+      ),
+    );
   }, (error, stackTrace) async {
     await _reportError(error, stackTrace);
   });

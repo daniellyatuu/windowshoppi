@@ -138,9 +138,6 @@ class _ExploreState extends State<Explore> {
                             PostImage(
                               postImage: data[index].productPhoto,
                             ),
-                            // AccountPostButton(
-                            //   post: data[index],
-                            // ),
                             AccountPostCaption(
                               post: data[index],
                             ),

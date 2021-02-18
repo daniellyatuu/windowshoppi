@@ -99,13 +99,12 @@ class AccountOwnerProfile extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: Colors.grey[200],
+                  color: Colors.grey[400],
                   shape: BoxShape.circle,
                 ),
                 child: state.user.profileImage == null
                     ? FittedBox(
-                        child:
-                            Icon(Icons.account_circle, color: Colors.grey[400]),
+                        child: Icon(Icons.account_circle, color: Colors.white),
                       )
                     : ClipOval(
                         child: ExtendedImage.network(
@@ -115,8 +114,10 @@ class AccountOwnerProfile extends StatelessWidget {
                             switch (state.extendedImageLoadState) {
                               case LoadState.loading:
                                 return FittedBox(
-                                  child: Icon(Icons.account_circle,
-                                      color: Colors.grey[400]),
+                                  child: Icon(
+                                    Icons.account_circle,
+                                    color: Colors.white,
+                                  ),
                                 );
                                 break;
 
@@ -133,8 +134,11 @@ class AccountOwnerProfile extends StatelessWidget {
                               case LoadState.failed:
                                 // _controller.reset();
                                 return GestureDetector(
-                                  child: Center(
-                                    child: Icon(Icons.refresh),
+                                  child: FittedBox(
+                                    child: Icon(
+                                      Icons.account_circle,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                   onTap: () {
                                     state.reLoadImage();
@@ -197,12 +201,12 @@ class OtherAccountProfile extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: Colors.grey[200],
+            color: Colors.grey[400],
             shape: BoxShape.circle,
           ),
           child: post.accountProfile == null
               ? FittedBox(
-                  child: Icon(Icons.account_circle, color: Colors.grey[400]),
+                  child: Icon(Icons.account_circle, color: Colors.white),
                 )
               : ClipOval(
                   child: ExtendedImage.network(
@@ -212,8 +216,10 @@ class OtherAccountProfile extends StatelessWidget {
                       switch (state.extendedImageLoadState) {
                         case LoadState.loading:
                           return FittedBox(
-                            child: Icon(Icons.account_circle,
-                                color: Colors.grey[400]),
+                            child: Icon(
+                              Icons.account_circle,
+                              color: Colors.white,
+                            ),
                           );
                           break;
 
@@ -230,8 +236,11 @@ class OtherAccountProfile extends StatelessWidget {
                         case LoadState.failed:
                           // _controller.reset();
                           return GestureDetector(
-                            child: Center(
-                              child: Icon(Icons.refresh),
+                            child: FittedBox(
+                              child: Icon(
+                                Icons.account_circle,
+                                color: Colors.white,
+                              ),
                             ),
                             onTap: () {
                               state.reLoadImage();

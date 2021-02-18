@@ -1,4 +1,4 @@
-const SERVER_NAME = "http://192.168.1.13:8000";
+const SERVER_NAME = "http://192.168.43.155:8000";
 // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
 const kGoogleApiKey = "AIzaSyAQSCSiJMsoMca0n65p0vPv5Em8Uk8FjLQ";

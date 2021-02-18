@@ -113,8 +113,10 @@ class _AppRootState extends State<AppRoot> {
                                       switch (state.extendedImageLoadState) {
                                         case LoadState.loading:
                                           return FittedBox(
-                                            child: Icon(Icons.account_circle,
-                                                color: Colors.grey[400]),
+                                            child: Icon(
+                                              Icons.account_circle_outlined,
+                                              color: Colors.grey[400],
+                                            ),
                                           );
                                           break;
 
@@ -130,14 +132,11 @@ class _AppRootState extends State<AppRoot> {
                                           );
                                           break;
                                         case LoadState.failed:
-                                          // _controller.reset();
-                                          return GestureDetector(
-                                            child: Center(
-                                              child: Icon(Icons.refresh),
+                                          return FittedBox(
+                                            child: Icon(
+                                              Icons.account_circle_outlined,
+                                              color: Colors.grey[400],
                                             ),
-                                            onTap: () {
-                                              state.reLoadImage();
-                                            },
                                           );
                                           break;
                                       }
