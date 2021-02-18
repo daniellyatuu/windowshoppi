@@ -90,78 +90,36 @@ class _CreatePostActionSheetState extends State<CreatePostActionSheet> {
     return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
       builder: (context, authState) {
         return CupertinoActionSheet(
-          message: Column(
-            children: [
-              // Align(
-              //   alignment: Alignment.centerLeft,
-              //   child: Text(
-              //     'Create New',
-              //     style: Theme.of(context).textTheme.headline6,
-              //   ),
-              // ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
                 children: [
-                  Text(
-                    'Create New',
-                    style: Theme.of(context).textTheme.headline6,
-                  ),
-                  if (authState is AuthenticationLoading)
-                    SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Create New',
+                        style: Theme.of(context).textTheme.headline6,
                       ),
-                    )
-                ],
-              ),
-              Divider(),
-              Card(
-                elevation: 0.0,
-                child: ListTile(
-                  onTap: () {
-                    if (authState is IsAuthenticated) {
-                      // choose image
-                      loadAssets();
-                    } else if (authState is IsNotAuthenticated) {
-                      Navigator.of(context).pop();
-
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return LoginOrRegister();
-                        },
-                      );
-                    } else if (authState is AuthNoInternet) {
-                      _toastNotification('No internet connection', Colors.red,
-                          Toast.LENGTH_SHORT, ToastGravity.CENTER);
-
-                      // Retry
-                      BlocProvider.of<AuthenticationBloc>(context)
-                          .add(CheckUserLoggedInStatus());
-                    } else if (authState is AuthenticationError) {
-                      _toastNotification('Error occurred, please try again.',
-                          Colors.red, Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
-
-                      // Delete Token
-                      BlocProvider.of<AuthenticationBloc>(context)
-                          .add(DeleteToken());
-                    }
-                  },
-                  leading: Icon(Icons.grid_on_outlined),
-                  title: Text('Feed Post'),
-                  trailing: Icon(Icons.keyboard_arrow_right_outlined),
-                ),
-              ),
-              Card(
-                elevation: 0.0,
-                child: Column(
-                  children: [
-                    ListTile(
+                      if (authState is AuthenticationLoading)
+                        SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                          ),
+                        )
+                    ],
+                  ),
+                  Divider(),
+                  Card(
+                    elevation: 0.0,
+                    child: ListTile(
                       onTap: () {
                         if (authState is IsAuthenticated) {
-                          Navigator.of(context).pop('recommend');
+                          // choose image
+                          loadAssets();
                         } else if (authState is IsNotAuthenticated) {
                           Navigator.of(context).pop();
 
@@ -193,22 +151,69 @@ class _CreatePostActionSheetState extends State<CreatePostActionSheet> {
                               .add(DeleteToken());
                         }
                       },
-                      leading: Icon(Icons.recommend),
-                      title: Text('Recommendation'),
+                      leading: Icon(Icons.grid_on_outlined),
+                      title: Text('Feed Post'),
                       trailing: Icon(Icons.keyboard_arrow_right_outlined),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(12.0, 0, 12.0, 5.0),
-                      child: Text(
-                        'Recommend the business around you, or the product you like, or the places to visit in your city and beyond.',
-                        style: Theme.of(context).textTheme.caption,
-                      ),
+                  ),
+                  Card(
+                    elevation: 0.0,
+                    child: Column(
+                      children: [
+                        ListTile(
+                          onTap: () {
+                            if (authState is IsAuthenticated) {
+                              Navigator.of(context).pop('recommend');
+                            } else if (authState is IsNotAuthenticated) {
+                              Navigator.of(context).pop();
+
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return LoginOrRegister();
+                                },
+                              );
+                            } else if (authState is AuthNoInternet) {
+                              _toastNotification(
+                                  'No internet connection',
+                                  Colors.red,
+                                  Toast.LENGTH_SHORT,
+                                  ToastGravity.CENTER);
+
+                              // Retry
+                              BlocProvider.of<AuthenticationBloc>(context)
+                                  .add(CheckUserLoggedInStatus());
+                            } else if (authState is AuthenticationError) {
+                              _toastNotification(
+                                  'Error occurred, please try again.',
+                                  Colors.red,
+                                  Toast.LENGTH_LONG,
+                                  ToastGravity.SNACKBAR);
+
+                              // Delete Token
+                              BlocProvider.of<AuthenticationBloc>(context)
+                                  .add(DeleteToken());
+                            }
+                          },
+                          leading: Icon(Icons.recommend),
+                          title: Text('Recommendation'),
+                          trailing: Icon(Icons.keyboard_arrow_right_outlined),
+                        ),
+                        Padding(
+                          padding:
+                              const EdgeInsets.fromLTRB(12.0, 0, 12.0, 5.0),
+                          child: Text(
+                            'Recommend the business around you, or the product you like, or the places to visit in your city and beyond.',
+                            style: Theme.of(context).textTheme.caption,
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );

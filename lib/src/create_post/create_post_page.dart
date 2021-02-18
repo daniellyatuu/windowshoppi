@@ -176,14 +176,21 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      _activeLocation ?? 'Add Location',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _activeLocation != null
+                        ? Text(
+                            _activeLocation,
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                            ),
+                          )
+                        : Text(
+                            'Add Location (option)',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -241,7 +248,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     Expanded(
                       child: TextFormField(
                         decoration: InputDecoration(
-                          labelText: 'Add Link',
+                          labelText: 'Add Link (option)',
                           labelStyle: TextStyle(
                             color: Colors.grey[700],
                             fontWeight: FontWeight.bold,
@@ -473,12 +480,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           if (_link != '') {
                             bool _validURL = Uri.parse(_link).isAbsolute;
 
+                            print(_validURL);
                             if (_validURL == false) {
                               setState(() {
                                 _linkError = true;
                               });
                             }
-                          } else {
+                          }
+
+                          if (_linkError == false) {
                             FocusScope.of(context).requestFocus(FocusNode());
 
                             BlocProvider.of<CreatePostBloc>(context)

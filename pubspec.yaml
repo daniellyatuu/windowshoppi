@@ -41,6 +41,7 @@ dependencies:
   intl_phone_number_input: ^0.5.2+2
   data_connection_checker: ^0.3.4
   fluttertoast: ^7.1.6
+  flutter_phoenix: ^0.1.0
 
 
 dev_dependencies:

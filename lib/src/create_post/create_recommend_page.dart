@@ -1,13 +1,13 @@
-import 'package:extended_image/extended_image.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:windowshoppi/src/location/flutter_google_places.dart';
-import 'package:windowshoppi/api.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:extended_image/extended_image.dart';
+import 'package:google_maps_webservice/places.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:windowshoppi/api.dart';
 
 // to get places detail (lat/lng)
 GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
@@ -382,7 +382,7 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
             return null;
           },
           inputDecoration: InputDecoration(
-            labelText: 'Phone number',
+            labelText: 'Phone number (option)',
             labelStyle: TextStyle(
               color: Colors.grey[700],
               fontWeight: FontWeight.bold,
@@ -443,14 +443,21 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                 Expanded(
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: Text(
-                      _activeLocation ?? 'Add Location',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    child: _activeLocation != null
+                        ? Text(
+                            _activeLocation,
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                            ),
+                          )
+                        : Text(
+                            'Add Location (option)',
+                            style: TextStyle(
+                              color: Colors.grey[700],
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ],
@@ -488,7 +495,6 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
               Focus(
                 onFocusChange: (hasFocus) {
                   int _urlLength = _url.length;
-                  print(_urlLength);
                   setState(() {
                     if (hasFocus) {
                       _showButtonSelection = true;
@@ -508,7 +514,7 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                     Expanded(
                       child: TextFormField(
                         decoration: InputDecoration(
-                          labelText: 'Add Link',
+                          labelText: 'Add Link (option)',
                           labelStyle: TextStyle(
                             color: Colors.grey[700],
                             fontWeight: FontWeight.bold,
@@ -521,7 +527,6 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                         onChanged: (value) {
                           setState(() {
                             _url = value;
-
                             if (_linkError == true) _linkError = false;
                           });
                         },
@@ -701,8 +706,10 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                             setState(() {
                               _noImage = true;
                             });
-                          } else if (_link != '') {
-                            // validate link
+                          }
+
+                          // validate link
+                          if (_link != '') {
                             bool _validURL = Uri.parse(_link).isAbsolute;
 
                             if (_validURL == false) {
@@ -710,7 +717,9 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                                 _linkError = true;
                               });
                             }
-                          } else {
+                          }
+
+                          if (images.length != 0 && _linkError == false) {
                             FocusScope.of(context).requestFocus(FocusNode());
 
                             BlocProvider.of<CreatePostBloc>(context)

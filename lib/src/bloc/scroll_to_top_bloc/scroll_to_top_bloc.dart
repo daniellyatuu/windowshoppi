@@ -4,17 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class ScrollToTopBloc extends Bloc<ScrollToTopEvents, ScrollToTopStates> {
   ScrollToTopBloc() : super(ScrollToTopInitial());
 
-  // @override
-  // Stream<Transition<ScrollToTopEvents, ScrollToTopStates>> transformEvents(
-  //   Stream<ScrollToTopEvents> events,
-  //   TransitionFunction<ScrollToTopEvents, ScrollToTopStates> transitionFn,
-  // ) {
-  //   return super.transformEvents(
-  //     events.debounceTime(const Duration(milliseconds: 300)),
-  //     transitionFn,
-  //   );
-  // }
-
   @override
   Stream<ScrollToTopStates> mapEventToState(ScrollToTopEvents event) async* {
     yield ScrollToTopInitial();

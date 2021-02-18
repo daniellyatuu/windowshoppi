@@ -4,6 +4,8 @@ import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:windowshoppi/src/widget/capitalization.dart';
+import 'package:windowshoppi/src/utilities/action.dart';
 
 class AccountPostCaption extends StatefulWidget {
   final Post post;
@@ -36,25 +38,81 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
             trimLines: 5,
             readLess: false,
           ),
-          BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-            builder: (context, state) {
-              if (state is IsAuthenticated) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+          if (widget.post.recommendationName != null)
+            Align(
+              alignment: Alignment.center,
+              child: Container(
+                margin: EdgeInsets.symmetric(vertical: 5.0),
+                width: (MediaQuery.of(context).size.width) -
+                    (MediaQuery.of(context).size.width / 4),
+                child: Column(
                   children: [
-                    Column(
+                    Container(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'recommended ${widget.post.recommendationType}'
+                            .capitalizeFirstofEach,
+                        style: TextStyle(fontSize: 12.0),
+                      ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(8.0),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(color: Colors.grey[300]),
+                      ),
+                      child: Text(
+                        '${widget.post.recommendationName}'.inCaps,
+                        style: TextStyle(
+                          color: Colors.teal,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          Row(
+            mainAxisAlignment: (widget.post.recommendationPhoneNumber != null &&
+                    widget.post.url != null)
+                ? MainAxisAlignment.spaceEvenly
+                : MainAxisAlignment.center,
+            children: [
+              if (widget.post.recommendationPhoneNumber != null)
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: RaisedButton(
+                    color: Colors.red,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                    ),
+                    onPressed: () => call(
+                        widget.post.recommendationPhoneDialCode +
+                            widget.post.recommendationPhoneNumber),
+                    child: Text(
+                      'call'.inCaps,
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
+              BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                builder: (context, state) {
+                  if (state is IsAuthenticated) {
+                    return Column(
                       children: [
                         if ((widget.post.url != null &&
                                 widget.post.isUrlValid == true) ||
-                            (state.user.accountId == widget.post.accountId &&
-                                widget.post.url != null))
+                            (widget.post.url != null &&
+                                widget.post.isUrlValid == null))
                           Container(
                             alignment: Alignment.centerRight,
                             child: RaisedButton(
                               color: Colors.red,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
-                                // side: BorderSide(color: Colors.teal, width: 3),
                               ),
                               onPressed: () => _launchURL('${widget.post.url}'),
                               child: Row(
@@ -73,14 +131,12 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                                             return Icon(
                                               Icons.verified_outlined,
                                               size: 16,
-                                              // color: Colors.teal,
                                             );
                                           } else if (widget.post.isUrlValid ==
                                               false) {
                                             return Icon(
                                               Icons.warning_outlined,
                                               size: 16,
-                                              // color: Colors.red,
                                             );
                                           } else {
                                             return Container();
@@ -106,14 +162,9 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                                 : Container()
                             : Container(),
                       ],
-                    ),
-                  ],
-                );
-              } else {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
+                    );
+                  } else {
+                    return Column(
                       children: [
                         if ((widget.post.url != null &&
                                 widget.post.isUrlValid == true) ||
@@ -135,11 +186,11 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                             ),
                           ),
                       ],
-                    ),
-                  ],
-                );
-              }
-            },
+                    );
+                  }
+                },
+              ),
+            ],
           ),
         ],
       ),

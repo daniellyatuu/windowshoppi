@@ -10,6 +10,8 @@ class AccountDetailBloc extends Bloc<AccountDetailEvents, AccountDetailStates> {
   Stream<AccountDetailStates> mapEventToState(
       AccountDetailEvents event) async* {
     if (event is GetAccountDetail) {
+      // await Future.delayed(Duration(seconds: 2000));
+
       try {
         final _account =
             await AccountDetailAPIClient().getAccountDetail(event.accountId);

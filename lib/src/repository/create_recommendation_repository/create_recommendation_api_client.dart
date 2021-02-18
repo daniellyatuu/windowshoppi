@@ -84,8 +84,6 @@ class CreateRecommendationAPIClient {
       // send
       var response = await request.send();
 
-      print('respond = ${response.statusCode}');
-
       if (response.statusCode == 201) {
         String result = await utf8.decoder.bind(response.stream).join();
 

@@ -39,17 +39,20 @@ class _AccountLoaderState extends State<AccountLoader> {
                 Align(
                   alignment: Alignment.center,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
                     child: Container(
-                      width: 120,
-                      height: 120,
+                      width: MediaQuery.of(context).size.width / 4,
+                      height: MediaQuery.of(context).size.width / 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey[200],
+                        // color: Colors.grey[200],
+                        color: Colors.grey[400],
                         shape: BoxShape.circle,
                       ),
                       child: FittedBox(
-                        child:
-                            Icon(Icons.account_circle, color: Colors.grey[400]),
+                        child: Icon(
+                          Icons.account_circle,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
