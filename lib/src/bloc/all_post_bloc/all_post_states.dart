@@ -12,6 +12,8 @@ class AllPostInitial extends AllPostStates {}
 
 class AllPostFailure extends AllPostStates {}
 
+class AllPostNoInternet extends AllPostStates {}
+
 class AllPostSuccess extends AllPostStates {
   final List<Post> posts;
   final bool hasReachedMax;

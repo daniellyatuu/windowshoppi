@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class NoInternet2 extends StatelessWidget {
+class NoInternet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(

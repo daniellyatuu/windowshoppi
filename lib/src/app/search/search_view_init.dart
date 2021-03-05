@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
-import 'package:windowshoppi/src/search/search_files.dart';
+import 'package:windowshoppi/src/app/search/search_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 
 class SearchViewInit extends StatelessWidget {
   final SearchPostRepository searchPostRepository = SearchPostRepository(

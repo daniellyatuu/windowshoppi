@@ -4,9 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:windowshoppi/api.dart';
 import 'dart:convert';
+import 'dart:io';
 
 class AllPostAPIClient {
-  Future<List<Post>> allPost(int offset, int limit) async {
+  Future allPost(int offset, int limit) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var postCount = localStorage.getInt('postCount') ?? 0;
 
@@ -16,19 +17,23 @@ class AllPostAPIClient {
       'Content-Type': 'application/json; charset=UTF-8',
     };
 
-    final response = await http.get(
-      _url,
-      headers: headers,
-    );
+    try {
+      final response = await http.get(
+        _url,
+        headers: headers,
+      );
 
-    if (response.statusCode == 200) {
-      // save new post count
-      var postData = jsonDecode(response.body);
-      localStorage.setInt('postCount', postData['count']);
+      if (response.statusCode == 200) {
+        // save new post count
+        var postData = jsonDecode(response.body);
+        localStorage.setInt('postCount', postData['count']);
 
-      return compute(_parsePost, response.body);
-    } else {
-      throw Exception('Error on server');
+        return compute(_parsePost, response.body);
+      } else {
+        throw Exception('Error on server');
+      }
+    } on SocketException {
+      return 'no_internet';
     }
   }
 }

@@ -71,7 +71,21 @@ class _AccountState extends State<Account> {
             child: CircularProgressIndicator(),
           );
         } else if (state is AuthNoInternet) {
-          return NoInternet1();
+          return GestureDetector(
+            onTap: () {
+              BlocProvider.of<AuthenticationBloc>(context)
+                  .add(CheckUserLoggedInStatus());
+            },
+            child: Scaffold(
+              appBar: AppBar(
+                title: Text('Windowshoppi'),
+              ),
+              body: Container(
+                width: MediaQuery.of(context).size.width,
+                child: NoInternet(),
+              ),
+            ),
+          );
         } else if (state is AuthenticationError) {
           return AuthenticationErrorMessage();
         } else if (state is IsAuthenticated) {

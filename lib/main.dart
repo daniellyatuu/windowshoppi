@@ -124,6 +124,7 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.red,
           brightness: Brightness.light,
         ),
+        debugShowCheckedModeBanner: false,
         home: Root(),
       ),
     );
@@ -158,11 +159,11 @@ class _RootState extends State<Root> {
         if (state is ConnectionSuccess) {
           if (state.prevState is ConnectionFailure) {
             _toastNotification('Back online', Colors.teal, Toast.LENGTH_SHORT,
-                ToastGravity.CENTER);
+                ToastGravity.BOTTOM);
           }
         } else if (state is ConnectionFailure) {
           _toastNotification('No internet connection', Colors.red,
-              Toast.LENGTH_SHORT, ToastGravity.CENTER);
+              Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
         }
       },
       child: BlocBuilder<UserAppVisitBloc, UserAppVisitStates>(

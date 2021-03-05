@@ -1,7 +1,7 @@
 name: windowshoppi
 description: A new Flutter application.
 
-version: 1.0.5+8
+version: 1.0.5+9
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -40,8 +40,10 @@ dependencies:
   international_phone_input: ^1.0.4
   intl_phone_number_input: ^0.5.2+2
   data_connection_checker: ^0.3.4
-  fluttertoast: ^7.1.6
+  fluttertoast: ^7.1.8
   flutter_phoenix: ^0.1.0
+  page_transition: "^1.1.7+6"
+  scrollable_positioned_list: ^0.1.9
 
 
 dev_dependencies:
