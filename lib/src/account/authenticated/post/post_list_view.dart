@@ -118,7 +118,7 @@ class _PostListViewState extends State<PostListView> {
               BlocProvider.of<UserPostBloc>(context)
                 ..add(UserPostRefresh(accountId: this.widget.accountId));
             },
-            child: NoInternet2(),
+            child: NoInternet(),
           );
         } else if (state is UserPostFailure) {
           return GestureDetector(

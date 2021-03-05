@@ -1,19 +1,23 @@
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:windowshoppi/src/account/not_authenticated/post/detail.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
+import 'package:windowshoppi/src/app/explore/explore_files.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class SinglePost extends StatelessWidget {
   final List<Post> data;
-  SinglePost({@required this.data});
+  final String tabName;
+  SinglePost({@required this.tabName, @required this.data});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: StaggeredGridView.countBuilder(
+          key: PageStorageKey<String>(tabName),
+          padding: EdgeInsets.zero,
           shrinkWrap: true,
           physics: ScrollPhysics(),
           crossAxisCount: 2,
@@ -35,12 +39,27 @@ class SinglePost extends StatelessWidget {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => Detail(
-                                post: data[index],
+                            PageTransition(
+                              type: PageTransitionType.rightToLeft,
+                              duration: Duration(milliseconds: 200),
+                              child: Explore(
+                                index: index,
                               ),
                             ),
                           );
+                          // Navigator.push(
+                          //     context,
+                          //     SlideFromRightPageRoute(
+                          //       widget: Explore(),
+                          //     ));
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => Detail(
+                          //       post: data[index],
+                          //     ),
+                          //   ),
+                          // );
                         },
                         child: Column(
                           children: [

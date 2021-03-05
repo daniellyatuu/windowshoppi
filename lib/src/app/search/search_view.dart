@@ -1,4 +1,4 @@
-import 'package:windowshoppi/src/search/search_files.dart';
+import 'package:windowshoppi/src/app/search/search_files.dart';
 import 'package:flutter/material.dart';
 
 class SearchView extends StatelessWidget {

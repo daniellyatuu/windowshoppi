@@ -120,7 +120,7 @@ class _PostGridViewState extends State<PostGridView> {
               BlocProvider.of<UserPostBloc>(context)
                 ..add(UserPostRefresh(accountId: this.widget.accountId));
             },
-            child: NoInternet2(),
+            child: NoInternet(),
           );
         } else if (state is UserPostFailure) {
           return GestureDetector(

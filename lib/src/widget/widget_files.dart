@@ -4,7 +4,6 @@ export 'account_loader.dart';
 export 'failed_to_fetch_post.dart';
 export 'capitalization.dart';
 export 'text_input_formatter.dart';
-export 'no_internet_1.dart';
-export 'no_internet_2.dart';
+export 'no_internet.dart';
 export 'failed_to_fetch_post.dart';
 export 'login_or_register.dart';

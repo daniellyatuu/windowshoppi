@@ -1,6 +1,8 @@
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
@@ -27,40 +29,54 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
     final currentState = state;
 
     if (event is AllPostRefresh) {
-      if (currentState is AllPostFailure) yield AllPostInitial();
+      if (currentState is AllPostFailure || currentState is AllPostNoInternet)
+        yield AllPostInitial();
 
       try {
         // get new posts
-        final List<Post> _posts = await allPostRepository.userPost(0, _limit);
+        final _posts = await allPostRepository.userPost(0, _limit);
 
-        // remove current posts
-        if (currentState is AllPostSuccess) currentState.posts.clear();
+        if (_posts == 'no_internet') {
+          // SHOW ALERT ON UI WITHOUT REMOVE currentState
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
 
-        yield AllPostSuccess(
-          posts: _posts,
-          hasReachedMax: _posts.length < _limit ? true : false,
-        );
-      } catch (_) {
-        yield AllPostFailure();
-      }
-    }
-
-    if (event is AllPostRetry) {
-      yield AllPostInitial();
-      try {
-        if (currentState is AllPostFailure) {
-          // get new posts
-          final List<Post> _posts = await allPostRepository.userPost(0, _limit);
-
+          if (currentState is! AllPostSuccess) {
+            yield AllPostNoInternet();
+          }
+        } else if (_posts is List<Post>) {
           yield AllPostSuccess(
             posts: _posts,
             hasReachedMax: _posts.length < _limit ? true : false,
           );
         }
       } catch (_) {
-        yield AllPostFailure();
+        // SHOW ALERT ON UI WITHOUT REMOVE currentState
+        _toastNotification('Failed to fetch posts.Try again', Colors.red,
+            Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+
+        if (currentState is! AllPostSuccess) {
+          yield AllPostFailure();
+        }
       }
     }
+
+    // if (event is AllPostRetry) {
+    //   yield AllPostInitial();
+    //   try {
+    //     if (currentState is AllPostFailure) {
+    //       // get new posts
+    //       final List<Post> _posts = await allPostRepository.userPost(0, _limit);
+    //
+    //       yield AllPostSuccess(
+    //         posts: _posts,
+    //         hasReachedMax: _posts.length < _limit ? true : false,
+    //       );
+    //     }
+    //   } catch (_) {
+    //     yield AllPostFailure();
+    //   }
+    // }
 
     if (event is AllPostInsert) {
       yield AllPostInitial();
@@ -87,12 +103,16 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
     if (event is AllPostFetched && !_hasReachedMax(currentState)) {
       if (currentState is AllPostInitial) {
         try {
-          final List<Post> _posts = await allPostRepository.userPost(0, _limit);
+          final _posts = await allPostRepository.userPost(0, _limit);
 
-          yield AllPostSuccess(
-            posts: _posts,
-            hasReachedMax: _posts.length < _limit ? true : false,
-          );
+          if (_posts == 'no_internet') {
+            yield AllPostNoInternet();
+          } else if (_posts is List<Post>) {
+            yield AllPostSuccess(
+              posts: _posts,
+              hasReachedMax: _posts.length < _limit ? true : false,
+            );
+          }
         } catch (_) {
           yield AllPostFailure();
         }
@@ -100,18 +120,31 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
 
       if (currentState is AllPostSuccess) {
         try {
-          final List<Post> _posts = await allPostRepository.userPost(
+          final _posts = await allPostRepository.userPost(
               currentState.posts.length, _limit);
 
-          yield AllPostSuccess(
-            posts: currentState.posts + _posts,
-            hasReachedMax: _posts.length < _limit ? true : false,
-          );
+          if (_posts == 'no_internet') {
+            _toastNotification('No internet connection', Colors.red,
+                Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+            if (event.from != 'explore') yield AllPostInitial();
+            yield AllPostSuccess(
+              posts: currentState.posts,
+              hasReachedMax: currentState.posts.length < _limit ? true : false,
+              hasFailedToLoadMore: true,
+            );
+          } else if (_posts is List<Post>) {
+            yield AllPostSuccess(
+              posts: currentState.posts + _posts,
+              hasReachedMax: _posts.length < _limit ? true : false,
+            );
+          }
         } catch (_) {
-          yield AllPostInitial();
+          _toastNotification('Failed to fetch posts.Try again', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+          if (event.from != 'explore') yield AllPostInitial();
           yield AllPostSuccess(
             posts: currentState.posts,
-            hasReachedMax: false,
+            hasReachedMax: currentState.posts.length < _limit ? true : false,
             hasFailedToLoadMore: true,
           );
         }
@@ -121,4 +154,19 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
 
   bool _hasReachedMax(AllPostStates state) =>
       state is AllPostSuccess && state.hasReachedMax;
+}
+
+void _toastNotification(
+    String txt, Color color, Toast length, ToastGravity gravity) {
+  // close active toast if any before open new one
+  Fluttertoast.cancel();
+
+  Fluttertoast.showToast(
+      msg: '$txt',
+      toastLength: length,
+      gravity: gravity,
+      timeInSecForIosWeb: 1,
+      backgroundColor: color,
+      textColor: Colors.white,
+      fontSize: 14.0);
 }

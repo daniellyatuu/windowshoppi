@@ -1,12 +1,12 @@
-import 'package:extended_image/extended_image.dart';
-import 'package:windowshoppi/src/create_post/create_post_files.dart';
+import 'package:windowshoppi/src/app/create_post/create_post_files.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
+import 'package:windowshoppi/src/app/search/search_files.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:windowshoppi/src/explore/explore_files.dart';
-import 'package:windowshoppi/src/search/search_files.dart';
+import 'package:windowshoppi/src/app/info/info_files.dart';
+import 'package:windowshoppi/src/app/home/home_files.dart';
 import 'package:custom_navigator/custom_navigation.dart';
-import 'package:windowshoppi/src/home/home_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -19,11 +19,13 @@ class AppRoot extends StatefulWidget {
 class _AppRootState extends State<AppRoot> {
   bool isLoggedIn = false;
 
+  int currentIndex;
+
   final List<Widget> _children = [
     Home(),
-    Explore(),
-    Container(),
     Search(),
+    Container(),
+    Info(),
     Account(),
   ];
 
@@ -32,8 +34,10 @@ class _AppRootState extends State<AppRoot> {
       if (navigatorKey.currentState.canPop()) {
         navigatorKey.currentState.popUntil((route) => route.isFirst);
       } else {
-        BlocProvider.of<ScrollToTopBloc>(context)
-          ..add(ScrollToTop(index: index));
+        if (currentIndex == index) {
+          BlocProvider.of<ScrollToTopBloc>(context)
+            ..add(ScrollToTop(index: index));
+        }
       }
 
       BlocProvider.of<NavigationBloc>(context)..add(ChangeIndex(index: index));
@@ -58,13 +62,23 @@ class _AppRootState extends State<AppRoot> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<NavigationBloc, NavigationStates>(
+    return BlocConsumer<NavigationBloc, NavigationStates>(
+      listener: (context, state) {
+        if (state is CurrentIndex) {
+          setState(() {
+            currentIndex = state.index;
+          });
+        }
+      },
       builder: (context, state) {
         if (state is CurrentIndex) {
           return Scaffold(
             body: CustomNavigator(
               navigatorKey: navigatorKey,
-              home: _children[state.index],
+              home: IndexedStack(
+                index: state.index,
+                children: _children,
+              ),
               pageRoute: PageRoutes.materialPageRoute,
             ),
             bottomNavigationBar: CustomNavigationBar(
@@ -77,19 +91,36 @@ class _AppRootState extends State<AppRoot> {
               items: [
                 CustomNavigationBarItem(
                   icon: Icon(Icons.home_outlined),
-                  title: Text('Home'),
-                ),
-                CustomNavigationBarItem(
-                  icon: Icon(Icons.explore_outlined),
-                  title: Text('Explore'),
-                ),
-                CustomNavigationBarItem(
-                  icon: Icon(Icons.add_box_outlined),
-                  title: Text('Post'),
+                  title: Text(
+                    'Home',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
                 ),
                 CustomNavigationBarItem(
                   icon: Icon(Icons.search_outlined),
-                  title: Text('Search'),
+                  title: Text(
+                    'Search',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                ),
+                CustomNavigationBarItem(
+                  icon: Icon(Icons.add_box_outlined),
+                  title: Text(
+                    'Post',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
+                ),
+                CustomNavigationBarItem(
+                  badgeCount: 2,
+                  showBadge: true,
+                  icon: Icon(
+                    Icons.notifications_outlined,
+                  ),
+                  selectedIcon: Icon(Icons.alternate_email),
+                  title: Text(
+                    'Info',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
                 ),
                 CustomNavigationBarItem(
                   icon: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
@@ -150,7 +181,10 @@ class _AppRootState extends State<AppRoot> {
                       }
                     },
                   ),
-                  title: Text('Account'),
+                  title: Text(
+                    'Account',
+                    style: Theme.of(context).textTheme.caption,
+                  ),
                 ),
               ],
             ),

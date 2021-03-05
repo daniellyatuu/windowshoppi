@@ -45,6 +45,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         resConfigs "en", "US"
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -63,6 +64,10 @@ android {
             signingConfig signingConfigs.release
         }
     }
+}
+
+dependencies {
+    implementation "androidx.multidex:multidex:2.0.1"
 }
 
 flutter {

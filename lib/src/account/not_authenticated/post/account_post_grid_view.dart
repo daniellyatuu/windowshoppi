@@ -1,10 +1,9 @@
+import 'package:windowshoppi/src/widget/widget_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:windowshoppi/src/account/account_files.dart';
-import 'package:windowshoppi/src/bloc/bloc_files.dart';
-import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class AccountPostGridView extends StatefulWidget {
   final ScrollController _primaryScrollController;
@@ -95,12 +94,12 @@ class _AccountPostGridViewState extends State<AccountPostGridView> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Detail(post: data[index]),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => Detail(post: data[index]),
+                        //   ),
+                        // );
                       },
                       // onTap: () async {
                       //   var result = await Navigator.push(

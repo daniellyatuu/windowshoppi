@@ -1,6 +1,6 @@
+import 'package:windowshoppi/src/app/search/search_files.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:flutter/material.dart';
-import 'package:windowshoppi/src/route/fade_transition.dart';
-import 'package:windowshoppi/src/search/search_files.dart';
 
 class Search extends StatelessWidget {
   @override
@@ -11,8 +11,10 @@ class Search extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              FadeRoute(
-                widget: SearchViewInit(),
+              PageTransition(
+                child: SearchViewInit(),
+                duration: Duration(milliseconds: 50),
+                type: PageTransitionType.fade,
               ),
             );
           },
@@ -33,8 +35,10 @@ class Search extends StatelessWidget {
             onTap: () {
               Navigator.push(
                 context,
-                FadeRoute(
-                  widget: SearchViewInit(),
+                PageTransition(
+                  child: SearchViewInit(),
+                  duration: Duration(milliseconds: 50),
+                  type: PageTransitionType.fade,
                 ),
               );
             },
@@ -66,8 +70,10 @@ class Search extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            FadeRoute(
-              widget: SearchViewInit(),
+            PageTransition(
+              child: SearchViewInit(),
+              duration: Duration(milliseconds: 50),
+              type: PageTransitionType.fade,
             ),
           );
         },

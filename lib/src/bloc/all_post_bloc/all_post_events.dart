@@ -6,7 +6,10 @@ abstract class AllPostEvents extends Equatable {
   List<Object> get props => [];
 }
 
-class AllPostFetched extends AllPostEvents {}
+class AllPostFetched extends AllPostEvents {
+  final String from;
+  AllPostFetched({this.from = 'home'});
+}
 
 class AllPostRefresh extends AllPostEvents {}
 
