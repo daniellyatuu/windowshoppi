@@ -16,6 +16,8 @@ export 'not_authenticated/account_post_list.dart';
 export 'not_authenticated/post/account_post_grid_view.dart';
 export 'not_authenticated/post/account_post_list_view.dart';
 export 'not_authenticated/post/account_post_caption.dart';
+export 'not_authenticated/post/account_explore.dart';
+export 'not_authenticated/other_account.dart';
 
 // files for authenticated account
 export 'authenticated/user_account.dart';
@@ -44,3 +46,4 @@ export 'authenticated/post/post_detail.dart';
 export 'authenticated/post/post_action_button.dart';
 export 'authenticated/update/post/update_post_init.dart';
 export 'authenticated/update/post/update_post_form.dart';
+export 'authenticated/post/my_account_explore.dart';

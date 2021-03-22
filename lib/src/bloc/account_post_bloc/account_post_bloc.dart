@@ -42,18 +42,40 @@ class AccountPostBloc extends Bloc<AccountPostEvents, AccountPostStates> {
       }
     }
 
-    if (event is AccountPostFetched && !_hasReachedMax(currentState)) {
-      try {
-        if (currentState is AccountPostInitial) {
-          final List<Post> _posts = await accountPostRepository.accountPost(
-              0, _limit, event.accountId);
+    if (event is ResetAccountPostState) {
+      yield AccountPostInitial();
+    }
 
-          yield AccountPostSuccess(
-            posts: _posts,
-            hasReachedMax: _posts.length < _limit ? true : false,
-          );
-        }
-        if (currentState is AccountPostSuccess) {
+    if (event is AccountPostRemove) {
+      yield AccountPostInitial();
+      if (currentState is AccountPostSuccess) {
+        currentState.posts.remove(event.post);
+        yield AccountPostSuccess(
+          posts: currentState.posts,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
+    // initial fetch data
+    if (event is AccountPostInitFetched) {
+      try {
+        final List<Post> _posts =
+            await accountPostRepository.accountPost(0, _limit, event.accountId);
+
+        yield AccountPostSuccess(
+          posts: _posts,
+          hasReachedMax: _posts.length < _limit ? true : false,
+        );
+      } catch (_) {
+        yield AccountPostFailure();
+      }
+    }
+
+    // load more data
+    if (event is AccountPostFetchedMoreData && !_hasReachedMax(currentState)) {
+      if (currentState is AccountPostSuccess) {
+        try {
           final List<Post> _posts = await accountPostRepository.accountPost(
               currentState.posts.length, _limit, event.accountId);
 
@@ -61,9 +83,9 @@ class AccountPostBloc extends Bloc<AccountPostEvents, AccountPostStates> {
             posts: currentState.posts + _posts,
             hasReachedMax: _posts.length < _limit ? true : false,
           );
+        } catch (_) {
+          yield AccountPostFailure();
         }
-      } catch (_) {
-        yield AccountPostFailure();
       }
     }
   }

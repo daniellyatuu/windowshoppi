@@ -16,7 +16,7 @@ class PostView extends StatelessWidget {
             ),
             endDrawer: UserEndDrawer(),
             body: DefaultTabController(
-              length: 2,
+              length: 1,
               child: NestedScrollView(
                 headerSliverBuilder: (context, _) {
                   return [
@@ -43,21 +43,21 @@ class PostView extends StatelessWidget {
                     return Column(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        TabBar(
-                          unselectedLabelColor: Colors.grey,
-                          labelColor: Colors.grey[700],
-                          tabs: [
-                            Tab(icon: Icon(Icons.grid_on)),
-                            Tab(icon: Icon(Icons.view_list)),
-                          ],
-                        ),
+                        // TabBar(
+                        //   unselectedLabelColor: Colors.grey,
+                        //   labelColor: Colors.grey[700],
+                        //   tabs: [
+                        //     Tab(icon: Icon(Icons.grid_on)),
+                        //     Tab(icon: Icon(Icons.view_list)),
+                        //   ],
+                        // ),
                         Expanded(
                           child: TabBarView(
                             children: [
                               PostGridView(
                                   innerScrollController, state.user.accountId),
-                              PostListView(
-                                  innerScrollController, state.user.accountId),
+                              // PostListView(
+                              //     innerScrollController, state.user.accountId),
                             ],
                           ),
                         ),

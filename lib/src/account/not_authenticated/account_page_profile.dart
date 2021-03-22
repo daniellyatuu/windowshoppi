@@ -6,6 +6,7 @@ import 'package:windowshoppi/src/utilities/action.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class AccountPageProfile extends StatelessWidget {
   @override
@@ -108,6 +109,23 @@ class AccountPageProfile extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyText2,
                     ),
                   ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    AccountInfo(
+                      name: 'Followers',
+                      number: 12,
+                    ),
+                    AccountInfo(
+                      name: 'Following',
+                      number: 15,
+                    ),
+                    AccountInfo(
+                      name: 'Posts',
+                      number: 30,
+                    ),
+                  ],
+                ),
                 if (data.group == 'windowshopper')
                   if (data.accountBio != null) Divider(),
                 if (data.group == 'vendor')

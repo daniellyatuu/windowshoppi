@@ -16,11 +16,8 @@ class AccountPostListInit extends StatelessWidget {
     return BlocBuilder<AccountDetailBloc, AccountDetailStates>(
       builder: (context, state) {
         if (state is AccountDetailSuccess) {
-          return BlocProvider<AccountPostBloc>(
-            create: (context) =>
-                AccountPostBloc(accountPostRepository: accountPostRepository)
-                  ..add(AccountPostFetched(accountId: state.account.accountId)),
-            child: AccountPostList(),
+          return OtherAccount(
+            accountId: state.account.accountId,
           );
         } else {
           return Container();

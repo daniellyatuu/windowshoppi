@@ -81,8 +81,11 @@ class _PostActionButtonInitState extends State<PostActionButtonInit> {
           BlocProvider.of<AllPostBloc>(context)
             ..add(PostRemove(post: widget.post));
 
+          BlocProvider.of<AccountPostBloc>(context)
+            ..add(AccountPostRemove(post: widget.post));
+
           Navigator.of(context, rootNavigator: true).pop();
-          if (widget.from != 'post_list') Navigator.of(context).pop();
+          // if (widget.from != 'post_list') Navigator.of(context).pop();
           _toastNotification('post deleted successfully', Colors.teal,
               Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
         }

@@ -83,6 +83,10 @@ class MyApp extends StatelessWidget {
     allPostAPIClient: AllPostAPIClient(),
   );
 
+  final AccountPostRepository accountPostRepository = AccountPostRepository(
+    accountPostAPIClient: AccountPostAPIClient(),
+  );
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -117,6 +121,10 @@ class MyApp extends StatelessWidget {
         BlocProvider<AllPostBloc>(
           create: (context) => AllPostBloc(allPostRepository: allPostRepository)
             ..add(AllPostFetched()),
+        ),
+        BlocProvider<AccountPostBloc>(
+          create: (context) =>
+              AccountPostBloc(accountPostRepository: accountPostRepository),
         ),
       ],
       child: MaterialApp(

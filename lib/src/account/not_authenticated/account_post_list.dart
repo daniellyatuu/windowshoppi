@@ -10,7 +10,7 @@ class AccountPostList extends StatelessWidget {
       builder: (context, state) {
         if (state is AccountDetailSuccess) {
           return DefaultTabController(
-            length: 2,
+            length: 1,
             child: NestedScrollView(
               headerSliverBuilder: (context, _) {
                 return [
@@ -36,21 +36,21 @@ class AccountPostList extends StatelessWidget {
 
                   return Column(
                     children: <Widget>[
-                      TabBar(
-                        unselectedLabelColor: Colors.grey,
-                        labelColor: Colors.grey[700],
-                        tabs: [
-                          Tab(icon: Icon(Icons.grid_on)),
-                          Tab(icon: Icon(Icons.view_list)),
-                        ],
-                      ),
+                      // TabBar(
+                      //   unselectedLabelColor: Colors.grey,
+                      //   labelColor: Colors.grey[700],
+                      //   tabs: [
+                      //     Tab(icon: Icon(Icons.grid_on)),
+                      //     Tab(icon: Icon(Icons.view_list)),
+                      //   ],
+                      // ),
                       Expanded(
                         child: TabBarView(
                           children: [
                             AccountPostGridView(
                                 innerScrollController, state.account.accountId),
-                            AccountPostListView(
-                                innerScrollController, state.account.accountId),
+                            // AccountPostListView(
+                            //     innerScrollController, state.account.accountId),
                           ],
                         ),
                       ),

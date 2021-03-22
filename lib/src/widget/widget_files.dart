@@ -8,3 +8,4 @@ export 'no_internet.dart';
 export 'failed_to_fetch_post.dart';
 export 'login_or_register.dart';
 export 'people_to_follow_loader.dart';
+export 'account_info.dart';
