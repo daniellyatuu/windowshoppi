@@ -6,15 +6,16 @@ import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
-class Explore extends StatefulWidget {
+class MyAccountExplore extends StatefulWidget {
+  final int accountId;
   final int index;
-  Explore({@required this.index}) : super();
+  MyAccountExplore({@required this.accountId, @required this.index}) : super();
 
   @override
-  _ExploreState createState() => _ExploreState();
+  _MyAccountExploreState createState() => _MyAccountExploreState();
 }
 
-class _ExploreState extends State<Explore> {
+class _MyAccountExploreState extends State<MyAccountExplore> {
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
       ItemPositionsListener.create();
@@ -29,14 +30,15 @@ class _ExploreState extends State<Explore> {
     if (_scrollThresholdIndex >= maxScrollIndex - currentScrollIndex) {
       int _limit = 21;
       if (maxScrollIndex >= _limit) {
-        BlocProvider.of<AllPostBloc>(context)
-          ..add(AllPostFetched(from: 'explore'));
+        BlocProvider.of<UserPostBloc>(context)
+          ..add(UserPostFetched(accountId: this.widget.accountId));
       }
     }
   }
 
   Future<void> refresh() async {
-    BlocProvider.of<AllPostBloc>(context)..add(AllPostRefresh());
+    BlocProvider.of<UserPostBloc>(context)
+      ..add(UserPostRefresh(accountId: this.widget.accountId));
     await Future.delayed(Duration(milliseconds: 700));
   }
 
@@ -59,9 +61,9 @@ class _ExploreState extends State<Explore> {
       appBar: AppBar(
         title: Text('Explore'),
       ),
-      body: BlocBuilder<AllPostBloc, AllPostStates>(
+      body: BlocBuilder<UserPostBloc, UserPostStates>(
         builder: (context, state) {
-          if (state is AllPostSuccess) {
+          if (state is UserPostSuccess) {
             var data = state.posts;
             maxScrollIndex = data.length;
 
@@ -90,6 +92,7 @@ class _ExploreState extends State<Explore> {
                           children: <Widget>[
                             PostHeader(
                               post: data[index],
+                              from: 'post_list',
                             ),
                             if (data[index].group == 'vendor')
                               if (data[index].businessBio != '')

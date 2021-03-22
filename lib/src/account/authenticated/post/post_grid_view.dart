@@ -7,6 +7,7 @@ import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:page_transition/page_transition.dart';
 
 class PostGridView extends StatefulWidget {
   final ScrollController _primaryScrollController;
@@ -84,7 +85,7 @@ class _PostGridViewState extends State<PostGridView> {
       listener: (context, state) {
         if (state is UserPostInitNoInternet) {
           _toastNotification('No internet connection', Colors.red,
-              Toast.LENGTH_SHORT, ToastGravity.CENTER);
+              Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
         } else if (state is InvalidToken) {
           BlocProvider.of<AuthenticationBloc>(context)..add(DeleteToken());
         } else if (state is UserPostSuccess) {
@@ -161,11 +162,22 @@ class _PostGridViewState extends State<PostGridView> {
                       if (data[index].productPhoto.length > 0) {
                         return GestureDetector(
                           onTap: () {
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) =>
+                            //         PostDetail(post: data[index]),
+                            //   ),
+                            // );
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PostDetail(post: data[index]),
+                              PageTransition(
+                                type: PageTransitionType.rightToLeft,
+                                duration: Duration(milliseconds: 200),
+                                child: MyAccountExplore(
+                                  accountId: this.widget.accountId,
+                                  index: index,
+                                ),
                               ),
                             );
                           },

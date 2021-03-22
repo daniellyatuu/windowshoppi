@@ -78,6 +78,7 @@ class _SearchedPostResultState extends State<SearchedPostResult> {
               controller: _scrollController,
               children: [
                 SinglePost(
+                  tabName: 'search post',
                   data: data,
                 ),
                 if (!state.hasReachedMax) BottomLoader(),

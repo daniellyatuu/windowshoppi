@@ -1,5 +1,4 @@
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
@@ -8,6 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/utilities/action.dart';
+import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class ProfileView extends StatefulWidget {
   @override
@@ -291,49 +292,84 @@ class _ProfileViewState extends State<ProfileView> {
                         style: Theme.of(context).textTheme.bodyText2,
                       ),
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      AccountInfo(
+                        name: 'Followers',
+                        number: 12,
+                      ),
+                      AccountInfo(
+                        name: 'Following',
+                        number: 15,
+                      ),
+                      AccountInfo(
+                        name: 'Posts',
+                        number: 30,
+                      ),
+                    ],
+                  ),
                   if (data.group == 'windowshopper') Divider(),
+                  if (data.group == 'vendor')
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 5.0),
+                              child: FlatButton(
+                                onPressed: () {
+                                  call(data.callDialCode + data.call);
+                                },
+                                child: Text(
+                                  'Call',
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                shape: new RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  side: BorderSide(
+                                    color: Colors.blue,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (data.whatsapp != null)
+                            Expanded(
+                              child: FlatButton(
+                                onPressed: () {
+                                  chat(data.whatsappDialCode + data.whatsapp,
+                                      "Hi there! I have seen your post on windowshoppi");
+                                },
+                                child: Text(
+                                  'Chat',
+                                  style: TextStyle(
+                                    color: Color(0xFF06B862),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                shape: new RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                  side: BorderSide(
+                                    color: Color(0xFF06B862),
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
                   if (data.group == 'vendor')
                     Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Expanded(
-                              child: ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  backgroundColor: Colors.blue,
-                                  child: FaIcon(
-                                    FontAwesomeIcons.phone,
-                                    size: 15.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                title:
-                                    Text('(${data.callDialCode})${data.call}'),
-                                dense: true,
-                              ),
-                            ),
-                            Expanded(
-                              child: ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: CircleAvatar(
-                                  backgroundColor: Color(0xFF06B862),
-                                  child: FaIcon(
-                                    FontAwesomeIcons.whatsapp,
-                                    size: 18.0,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                title: data.whatsapp != null
-                                    ? Text(
-                                        '(${data.whatsappDialCode})${data.whatsapp}')
-                                    : WhatsappNumberPopUp(),
-                                dense: true,
-                              ),
-                            ),
-                          ],
-                        ),
                         if (data.email != null)
                           Row(
                             children: [

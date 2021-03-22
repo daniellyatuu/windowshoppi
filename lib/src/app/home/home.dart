@@ -182,8 +182,10 @@ class _HomeState extends State<Home> {
   int _activeTab = 0;
 
   void _tappedTab(int index) {
-    print('tapped Index $index');
-    print('active tab = $_activeTab');
+    if (index == _activeTab) {
+      print('scroll to top');
+      // BlocProvider.of<ScrollToTopBloc>(context)..add(ScrollToTop(index: index));
+    }
   }
 
   @override
@@ -238,11 +240,10 @@ class _HomeState extends State<Home> {
             builder: (BuildContext context) {
               final innerScrollController = PrimaryScrollController.of(context);
 
-              print('here');
               return NotificationListener<ScrollNotification>(
                 onNotification: (scrollNotification) {
                   // scrollNotification
-                  print('outer ${DefaultTabController.of(context).index}');
+                  // print('outer ${DefaultTabController.of(context).index}');
                   setState(() {
                     _activeTab = DefaultTabController.of(context).index;
                   });

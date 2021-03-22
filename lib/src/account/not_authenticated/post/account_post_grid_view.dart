@@ -4,6 +4,8 @@ import 'package:extended_image/extended_image.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:windowshoppi/src/account/account_files.dart';
 
 class AccountPostGridView extends StatefulWidget {
   final ScrollController _primaryScrollController;
@@ -33,7 +35,7 @@ class _AccountPostGridViewState extends State<AccountPostGridView> {
 
       if (maxScroll - currentScroll <= _scrollThreshold && currentScroll > 0) {
         BlocProvider.of<AccountPostBloc>(context)
-          ..add(AccountPostFetched(accountId: this.widget.accountId));
+          ..add(AccountPostFetchedMoreData(accountId: this.widget.accountId));
       }
     }
   }
@@ -94,6 +96,17 @@ class _AccountPostGridViewState extends State<AccountPostGridView> {
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            duration: Duration(milliseconds: 200),
+                            child: AccountExplore(
+                              accountId: this.widget.accountId,
+                              index: index,
+                            ),
+                          ),
+                        );
                         // Navigator.push(
                         //   context,
                         //   MaterialPageRoute(

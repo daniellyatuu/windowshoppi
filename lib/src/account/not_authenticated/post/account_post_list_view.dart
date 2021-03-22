@@ -31,8 +31,8 @@ class _AccountPostListViewState extends State<AccountPostListView> {
           this.widget._primaryScrollController.positions.elementAt(0).pixels;
 
       if (maxScroll - currentScroll <= _scrollThreshold && currentScroll > 0) {
-        BlocProvider.of<AccountPostBloc>(context)
-          ..add(AccountPostFetched(accountId: this.widget.accountId));
+        // BlocProvider.of<AccountPostBloc>(context)
+        //   ..add(AccountPostFetched(accountId: this.widget.accountId));
       }
     }
   }

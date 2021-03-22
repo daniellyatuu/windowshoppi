@@ -13,70 +13,78 @@ class PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+    Size size = MediaQuery.of(context).size;
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(8.0, 5.0, 0.0, 5.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AccountPageInit(
-                    accountId: post.accountId,
-                  ),
+          Expanded(
+            child: Container(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AccountPageInit(
+                        accountId: post.accountId,
+                      ),
+                    ),
+                  );
+                },
+                child: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                  builder: (context, state) {
+                    if (state is IsAuthenticated) {
+                      return state.user.accountId == post.accountId
+                          ? AccountOwnerProfile(post: post)
+                          : OtherAccountProfile(post: post);
+                    } else {
+                      return OtherAccountProfile(post: post);
+                    }
+                  },
                 ),
-              );
-            },
-            child: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-              builder: (context, state) {
-                if (state is IsAuthenticated) {
-                  return state.user.accountId == post.accountId
-                      ? AccountOwnerProfile(post: post)
-                      : OtherAccountProfile(post: post);
-                } else {
-                  return OtherAccountProfile(post: post);
-                }
-              },
+              ),
             ),
           ),
-          BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-            builder: (context, state) {
-              if (state is IsAuthenticated) {
-                return state.user.accountId == post.accountId
-                    ? MultiBlocProvider(
-                        providers: [
-                          BlocProvider<DeletePostBloc>(
-                            create: (context) => DeletePostBloc(),
-                          ),
-                        ],
-                        child: PostActionButtonInit(
-                          post: post,
-                          from: from,
-                        ),
-                      )
-                    : Container(
-                        child: Opacity(
-                          opacity: 0.0,
-                          child: IconButton(
-                            onPressed: null,
-                            icon: Icon(Icons.more_vert),
-                          ),
-                        ),
-                      );
-              } else {
-                return Container(
-                  child: Opacity(
-                    opacity: 0.0,
-                    child: IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.more_vert),
-                    ),
-                  ),
-                );
-              }
-            },
+          Container(
+            padding: EdgeInsets.only(left: size.width * 0.02),
+            child: Row(
+              children: [
+                BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                  builder: (context, state) {
+                    if (state is IsAuthenticated) {
+                      return state.user.accountId == post.accountId
+                          ? Container()
+                          : FollowButton();
+                    } else {
+                      return FollowButton();
+                    }
+                  },
+                ),
+                BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                  builder: (context, state) {
+                    if (state is IsAuthenticated) {
+                      return state.user.accountId == post.accountId
+                          ? MultiBlocProvider(
+                              providers: [
+                                BlocProvider<DeletePostBloc>(
+                                  create: (context) => DeletePostBloc(),
+                                ),
+                              ],
+                              child: PostActionButtonInit(
+                                post: post,
+                                from: from,
+                              ),
+                            )
+                          : Container();
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -154,12 +162,11 @@ class AccountOwnerProfile extends StatelessWidget {
               SizedBox(
                 width: 10.0,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 2,
-                    child: Text(
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
                       '${state.user.username}',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
@@ -167,17 +174,14 @@ class AccountOwnerProfile extends StatelessWidget {
                         fontSize: 16.0,
                       ),
                     ),
-                  ),
-                  if (post.taggedLocation != null)
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width / 2,
-                      child: Text(
+                    if (post.taggedLocation != null)
+                      Text(
                         '${post.taggedLocation}',
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(fontSize: 13.0),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ],
           );
@@ -256,12 +260,11 @@ class OtherAccountProfile extends StatelessWidget {
         SizedBox(
           width: 10.0,
         ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              width: MediaQuery.of(context).size.width / 2,
-              child: Text(
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
                 '${post.username}',
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -269,19 +272,31 @@ class OtherAccountProfile extends StatelessWidget {
                   fontSize: 16.0,
                 ),
               ),
-            ),
-            if (post.taggedLocation != null)
-              SizedBox(
-                width: MediaQuery.of(context).size.width / 2,
-                child: Text(
+              if (post.taggedLocation != null)
+                Text(
                   '${post.taggedLocation}',
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 13.0),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ],
+    );
+  }
+}
+
+class FollowButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      onPressed: () {},
+      child: Text(
+        'Follow',
+        style: TextStyle(
+          color: Colors.teal,
+        ),
+      ),
     );
   }
 }
