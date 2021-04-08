@@ -27,7 +27,8 @@ Future<File> urlToFile(String imageUrl) async {
 // create a new file in temporary path with random file name.
   File file = new File('$tempPath' + (rng.nextInt(100)).toString() + '.png');
 // call http.get method and pass imageUrl into it to get response.
-  http.Response response = await http.get(imageUrl);
+  var _url = Uri.parse('$imageUrl');
+  http.Response response = await http.get(_url);
 // write bodyBytes received in response to file.
   await file.writeAsBytes(response.bodyBytes);
 // now return the file which is created with random name in

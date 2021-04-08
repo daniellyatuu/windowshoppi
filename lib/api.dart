@@ -1,32 +1,47 @@
-const SERVER_NAME = "http://192.168.1.141:8000";
-// const SERVER_NAME = "http://3.17.145.13/"; // production ip address
+// const SERVER_NAME = "http://192.168.1.152:8000";
+// // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
+
+const SERVER_NAME = "192.168.1.225:8000";
+// const SERVER_NAME = "3.17.145.13"; // production ip address
+
+// PUBLIC URL
+var getRequestServerName = SERVER_NAME;
+var postRequestServerName = 'http://' + SERVER_NAME;
 
 const kGoogleApiKey = "AIzaSyAQSCSiJMsoMca0n65p0vPv5Em8Uk8FjLQ";
-const REGISTER_USER = "$SERVER_NAME/register/";
-const USER_LOGIN = "$SERVER_NAME/user-login/";
-const USER_DATA = "$SERVER_NAME/user-data/";
-const UPDATE_WHATSAPP_NUMBER = "$SERVER_NAME/update-whatsapp-number/";
-const UPDATE_WINDOWSHOPPER_PROFILE =
-    "$SERVER_NAME/update-windowshopper-profile/";
-const BUSINESS_ACCOUNT_SWITCH = "$SERVER_NAME/business-account-switch/";
-const UPDATE_VENDOR_PROFILE = "$SERVER_NAME/update-vendor-profile/";
-const CHANGE_PASSWORD = "$SERVER_NAME/change-password/";
-const USER_POST = '$SERVER_NAME/post/user-post/';
-const USER_CREATE_POST = "$SERVER_NAME/post/create-post/";
-const USER_SINGLE_POST_DATA = "$SERVER_NAME/post/post-data/";
-const SEARCH_ACCOUNT_POST = "$SERVER_NAME/post/search-post/";
-const SEARCH_ACCOUNT = "$SERVER_NAME/account/search-account/";
-const UPDATE_POST = "$SERVER_NAME/post/update-post/";
-const ACCOUNT_INFO = "$SERVER_NAME/account/";
-const ACCOUNT_POST = "$SERVER_NAME/post/account/";
-const ALL_POST = "$SERVER_NAME/post/post-list/";
-const UPDATE_PROFILE_PICTURE = "$SERVER_NAME/account/update-profile-picture/";
-const REMOVE_PROFILE_PICTURE = "$SERVER_NAME/account/remove-profile-picture/";
+var registerUserUri = "$postRequestServerName/register/";
+var userLoginUri = "$postRequestServerName/user-login/";
+var userDataUri = "/user-data/";
+var updateWhatsappNumberUri = "$postRequestServerName/update-whatsapp-number/";
+var updateWindowshopperProfileUri =
+    "$postRequestServerName/update-windowshopper-profile/";
+var businessAccountSwitchUri =
+    "$postRequestServerName/business-account-switch/";
+var updateVendorProfileUri = "$postRequestServerName/update-vendor-profile/";
+var changePasswordUri = "$postRequestServerName/change-password/";
+var userPostUri = '/post/user-post/';
+var userCreatePostUri = "$postRequestServerName/post/create-post/";
+var userSinglePostDataUri = "/post/post-data/";
+var searchAccountPostUri = "/post/search-post/";
+var searchAccountUri = "/account/search-account/";
+var updatePostUri = "$postRequestServerName/post/update-post/";
+var accountInfoUri = "/account/";
+var accountPostUri = "/post/account/";
+var allPostUri = "/post/post-list/";
+var updateProfilePictureUri =
+    "$postRequestServerName/account/update-profile-picture/";
+var removeProfilePictureUri =
+    "$postRequestServerName/account/remove-profile-picture/";
 
-const FETCH_POST_API = "$SERVER_NAME/post/post-list/";
-const ALL_COUNTRY_URL = "$SERVER_NAME/master_data/country/";
-const TOP30_CATEGORY = "$SERVER_NAME/master_data/top30category/";
-const ALL_CATEGORY = "$SERVER_NAME/master_data/allCategory/";
+const FETCH_POST_URI =
+    "$SERVER_NAME/post/post-list/"; // will be removed in the future
 
-const VALIDATE_USERNAME = "$SERVER_NAME/validate/";
-const UPDATE_PROFILE = "$SERVER_NAME/update/";
+const ALL_COUNTRY_URI =
+    "$SERVER_NAME/master_data/country/"; // will be removed in the future
+
+// const TOP30_CATEGORY_URI =
+//     "$SERVER_NAME/master_data/top30category/"; // will be removed in the future
+// const ALL_CATEGORY_URI =
+//     "$SERVER_NAME/master_data/allCategory/"; // will be removed in the future
+// const VALIDATE_USERNAME_URI = "$SERVER_NAME/validate/";
+// const UPDATE_PROFILE_URI = "$SERVER_NAME/update/";

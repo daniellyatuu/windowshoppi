@@ -6,8 +6,8 @@ import 'dart:convert';
 
 class SearchAccountAPIClient {
   Future searchAccount(String accountKeyword, int offset, int limit) async {
-    var _url =
-        SEARCH_ACCOUNT + '?keyword=$accountKeyword&limit=$limit&offset=$offset';
+    var _url = Uri.http('$getRequestServerName', '$searchAccountUri',
+        {'keyword': '$accountKeyword', 'limit': '$limit', 'offset': '$offset'});
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',

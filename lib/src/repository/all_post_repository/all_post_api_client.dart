@@ -11,7 +11,8 @@ class AllPostAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var postCount = localStorage.getInt('postCount') ?? 0;
 
-    var _url = ALL_POST + '?limit=$limit&offset=$offset&post_count=$postCount';
+    var _url = Uri.http('$getRequestServerName', '$allPostUri',
+        {'limit': '$limit', 'offset': '$offset', 'post_count': '$postCount'});
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',

@@ -8,9 +8,11 @@ import 'dart:io';
 
 class RegistrationAPIClient {
   Future registerUser(data) async {
+    var _url = Uri.parse(registerUserUri);
+
     try {
       final response = await http.post(
-        REGISTER_USER,
+        _url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
         },

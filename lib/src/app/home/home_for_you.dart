@@ -28,7 +28,7 @@ class _HomeForYouState extends State<HomeForYou> {
   bool _showFailedToLoadMore = false;
 
   void _scrollListener() {
-    if (context != null) {
+    if (mounted) {
       final maxScroll = this
           .widget
           .primaryScrollController

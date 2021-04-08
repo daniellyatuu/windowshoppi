@@ -13,8 +13,10 @@ class ChangePasswordAPIClient {
       'Authorization': 'Token $token',
     };
 
+    var _url = Uri.parse(changePasswordUri);
+
     final response = await http.put(
-      CHANGE_PASSWORD,
+      _url,
       headers: headers,
       body: jsonEncode(data),
     );

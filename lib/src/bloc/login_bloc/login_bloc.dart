@@ -27,6 +27,7 @@ class LoginBloc extends Bloc<LoginEvents, LoginStates> {
           yield ValidAccount(user: user);
         }
       } catch (_) {
+        print('error $_');
         yield LoginFormError();
       }
     }

@@ -126,70 +126,85 @@ class AccountPageProfile extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (data.group == 'windowshopper')
-                  if (data.accountBio != null) Divider(),
+                // if (data.group == 'windowshopper')
+                //   if (data.accountBio != null) Divider(),
+                if (data.group == 'vendor')
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                        child: OutlineButton(
+                          onPressed: () {
+                            call(data.callDialCode + data.call);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              FaIcon(
+                                FontAwesomeIcons.phone,
+                                size: 15.0,
+                                color: Colors.blue,
+                              ),
+                              Text(
+                                ' CALL',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.blue,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      if (data.whatsapp != null)
+                        SizedBox(
+                          width: 20.0,
+                        ),
+                      if (data.whatsapp != null)
+                        Expanded(
+                          child: OutlineButton(
+                            onPressed: () {
+                              chat(data.whatsappDialCode + data.whatsapp,
+                                  "Hi there! I have seen your post on windowshoppi");
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                FaIcon(
+                                  FontAwesomeIcons.whatsapp,
+                                  size: 18.0,
+                                  color: Color(0xFF06B862),
+                                ),
+                                Text(
+                                  ' CHAT',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color(0xFF06B862),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.teal,
+                        ),
+                        onPressed: () {},
+                        child: Text('Follow'),
+                      ),
+                    ),
+                  ],
+                ),
                 if (data.group == 'vendor')
                   Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Expanded(
-                            child: OutlineButton(
-                              onPressed: () {
-                                call(data.callDialCode + data.call);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  FaIcon(
-                                    FontAwesomeIcons.phone,
-                                    size: 15.0,
-                                    color: Colors.blue,
-                                  ),
-                                  Text(
-                                    ' CALL',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.blue,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          if (data.whatsapp != null)
-                            SizedBox(
-                              width: 20.0,
-                            ),
-                          if (data.whatsapp != null)
-                            Expanded(
-                              child: OutlineButton(
-                                onPressed: () {
-                                  chat(data.whatsappDialCode + data.whatsapp,
-                                      "Hi there! I have seen your post on windowshoppi");
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    FaIcon(
-                                      FontAwesomeIcons.whatsapp,
-                                      size: 18.0,
-                                      color: Color(0xFF06B862),
-                                    ),
-                                    Text(
-                                      ' CHAT',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        color: Color(0xFF06B862),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
                       if (data.email != null)
                         Row(
                           children: [
@@ -217,6 +232,7 @@ class AccountPageProfile extends StatelessWidget {
                         ),
                     ],
                   ),
+
                 if (data.group == 'windowshopper')
                   Column(
                     children: [

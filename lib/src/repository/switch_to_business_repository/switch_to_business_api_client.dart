@@ -11,7 +11,8 @@ class SwitchToBusinessAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = BUSINESS_ACCOUNT_SWITCH + '$accountId/$contactId/';
+    var _uri = businessAccountSwitchUri + '$accountId/$contactId/';
+    var _url = Uri.parse(_uri);
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',

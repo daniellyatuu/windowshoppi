@@ -11,7 +11,8 @@ class UpdatePostAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = UPDATE_POST + '$postId/';
+    var _uri = updatePostUri + '$postId/';
+    var _url = Uri.parse(_uri);
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -27,7 +28,8 @@ class UpdatePostAPIClient {
     if (response.statusCode == 200) {
       // get post data
 
-      var _postUrl = USER_SINGLE_POST_DATA + "$postId/";
+      var _postUri = userSinglePostDataUri + "$postId/";
+      var _postUrl = Uri.http('$getRequestServerName', '$_postUri');
 
       final getPostResponse = await http.get(
         _postUrl,

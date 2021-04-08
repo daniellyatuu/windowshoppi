@@ -7,9 +7,11 @@ import 'dart:io';
 
 class AuthenticationAPIClient {
   Future getUser(token) async {
+    var _url = Uri.http('$getRequestServerName', '$userDataUri');
+
     try {
       final response = await http.get(
-        USER_DATA,
+        _url,
         headers: {HttpHeaders.authorizationHeader: "Token $token"},
       );
 

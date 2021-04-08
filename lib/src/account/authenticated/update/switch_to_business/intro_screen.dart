@@ -84,7 +84,7 @@ class _IntroScreenState extends State<IntroScreen> {
       onDone: () => _onIntroEnd(context),
       done: Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
       dotsDecorator: const DotsDecorator(
-        activeColor: Color(0xFF4D8AF0),
+        activeColor: Colors.red,
         size: Size(10.0, 10.0),
         color: Color(0xFFBDBDBD),
         activeSize: Size(22.0, 10.0),

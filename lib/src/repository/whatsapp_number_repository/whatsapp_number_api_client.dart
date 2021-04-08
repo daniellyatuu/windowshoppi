@@ -11,7 +11,8 @@ class WhatsappNumberAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = UPDATE_WHATSAPP_NUMBER + '$id/';
+    var _uri = updateWhatsappNumberUri + '$id/';
+    var _url = Uri.parse(_uri);
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',

@@ -1,3 +1,4 @@
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
 import 'package:windowshoppi/src/app/create_post/create_post_files.dart';
 import 'package:custom_navigation_bar/custom_navigation_bar.dart';
 import 'package:windowshoppi/src/app/search/search_files.dart';
@@ -90,7 +91,8 @@ class _AppRootState extends State<AppRoot> {
               onTap: _onTappedBar,
               items: [
                 CustomNavigationBarItem(
-                  icon: Icon(Icons.home_outlined),
+                  icon: Icon(LineAwesomeIcons.home),
+                  selectedIcon: Icon(Icons.home),
                   title: Text(
                     'Home',
                     style: Theme.of(context).textTheme.caption,
@@ -98,6 +100,7 @@ class _AppRootState extends State<AppRoot> {
                 ),
                 CustomNavigationBarItem(
                   icon: Icon(Icons.search_outlined),
+                  selectedIcon: Icon(Icons.search),
                   title: Text(
                     'Search',
                     style: Theme.of(context).textTheme.caption,
@@ -114,11 +117,11 @@ class _AppRootState extends State<AppRoot> {
                   badgeCount: 2,
                   showBadge: true,
                   icon: Icon(
-                    Icons.notifications_outlined,
+                    LineAwesomeIcons.bell,
                   ),
-                  selectedIcon: Icon(Icons.alternate_email),
+                  selectedIcon: Icon(Icons.notifications),
                   title: Text(
-                    'Info',
+                    'Activity',
                     style: Theme.of(context).textTheme.caption,
                   ),
                 ),

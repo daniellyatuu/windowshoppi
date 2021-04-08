@@ -243,30 +243,33 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
             return showDialog(
               barrierDismissible: false,
               context: context,
-              builder: (dialogContext) => Material(
-                type: MaterialType.transparency,
-                child: Center(
-                  // Aligns the container to center
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: CircularProgressIndicator(),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        'Updating..',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
+              builder: (dialogContext) => WillPopScope(
+                onWillPop: () async => false,
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: Center(
+                    // Aligns the container to center
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(),
                         ),
-                      ),
-                    ],
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          'Updating..',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

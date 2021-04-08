@@ -6,7 +6,8 @@ import 'dart:convert';
 
 class AccountDetailAPIClient {
   Future getAccountDetail(accountId) async {
-    var _url = ACCOUNT_INFO + '$accountId/';
+    var _uri = accountInfoUri + '$accountId/';
+    var _url = Uri.http('$getRequestServerName', '$_uri');
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',

@@ -29,7 +29,7 @@ class CreateRecommendationAPIClient {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       var token = localStorage.getString('token');
 
-      Uri uri = Uri.parse(USER_CREATE_POST);
+      Uri uri = Uri.parse(userCreatePostUri);
 
       // create multipart request
       MultipartRequest request = http.MultipartRequest("POST", uri);
@@ -92,10 +92,11 @@ class CreateRecommendationAPIClient {
         // get post data
         int _postId = _postResult['id'];
 
-        var _postUrl = USER_SINGLE_POST_DATA + "$_postId/";
+        var _postUrl = userSinglePostDataUri + "$_postId/";
+        var _url = Uri.http('$getRequestServerName', '$_postUrl');
 
         final getPostResponse = await http.get(
-          _postUrl,
+          _url,
           headers: {HttpHeaders.authorizationHeader: "Token $token"},
         );
 

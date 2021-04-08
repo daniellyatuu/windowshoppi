@@ -6,7 +6,10 @@ import 'dart:convert';
 
 class AccountPostAPIClient {
   Future<List<Post>> accountPost(int offset, int limit, int accountId) async {
-    var _url = ACCOUNT_POST + '$accountId/?limit=$limit&offset=$offset';
+    var _uri = accountPostUri + '$accountId/';
+
+    var _url = Uri.http('$getRequestServerName', '$_uri',
+        {'limit': '$limit', 'offset': '$offset'});
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
