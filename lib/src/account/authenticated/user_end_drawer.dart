@@ -76,22 +76,5 @@ class UserEndDrawer extends StatelessWidget {
         },
       ),
     );
-    // return Drawer(
-    //   child: ListView(
-    //     children: <Widget>[
-    //       GestureDetector(
-    //         onTap: () {
-    //           BlocProvider.of<AuthenticationBloc>(context).add(UserLoggedOut());
-    //         },
-    //         child: Card(
-    //           child: ListTile(
-    //             dense: true,
-    //             title: Text('LOGOUT'),
-    //           ),
-    //         ),
-    //       )
-    //     ],
-    //   ),
-    // );
   }
 }

@@ -289,14 +289,24 @@ class OtherAccountProfile extends StatelessWidget {
 class FollowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
-      onPressed: () {},
-      child: Text(
-        'Follow',
-        style: TextStyle(
-          color: Colors.teal,
-        ),
-      ),
+    return BlocConsumer<FollowUnfollowBloc, FollowUnfollowStates>(
+      listener: (context, state) {
+        print('listener for follow unfollow $state');
+      },
+      builder: (context, state) {
+        return TextButton(
+          onPressed: () {
+            BlocProvider.of<FollowUnfollowBloc>(context)
+              ..add(FollowAccount(accountId: 1));
+          },
+          child: Text(
+            'Follow',
+            style: TextStyle(
+              color: Colors.teal,
+            ),
+          ),
+        );
+      },
     );
   }
 }

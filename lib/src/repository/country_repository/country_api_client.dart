@@ -10,7 +10,9 @@ class CountryAPIClient {
   CountryAPIClient({@required this.httpClient}) : assert(httpClient != null);
 
   Future<List<Country>> getCountry() async {
-    final response = await this.httpClient.get(ALL_COUNTRY_URL);
+    var _url = Uri.parse(ALL_COUNTRY_URI);
+
+    final response = await this.httpClient.get(_url);
 
     if (response.statusCode == 200) {
       return compute(parseCountry, response.body);

@@ -48,11 +48,6 @@ export 'user_post_bloc/user_post_events.dart';
 export 'user_post_bloc/user_post_bloc.dart';
 export 'user_post_bloc/user_post_states.dart';
 
-// bloc files for image selection
-export 'image_selection_bloc/image_selection_events.dart';
-export 'image_selection_bloc/image_selection_bloc.dart';
-export 'image_selection_bloc/image_selection_states.dart';
-
 // bloc files for create post
 export 'create_post_bloc/create_post_events.dart';
 export 'create_post_bloc/create_post_bloc.dart';
@@ -117,3 +112,8 @@ export 'create_profile_bloc/create_profile_states.dart';
 export 'navigation_bloc/navigation_events.dart';
 export 'navigation_bloc/navigation_bloc.dart';
 export 'navigation_bloc/navigation_states.dart';
+
+// bloc files for follow unfollow bloc
+export 'follow_unfollow_bloc/follow_unfollow_events.dart';
+export 'follow_unfollow_bloc/follow_unfollow_bloc.dart';
+export 'follow_unfollow_bloc/follow_unfollow_states.dart';

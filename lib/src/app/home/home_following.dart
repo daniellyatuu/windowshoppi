@@ -28,7 +28,7 @@ class _HomeFollowingState extends State<HomeFollowing> {
   final _scrollThreshold = 400.0;
 
   void _scrollListener() {
-    if (context != null) {
+    if (mounted) {
       print('page 1 here');
       final maxScroll = this
           .widget

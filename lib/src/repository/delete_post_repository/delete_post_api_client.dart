@@ -9,7 +9,8 @@ class DeletePostAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = UPDATE_POST + '$id/';
+    var _uri = updatePostUri + '$id/';
+    var _url = Uri.parse(_uri);
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',

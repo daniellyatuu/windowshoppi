@@ -126,6 +126,9 @@ class MyApp extends StatelessWidget {
           create: (context) =>
               AccountPostBloc(accountPostRepository: accountPostRepository),
         ),
+        BlocProvider<FollowUnfollowBloc>(
+          create: (context) => FollowUnfollowBloc(),
+        ),
       ],
       child: MaterialApp(
         theme: ThemeData(

@@ -14,7 +14,7 @@ class CreateProfileAPIClient {
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       var token = localStorage.getString('token');
 
-      var _url = UPDATE_PROFILE_PICTURE + '$accountId' + '/';
+      var _url = updateProfilePictureUri + '$accountId/';
 
       Uri uri = Uri.parse(_url);
 
@@ -48,8 +48,10 @@ class CreateProfileAPIClient {
       var response = await request.send();
 
       if (response.statusCode == 200) {
+        var _url = Uri.http('$getRequestServerName', '$userDataUri');
+
         final getUserResponse = await http.get(
-          USER_DATA,
+          _url,
           headers: {HttpHeaders.authorizationHeader: "Token $token"},
         );
 

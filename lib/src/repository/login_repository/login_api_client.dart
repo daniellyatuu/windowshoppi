@@ -8,9 +8,11 @@ import 'dart:io';
 
 class LoginAPIClient {
   Future userLogin(data) async {
+    var _url = Uri.parse(userLoginUri);
+
     try {
       final response = await http.post(
-        USER_LOGIN,
+        _url,
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
         },

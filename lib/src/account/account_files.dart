@@ -6,7 +6,6 @@ export 'not_authenticated/register_form.dart';
 export 'not_authenticated/login_form.dart';
 export 'not_authenticated/register_init.dart';
 export 'not_authenticated/login_init.dart';
-export 'not_authenticated/post/detail.dart';
 export 'not_authenticated/account_page_init.dart';
 export 'not_authenticated/account_page.dart';
 export 'not_authenticated/account_page_profile.dart';

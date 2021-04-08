@@ -100,30 +100,33 @@ class _ProfileViewState extends State<ProfileView> {
                 return showDialog(
                   barrierDismissible: false,
                   context: context,
-                  builder: (dialogContext) => Material(
-                    type: MaterialType.transparency,
-                    child: Center(
-                      // Aligns the container to center
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: CircularProgressIndicator(),
-                          ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
-                          Text(
-                            'Please wait..',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
+                  builder: (dialogContext) => WillPopScope(
+                    onWillPop: () async => false,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Center(
+                        // Aligns the container to center
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: CircularProgressIndicator(),
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Text(
+                              'Please wait..',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -309,41 +312,42 @@ class _ProfileViewState extends State<ProfileView> {
                       ),
                     ],
                   ),
-                  if (data.group == 'windowshopper') Divider(),
+                  // if (data.group == 'windowshopper') Divider(),
+
                   if (data.group == 'vendor')
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 0.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5.0),
-                              child: FlatButton(
-                                onPressed: () {
-                                  call(data.callDialCode + data.call);
-                                },
-                                child: Text(
-                                  'Call',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                shape: new RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  side: BorderSide(
-                                    color: Colors.blue,
-                                    width: 2,
-                                  ),
+                            child: OutlinedButton(
+                              onPressed: () {
+                                call(data.callDialCode + data.call);
+                              },
+                              child: Text(
+                                'Call',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
+                              // shape: new RoundedRectangleBorder(
+                              //   borderRadius: BorderRadius.circular(5.0),
+                              //   side: BorderSide(
+                              //     color: Colors.blue,
+                              //     width: 2,
+                              //   ),
+                              // ),
                             ),
                           ),
                           if (data.whatsapp != null)
+                            SizedBox(
+                              width: 10.0,
+                            ),
+                          if (data.whatsapp != null)
                             Expanded(
-                              child: FlatButton(
+                              child: OutlinedButton(
                                 onPressed: () {
                                   chat(data.whatsappDialCode + data.whatsapp,
                                       "Hi there! I have seen your post on windowshoppi");
@@ -355,18 +359,68 @@ class _ProfileViewState extends State<ProfileView> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                shape: new RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                  side: BorderSide(
-                                    color: Color(0xFF06B862),
-                                    width: 2,
-                                  ),
-                                ),
+                                // shape: new RoundedRectangleBorder(
+                                //   borderRadius: BorderRadius.circular(5.0),
+                                //   side: BorderSide(
+                                //     color: Color(0xFF06B862),
+                                //     width: 2,
+                                //   ),
+                                // ),
                               ),
                             ),
                         ],
                       ),
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Expanded(
+                        flex: 1,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    data.group == 'windowshopper'
+                                        ? UpdateProfileInit(
+                                            user: data,
+                                          )
+                                        : VendorUpdateProfileInit(
+                                            user: data,
+                                          ),
+                              ),
+                            );
+                          },
+                          child: Text('Edit Profile'),
+                        ),
+                      ),
+                      if (data.group == 'windowshopper')
+                        SizedBox(
+                          width: 8.0,
+                        ),
+                      if (data.group == 'windowshopper')
+                        Expanded(
+                          flex: 2,
+                          child: RaisedButton(
+                            color: Colors.teal,
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => IntroScreen(
+                                    user: data,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'switch to business account',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                   if (data.group == 'vendor')
                     Column(
                       children: [
@@ -469,56 +523,6 @@ class _ProfileViewState extends State<ProfileView> {
                           ),
                       ],
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: OutlineButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    data.group == 'windowshopper'
-                                        ? UpdateProfileInit(
-                                            user: data,
-                                          )
-                                        : VendorUpdateProfileInit(
-                                            user: data,
-                                          ),
-                              ),
-                            );
-                          },
-                          child: Text('edit profile'),
-                        ),
-                      ),
-                      if (data.group == 'windowshopper')
-                        SizedBox(
-                          width: 8.0,
-                        ),
-                      if (data.group == 'windowshopper')
-                        Expanded(
-                          flex: 2,
-                          child: RaisedButton(
-                            color: Colors.teal,
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => IntroScreen(
-                                    user: data,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'switch to business account',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
                 ],
               ),
             ),

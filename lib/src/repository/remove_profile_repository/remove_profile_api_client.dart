@@ -11,7 +11,8 @@ class RemoveProfileAPIClient {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = REMOVE_PROFILE_PICTURE + '$accountId/$contactId/';
+    var _uri = removeProfilePictureUri + '$accountId/$contactId/';
+    var _url = Uri.parse(_uri);
 
     try {
       final response = await http.put(
