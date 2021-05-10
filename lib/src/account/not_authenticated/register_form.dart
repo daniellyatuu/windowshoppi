@@ -291,6 +291,9 @@ class _RegisterFormState extends State<RegisterForm> {
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
           child: TextFormField(
+            inputFormatters: [
+              LowerCaseTextFormatter(),
+            ],
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               labelText: 'Email Address',

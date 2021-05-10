@@ -768,12 +768,13 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Form(
-          key: _recommendFormKey,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
+      body: Form(
+        key: _recommendFormKey,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
               children: <Widget>[
                 _buildRecommendedName(),
                 Divider(),

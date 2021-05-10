@@ -531,12 +531,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
           ),
         ],
       ),
-      body: Center(
-        child: Form(
-          key: _postFormKey,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
+      body: Form(
+        key: _postFormKey,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SingleChildScrollView(
+            physics: BouncingScrollPhysics(),
+            child: Column(
               children: <Widget>[
                 _buildPostCaption(),
                 Divider(),

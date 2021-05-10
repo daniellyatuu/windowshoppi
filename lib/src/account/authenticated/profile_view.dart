@@ -392,7 +392,10 @@ class _ProfileViewState extends State<ProfileView> {
                               ),
                             );
                           },
-                          child: Text('Edit Profile'),
+                          child: Text(
+                            'Edit Profile',
+                            style: TextStyle(color: Colors.grey.shade800),
+                          ),
                         ),
                       ),
                       if (data.group == 'windowshopper')
@@ -402,8 +405,7 @@ class _ProfileViewState extends State<ProfileView> {
                       if (data.group == 'windowshopper')
                         Expanded(
                           flex: 2,
-                          child: RaisedButton(
-                            color: Colors.teal,
+                          child: ElevatedButton(
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
@@ -416,6 +418,9 @@ class _ProfileViewState extends State<ProfileView> {
                             child: Text(
                               'switch to business account',
                               style: TextStyle(color: Colors.white),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.teal,
                             ),
                           ),
                         ),
@@ -454,64 +459,64 @@ class _ProfileViewState extends State<ProfileView> {
                   if (data.group == 'windowshopper')
                     Column(
                       children: [
-                        if (data.email != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 3.0),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.email_outlined,
-                                  size: 16,
-                                  color: Colors.grey,
-                                ),
-                                Expanded(
-                                  child: RichText(
-                                    text: TextSpan(
-                                      text: ' ${data.email}',
-                                      style:
-                                          Theme.of(context).textTheme.bodyText1,
-                                      children: <TextSpan>[
-                                        TextSpan(
-                                            text: ' (private)',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .caption),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 3.0),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.call,
-                                size: 16,
-                                color: Colors.grey,
-                              ),
-                              Expanded(
-                                child: RichText(
-                                  text: TextSpan(
-                                    text:
-                                        ' (${data.callDialCode}) ${data.call}',
-                                    style:
-                                        Theme.of(context).textTheme.bodyText1,
-                                    children: <TextSpan>[
-                                      TextSpan(
-                                          text: ' (private)',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .caption),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // if (data.email != null)
+                        //   Padding(
+                        //     padding: const EdgeInsets.only(bottom: 3.0),
+                        //     child: Row(
+                        //       children: [
+                        //         Icon(
+                        //           Icons.email_outlined,
+                        //           size: 16,
+                        //           color: Colors.grey,
+                        //         ),
+                        //         Expanded(
+                        //           child: RichText(
+                        //             text: TextSpan(
+                        //               text: ' ${data.email}',
+                        //               style:
+                        //                   Theme.of(context).textTheme.bodyText1,
+                        //               children: <TextSpan>[
+                        //                 TextSpan(
+                        //                     text: ' (private)',
+                        //                     style: Theme.of(context)
+                        //                         .textTheme
+                        //                         .caption),
+                        //               ],
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   ),
+                        // Padding(
+                        //   padding: const EdgeInsets.only(bottom: 3.0),
+                        //   child: Row(
+                        //     children: [
+                        //       Icon(
+                        //         Icons.call,
+                        //         size: 16,
+                        //         color: Colors.grey,
+                        //       ),
+                        //       Expanded(
+                        //         child: RichText(
+                        //           text: TextSpan(
+                        //             text:
+                        //                 ' (${data.callDialCode}) ${data.call}',
+                        //             style:
+                        //                 Theme.of(context).textTheme.bodyText1,
+                        //             children: <TextSpan>[
+                        //               TextSpan(
+                        //                   text: ' (private)',
+                        //                   style: Theme.of(context)
+                        //                       .textTheme
+                        //                       .caption),
+                        //             ],
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         if (data.accountBio != null)
                           Container(
                             alignment: Alignment.centerLeft,

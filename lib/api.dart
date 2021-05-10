@@ -1,8 +1,8 @@
 // const SERVER_NAME = "http://192.168.1.152:8000";
 // // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
-// const SERVER_NAME = "192.168.1.225:8000";
-const SERVER_NAME = "3.17.145.13"; // production ip address
+const SERVER_NAME = "192.168.1.121:8000";
+// const SERVER_NAME = "3.17.145.13"; // production ip address
 
 // PUBLIC URL
 var getRequestServerName = SERVER_NAME;
@@ -28,10 +28,12 @@ var updatePostUri = "$postRequestServerName/post/update-post/";
 var accountInfoUri = "/account/";
 var accountPostUri = "/post/account/";
 var allPostUri = "/post/post-list/";
+var authAllPostUri = "/post/auth-post-list/";
 var updateProfilePictureUri =
     "$postRequestServerName/account/update-profile-picture/";
 var removeProfilePictureUri =
     "$postRequestServerName/account/remove-profile-picture/";
+var followAccount = '$postRequestServerName/account/follow/';
 
 const FETCH_POST_URI =
     "$SERVER_NAME/post/post-list/"; // will be removed in the future

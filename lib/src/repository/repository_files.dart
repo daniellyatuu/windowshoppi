@@ -70,6 +70,10 @@ export 'account_post_repository/account_post_api_client.dart';
 export 'all_post_repository/all_post_repository.dart';
 export 'all_post_repository/all_post_api_client.dart';
 
+// repo files for auth posts
+export 'all_post_repository/auth_post_repository/auth_post_repository.dart';
+export 'all_post_repository/auth_post_repository/auth_post_api_client.dart';
+
 // repo files for update post
 export 'update_post_repository/update_post_api_client.dart';
 
@@ -81,3 +85,6 @@ export 'remove_profile_repository/remove_profile_api_client.dart';
 
 // repo files for create recommendation post
 export 'create_recommendation_repository/create_recommendation_api_client.dart';
+
+// repo files for follow_unfollow
+export 'follow_unfollow_repository/follow_unfollow_api_client.dart';

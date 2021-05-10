@@ -83,10 +83,17 @@ export 'account_post_bloc/account_post_events.dart';
 export 'account_post_bloc/account_post_bloc.dart';
 export 'account_post_bloc/account_post_states.dart';
 
-// bloc files for all post
+// BLOC FILES FOR ALL POST
+
+// not authenticated
 export 'all_post_bloc/all_post_events.dart';
 export 'all_post_bloc/all_post_bloc.dart';
 export 'all_post_bloc/all_post_states.dart';
+
+// authenticated
+export 'all_post_bloc/auth_post_bloc/auth_post_events.dart';
+export 'all_post_bloc/auth_post_bloc/auth_post_bloc.dart';
+export 'all_post_bloc/auth_post_bloc/auth_post_states.dart';
 
 // bloc files for scroll to top
 export 'scroll_to_top_bloc/scroll_to_top_events.dart';

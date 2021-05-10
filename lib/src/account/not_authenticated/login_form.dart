@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -28,6 +29,9 @@ class _LoginState extends State<Login> {
           padding: EdgeInsets.all(0.0),
           alignment: Alignment.centerLeft,
           child: TextFormField(
+            inputFormatters: [
+              LowerCaseTextFormatter(),
+            ],
             decoration: InputDecoration(
               prefixIcon: Icon(Icons.alternate_email, color: Colors.black54),
               labelText: 'Username*',

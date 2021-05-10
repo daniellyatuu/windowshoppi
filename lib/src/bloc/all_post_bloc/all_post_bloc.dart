@@ -101,6 +101,7 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
     }
 
     if (event is AllPostFetched && !_hasReachedMax(currentState)) {
+      print('inside not_auth for all post bloc');
       if (currentState is AllPostInitial) {
         try {
           final _posts = await allPostRepository.userPost(0, _limit);

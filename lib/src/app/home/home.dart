@@ -1,3 +1,4 @@
+import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 import 'package:windowshoppi/src/app/home/home_files.dart';
 import 'package:windowshoppi/src/app/home/home_files.dart';
@@ -171,101 +172,28 @@ import 'package:flutter/material.dart';
 //   }
 // }
 
-class Home extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
+class Home extends StatelessWidget {
+  // const Home({Key key}) : super(key: key);
 
-class _HomeState extends State<Home> {
-  final List<String> _tabs = ['For You', 'Following'];
-
-  int _activeTab = 0;
-
-  void _tappedTab(int index) {
-    if (index == _activeTab) {
-      print('scroll to top');
-      // BlocProvider.of<ScrollToTopBloc>(context)..add(ScrollToTop(index: index));
-    }
-  }
+  final AuthPostRepository authPostRepository = AuthPostRepository(
+    authPostAPIClient: AuthPostAPIClient(),
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: DefaultTabController(
-        length: _tabs.length,
-        child: NestedScrollView(
-          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-            return <Widget>[
-              SliverOverlapAbsorber(
-                handle:
-                    NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                sliver: SliverSafeArea(
-                  top: false,
-                  bottom: true,
-                  sliver: SliverAppBar(
-                    title: Text('Windowshoppi'),
-                    floating: true,
-                    pinned: true,
-                    forceElevated: innerBoxIsScrolled,
-                    bottom: TabBar(
-                      onTap: _tappedTab,
-                      labelColor: Colors.red,
-                      unselectedLabelColor: Colors.white,
-                      indicatorSize: TabBarIndicatorSize.label,
-                      indicator: BoxDecoration(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10.0),
-                          topRight: Radius.circular(10.0),
-                        ),
-                        color: Colors.white,
-                      ),
-                      tabs: _tabs
-                          .map(
-                            (String name) => Tab(
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Text(name),
-                              ),
-                              // text: name,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ),
-                ),
-              ),
-            ];
-          },
-          body: Builder(
-            builder: (BuildContext context) {
-              final innerScrollController = PrimaryScrollController.of(context);
-
-              return NotificationListener<ScrollNotification>(
-                onNotification: (scrollNotification) {
-                  // scrollNotification
-                  // print('outer ${DefaultTabController.of(context).index}');
-                  setState(() {
-                    _activeTab = DefaultTabController.of(context).index;
-                  });
-                  return true;
-                },
-                child: TabBarView(
-                  children: [
-                    HomeForYou(
-                      primaryScrollController: innerScrollController,
-                      tabName: _tabs[0],
-                    ),
-                    HomeFollowing(
-                      primaryScrollController: innerScrollController,
-                      tabName: _tabs[1],
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ),
-      ),
+    return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+      builder: (context, authState) {
+        if (authState is IsAuthenticated) {
+          return BlocProvider<AuthPostBloc>(
+            create: (context) =>
+                AuthPostBloc(authPostRepository: authPostRepository)
+                  ..add(AuthPostInitFetch(accountId: authState.user.accountId)),
+            child: AuthHome(),
+          );
+        } else {
+          return NotAuthHome();
+        }
+      },
     );
   }
 }

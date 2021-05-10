@@ -6,6 +6,8 @@ abstract class FollowUnfollowStates extends Equatable {
   List<Object> get props => [];
 }
 
+class FollowUnfollowInit extends FollowUnfollowStates {}
+
 class FollowLoading extends FollowUnfollowStates {}
 
 class FollowSuccess extends FollowUnfollowStates {}
