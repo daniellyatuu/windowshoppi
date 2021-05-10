@@ -1,8 +1,8 @@
 // const SERVER_NAME = "http://192.168.1.152:8000";
 // // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
 
-const SERVER_NAME = "192.168.1.225:8000";
-// const SERVER_NAME = "3.17.145.13"; // production ip address
+// const SERVER_NAME = "192.168.1.225:8000";
+const SERVER_NAME = "3.17.145.13"; // production ip address
 
 // PUBLIC URL
 var getRequestServerName = SERVER_NAME;

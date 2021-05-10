@@ -154,13 +154,14 @@ class _RootState extends State<Root> {
     Fluttertoast.cancel();
 
     Fluttertoast.showToast(
-        msg: '$txt',
-        toastLength: length,
-        gravity: gravity,
-        timeInSecForIosWeb: 1,
-        backgroundColor: color,
-        textColor: Colors.white,
-        fontSize: 14.0);
+      msg: '$txt',
+      toastLength: length,
+      gravity: gravity,
+      timeInSecForIosWeb: 1,
+      backgroundColor: color,
+      textColor: Colors.white,
+      fontSize: 14.0,
+    );
   }
 
   @override
