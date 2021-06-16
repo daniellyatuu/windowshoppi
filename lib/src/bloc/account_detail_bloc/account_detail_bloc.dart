@@ -11,8 +11,8 @@ class AccountDetailBloc extends Bloc<AccountDetailEvents, AccountDetailStates> {
       AccountDetailEvents event) async* {
     if (event is GetAccountDetail) {
       try {
-        final _account =
-            await AccountDetailAPIClient().getAccountDetail(event.accountId);
+        final _account = await AccountDetailAPIClient()
+            .getAccountDetail(event.accountId, event.loggedInAccountId);
 
         if (_account == 404) {
           yield AccountNotFound();

@@ -7,9 +7,9 @@ abstract class NavigationStates extends Equatable {
   List<Object> get props => [];
 }
 
-class CurrentIndex extends NavigationStates {
+class AppCurrentIndex extends NavigationStates {
   final int index;
-  CurrentIndex({this.index = 0});
+  AppCurrentIndex({this.index = 0});
 
   @override
   List<Object> get props => [index];

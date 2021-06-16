@@ -1,7 +1,4 @@
-// const SERVER_NAME = "http://192.168.1.152:8000";
-// // const SERVER_NAME = "http://3.17.145.13/"; // production ip address
-
-const SERVER_NAME = "192.168.1.121:8000";
+const SERVER_NAME = "192.168.1.106:8000";
 // const SERVER_NAME = "3.17.145.13"; // production ip address
 
 // PUBLIC URL
@@ -23,17 +20,24 @@ var userPostUri = '/post/user-post/';
 var userCreatePostUri = "$postRequestServerName/post/create-post/";
 var userSinglePostDataUri = "/post/post-data/";
 var searchAccountPostUri = "/post/search-post/";
+var authSearchAccountPostUri = "/post/auth-search-post/";
 var searchAccountUri = "/account/search-account/";
 var updatePostUri = "$postRequestServerName/post/update-post/";
 var accountInfoUri = "/account/";
+var followerFollowingPostNumberUri = "/account/follower-number/";
 var accountPostUri = "/post/account/";
 var allPostUri = "/post/post-list/";
 var authAllPostUri = "/post/auth-post-list/";
+var followingPostUri = "/post/following-account-post-list/";
 var updateProfilePictureUri =
     "$postRequestServerName/account/update-profile-picture/";
 var removeProfilePictureUri =
     "$postRequestServerName/account/remove-profile-picture/";
-var followAccount = '$postRequestServerName/account/follow/';
+var followUnfollowAccountUri =
+    '$postRequestServerName/account/follow-unfollow/';
+var accountListUri = '/account/account-list';
+var updateFcmTokenUri = '$postRequestServerName/update-fcm-token/';
+var notificationUri = '/notification/user-notification/';
 
 const FETCH_POST_URI =
     "$SERVER_NAME/post/post-list/"; // will be removed in the future

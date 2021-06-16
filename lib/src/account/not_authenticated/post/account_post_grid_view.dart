@@ -10,8 +10,10 @@ import 'package:windowshoppi/src/account/account_files.dart';
 class AccountPostGridView extends StatefulWidget {
   final ScrollController _primaryScrollController;
   final int accountId;
+  final bool isFollowed;
 
-  AccountPostGridView(this._primaryScrollController, this.accountId);
+  AccountPostGridView(
+      this._primaryScrollController, this.accountId, this.isFollowed);
 
   @override
   _AccountPostGridViewState createState() => _AccountPostGridViewState();
@@ -104,6 +106,7 @@ class _AccountPostGridViewState extends State<AccountPostGridView> {
                             child: AccountExplore(
                               accountId: this.widget.accountId,
                               index: index,
+                              isFollowed: widget.isFollowed,
                             ),
                           ),
                         );

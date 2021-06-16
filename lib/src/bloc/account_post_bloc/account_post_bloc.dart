@@ -49,7 +49,9 @@ class AccountPostBloc extends Bloc<AccountPostEvents, AccountPostStates> {
     if (event is AccountPostRemove) {
       yield AccountPostInitial();
       if (currentState is AccountPostSuccess) {
-        currentState.posts.remove(event.post);
+        currentState.posts
+            .removeWhere((element) => element.id == event.post.id);
+
         yield AccountPostSuccess(
           posts: currentState.posts,
           hasReachedMax: currentState.posts.length < _limit ? true : false,

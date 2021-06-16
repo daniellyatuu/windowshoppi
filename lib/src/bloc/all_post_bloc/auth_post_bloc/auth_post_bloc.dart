@@ -13,79 +13,84 @@ class AuthPostBloc extends Bloc<AuthPostEvents, AuthPostStates> {
   AuthPostBloc({@required this.authPostRepository})
       : super(AuthPostInitFetchLoading());
 
-  // @override
-  // Stream<Transition<AllPostEvents, AllPostStates>> transformEvents(
-  //   Stream<AllPostEvents> events,
-  //   TransitionFunction<AllPostEvents, AllPostStates> transitionFn,
-  // ) {
-  //   return super.transformEvents(
-  //     events.debounceTime(const Duration(milliseconds: 500)),
-  //     transitionFn,
-  //   );
-  // }
+  @override
+  Stream<Transition<AuthPostEvents, AuthPostStates>> transformEvents(
+    Stream<AuthPostEvents> events,
+    TransitionFunction<AuthPostEvents, AuthPostStates> transitionFn,
+  ) {
+    return super.transformEvents(
+      events.debounceTime(const Duration(milliseconds: 500)),
+      transitionFn,
+    );
+  }
 
   @override
   Stream<AuthPostStates> mapEventToState(AuthPostEvents event) async* {
     int _limit = 21;
     final currentState = state;
 
-    // if (event is AllPostRefresh) {
-    //   if (currentState is AllPostFailure || currentState is AllPostNoInternet)
-    //     yield AllPostInitial();
-    //
-    //   try {
-    //     // get new posts
-    //     final _posts = await allPostRepository.userPost(0, _limit);
-    //
-    //     if (_posts == 'no_internet') {
-    //       // SHOW ALERT ON UI WITHOUT REMOVE currentState
-    //       _toastNotification('No internet connection', Colors.red,
-    //           Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
-    //
-    //       if (currentState is! AllPostSuccess) {
-    //         yield AllPostNoInternet();
-    //       }
-    //     } else if (_posts is List<Post>) {
-    //       yield AllPostSuccess(
-    //         posts: _posts,
-    //         hasReachedMax: _posts.length < _limit ? true : false,
-    //       );
-    //     }
-    //   } catch (_) {
-    //     // SHOW ALERT ON UI WITHOUT REMOVE currentState
-    //     _toastNotification('Failed to fetch posts.Try again', Colors.red,
-    //         Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
-    //
-    //     if (currentState is! AllPostSuccess) {
-    //       yield AllPostFailure();
-    //     }
-    //   }
-    // }
+    if (event is AuthPostRefresh) {
+      if (currentState is AllPostFailure || currentState is AllPostNoInternet)
+        yield AuthPostInitFetchLoading();
 
-    // if (event is AllPostInsert) {
-    //   yield AllPostInitial();
-    //   if (currentState is AllPostSuccess) {
-    //     currentState.posts.insert(0, event.post);
-    //     yield AllPostSuccess(
-    //       posts: currentState.posts,
-    //       hasReachedMax: currentState.posts.length < _limit ? true : false,
-    //     );
-    //   }
-    // }
-    //
-    // if (event is PostRemove) {
-    //   yield AllPostInitial();
-    //   if (currentState is AllPostSuccess) {
-    //     currentState.posts.remove(event.post);
-    //     yield AllPostSuccess(
-    //       posts: currentState.posts,
-    //       hasReachedMax: currentState.posts.length < _limit ? true : false,
-    //     );
-    //   }
-    // }
-    //
+      try {
+        // get new auth posts
+        final _authPosts =
+            await authPostRepository.authPost(0, _limit, event.accountId);
 
-    if (event is AuthPostInitFetch) {
+        if (_authPosts == 'no_internet') {
+          // SHOW ALERT ON UI WITHOUT REMOVE currentState
+          _toastNotification('No internet connection', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+
+          if (currentState is! AuthPostSuccess) {
+            yield AuthPostNoInternet();
+          }
+        } else if (_authPosts is List<Post>) {
+          yield AuthPostSuccess(
+            posts: _authPosts,
+            activeAccountId: event.accountId,
+            hasReachedMax: _authPosts.length < _limit ? true : false,
+          );
+        }
+      } catch (_) {
+        // SHOW ALERT ON UI WITHOUT REMOVE currentState
+        _toastNotification('Failed to fetch posts.Try again', Colors.red,
+            Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+
+        if (currentState is! AuthPostSuccess) {
+          yield AuthPostFailure();
+        }
+      }
+    }
+
+    if (event is AuthAllPostInsert) {
+      yield AuthPostInitFetchLoading();
+      if (currentState is AuthPostSuccess) {
+        currentState.posts.insert(0, event.post);
+        yield AuthPostSuccess(
+          posts: currentState.posts,
+          activeAccountId: currentState.activeAccountId,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
+    if (event is AuthPostRemove) {
+      yield AuthPostInitFetchLoading();
+      if (currentState is AuthPostSuccess) {
+        currentState.posts
+            .removeWhere((element) => element.id == event.post.id);
+
+        yield AuthPostSuccess(
+          posts: currentState.posts,
+          activeAccountId: currentState.activeAccountId,
+          hasReachedMax: currentState.posts.length < _limit ? true : false,
+        );
+      }
+    }
+
+    if (event is AuthPostInitFetch && currentState is! AuthPostSuccess) {
       try {
         final _authPosts =
             await authPostRepository.authPost(0, _limit, event.accountId);
@@ -95,6 +100,7 @@ class AuthPostBloc extends Bloc<AuthPostEvents, AuthPostStates> {
         } else if (_authPosts is List<Post>) {
           yield AuthPostSuccess(
             posts: _authPosts,
+            activeAccountId: event.accountId,
             hasReachedMax: _authPosts.length < _limit ? true : false,
           );
         }
@@ -103,60 +109,47 @@ class AuthPostBloc extends Bloc<AuthPostEvents, AuthPostStates> {
       }
     }
 
-    // if (event is AllPostFetched && !_hasReachedMax(currentState)) {
-    //   if (currentState is AllPostInitial) {
-    //     try {
-    //       final _posts = await allPostRepository.userPost(0, _limit);
-    //
-    //       if (_posts == 'no_internet') {
-    //         yield AllPostNoInternet();
-    //       } else if (_posts is List<Post>) {
-    //         yield AllPostSuccess(
-    //           posts: _posts,
-    //           hasReachedMax: _posts.length < _limit ? true : false,
-    //         );
-    //       }
-    //     } catch (_) {
-    //       yield AllPostFailure();
-    //     }
-    //   }
-    //
-    //   if (currentState is AllPostSuccess) {
-    //     try {
-    //       final _posts = await allPostRepository.userPost(
-    //           currentState.posts.length, _limit);
-    //
-    //       if (_posts == 'no_internet') {
-    //         _toastNotification('No internet connection', Colors.red,
-    //             Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
-    //         if (event.from != 'explore') yield AllPostInitial();
-    //         yield AllPostSuccess(
-    //           posts: currentState.posts,
-    //           hasReachedMax: currentState.posts.length < _limit ? true : false,
-    //           hasFailedToLoadMore: true,
-    //         );
-    //       } else if (_posts is List<Post>) {
-    //         yield AllPostSuccess(
-    //           posts: currentState.posts + _posts,
-    //           hasReachedMax: _posts.length < _limit ? true : false,
-    //         );
-    //       }
-    //     } catch (_) {
-    //       _toastNotification('Failed to fetch posts.Try again', Colors.red,
-    //           Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
-    //       if (event.from != 'explore') yield AllPostInitial();
-    //       yield AllPostSuccess(
-    //         posts: currentState.posts,
-    //         hasReachedMax: currentState.posts.length < _limit ? true : false,
-    //         hasFailedToLoadMore: true,
-    //       );
-    //     }
-    //   }
-    // }
+    if (event is AuthPostLoadMore && !_hasReachedMax(currentState)) {
+      if (currentState is AuthPostSuccess) {
+        try {
+          final _authPosts = await authPostRepository.authPost(
+              currentState.posts.length, _limit, currentState.activeAccountId);
+
+          if (_authPosts == 'no_internet') {
+            _toastNotification('No internet connection.', Colors.red,
+                Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+
+            yield AuthPostSuccess(
+              posts: currentState.posts,
+              activeAccountId: currentState.activeAccountId,
+              hasReachedMax: currentState.posts.length < _limit ? true : false,
+              hasFailedToLoadMore: true,
+            );
+          } else if (_authPosts is List<Post>) {
+            yield AuthPostSuccess(
+              posts: currentState.posts + _authPosts,
+              activeAccountId: currentState.activeAccountId,
+              hasReachedMax: _authPosts.length < _limit ? true : false,
+              hasFailedToLoadMore: true,
+            );
+          }
+        } catch (_) {
+          _toastNotification('Failed to fetch posts.Try again', Colors.red,
+              Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
+
+          yield AuthPostSuccess(
+            posts: currentState.posts,
+            activeAccountId: currentState.activeAccountId,
+            hasReachedMax: currentState.posts.length < _limit ? true : false,
+            hasFailedToLoadMore: true,
+          );
+        }
+      }
+    }
   }
 
-  bool _hasReachedMax(AllPostStates state) =>
-      state is AllPostSuccess && state.hasReachedMax;
+  bool _hasReachedMax(AuthPostSuccess state) =>
+      state is AuthPostSuccess && state.hasReachedMax;
 }
 
 void _toastNotification(

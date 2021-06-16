@@ -37,134 +37,153 @@ class _SearchedAccountResultState extends State<SearchedAccountResult> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SearchTextFieldBloc, SearchTextFieldStates>(
-      listener: (context, state) {
-        if (state is SearchTextFieldNotEmpty) {
-          if (state.keyword != '') {
-            // print('search for account result in  = ${state.keyword}');
-            BlocProvider.of<SearchAccountBloc>(context)
-              ..add(InitSearchAccountFetched(accountKeyword: state.keyword));
+    return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+        builder: (context, authState) {
+      return BlocListener<SearchTextFieldBloc, SearchTextFieldStates>(
+        listener: (context, state) {
+          if (state is SearchTextFieldNotEmpty) {
+            if (state.keyword != '') {
+              // print('search for account result in  = ${state.keyword}');
+              BlocProvider.of<SearchAccountBloc>(context)
+                ..add(InitSearchAccountFetched(accountKeyword: state.keyword));
+            }
           }
-        }
-      },
-      child: BlocBuilder<SearchAccountBloc, SearchAccountStates>(
-        builder: (context, state) {
-          if (state is SearchAccountEmpty) {
-            return SearchWelcomeText(txt: 'Search Accounts');
-          } else if (state is SearchAccountInitial) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is SearchAccountFailure) {
-            return Center(
-              child: Text(
-                'Failed to fetch posts',
-                style: Theme.of(context).textTheme.bodyText1,
-              ),
-            );
-          } else if (state is SearchAccountSuccess) {
-            var data = state.accounts;
-
-            if (state.accounts.isEmpty) {
+        },
+        child: BlocBuilder<SearchAccountBloc, SearchAccountStates>(
+          builder: (context, state) {
+            if (state is SearchAccountEmpty) {
+              return SearchWelcomeText(txt: 'Search Accounts');
+            } else if (state is SearchAccountInitial) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (state is SearchAccountFailure) {
               return Center(
                 child: Text(
-                  'No Accounts',
-                  style: Theme.of(context).textTheme.headline6,
+                  'Failed to fetch posts',
+                  style: Theme.of(context).textTheme.bodyText1,
                 ),
               );
-            }
+            } else if (state is SearchAccountSuccess) {
+              var data = state.accounts;
 
-            return ListView(
-              physics: BouncingScrollPhysics(),
-              controller: _scrollController,
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  physics: ScrollPhysics(),
-                  itemCount: data.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AccountPageInit(
-                              accountId: data[index].accountId,
-                            ),
+              if (state.accounts.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No Accounts',
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                );
+              }
+
+              return ListView(
+                physics: BouncingScrollPhysics(),
+                controller: _scrollController,
+                children: [
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        onTap: () async {
+                          if (authState is IsAuthenticated) {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AccountPageInit(
+                                  accountId: data[index].accountId,
+                                  loggedInAccountId: authState.user.accountId,
+                                ),
+                              ),
+                            );
+                          } else {
+                            await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AccountPageInit(
+                                  accountId: data[index].accountId,
+                                ),
+                              ),
+                            );
+                          }
+                          BlocProvider.of<AccountPostBloc>(context)
+                            ..add(ResetAccountPostState());
+                        },
+                        dense: true,
+                        leading: Container(
+                          width: 45,
+                          height: 45,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[400],
+                            shape: BoxShape.circle,
                           ),
-                        );
-                      },
-                      dense: true,
-                      leading: Container(
-                        width: 45,
-                        height: 45,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[400],
-                          shape: BoxShape.circle,
-                        ),
-                        child: data[index].accountProfile == null
-                            ? FittedBox(
-                                child: Icon(Icons.account_circle,
-                                    color: Colors.white),
-                              )
-                            : ClipOval(
-                                child: ExtendedImage.network(
-                                  '${data[index].accountProfile}',
-                                  cache: true,
-                                  loadStateChanged: (ExtendedImageState state) {
-                                    switch (state.extendedImageLoadState) {
-                                      case LoadState.loading:
-                                        return FittedBox(
-                                          child: Icon(
-                                            Icons.account_circle,
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                        break;
-
-                                      ///if you don't want override completed widget
-                                      ///please return null or state.completedWidget
-                                      //return null;
-                                      //return state.completedWidget;
-                                      case LoadState.completed:
-                                        return ExtendedRawImage(
-                                          fit: BoxFit.cover,
-                                          image: state.extendedImageInfo?.image,
-                                        );
-                                        break;
-                                      case LoadState.failed:
-                                        // _controller.reset();
-                                        return GestureDetector(
-                                          child: FittedBox(
+                          child: data[index].accountProfile == null
+                              ? FittedBox(
+                                  child: Icon(Icons.account_circle,
+                                      color: Colors.white),
+                                )
+                              : ClipOval(
+                                  child: ExtendedImage.network(
+                                    '${data[index].accountProfile}',
+                                    cache: true,
+                                    loadStateChanged:
+                                        (ExtendedImageState state) {
+                                      switch (state.extendedImageLoadState) {
+                                        case LoadState.loading:
+                                          return FittedBox(
                                             child: Icon(
                                               Icons.account_circle,
                                               color: Colors.white,
                                             ),
-                                          ),
-                                          onTap: () {
-                                            state.reLoadImage();
-                                          },
-                                        );
-                                        break;
-                                    }
-                                    return null;
-                                  },
+                                          );
+                                          break;
+
+                                        ///if you don't want override completed widget
+                                        ///please return null or state.completedWidget
+                                        //return null;
+                                        //return state.completedWidget;
+                                        case LoadState.completed:
+                                          return ExtendedRawImage(
+                                            fit: BoxFit.cover,
+                                            image:
+                                                state.extendedImageInfo?.image,
+                                          );
+                                          break;
+                                        case LoadState.failed:
+                                          // _controller.reset();
+                                          return GestureDetector(
+                                            child: FittedBox(
+                                              child: Icon(
+                                                Icons.account_circle,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            onTap: () {
+                                              state.reLoadImage();
+                                            },
+                                          );
+                                          break;
+                                      }
+                                      return null;
+                                    },
+                                  ),
                                 ),
-                              ),
-                      ),
-                      title: Text('${data[index].username}'),
-                      subtitle: Text('${data[index].accountName}'),
-                    );
-                  },
-                ),
-                if (!state.hasReachedMax) BottomLoader(),
-              ],
-            );
-          } else {
-            return Container();
-          }
-        },
-      ),
-    );
+                        ),
+                        title: Text('${data[index].username}'),
+                        subtitle: Text('${data[index].accountName}'),
+                      );
+                    },
+                  ),
+                  if (!state.hasReachedMax) BottomLoader(),
+                ],
+              );
+            } else {
+              return Container();
+            }
+          },
+        ),
+      );
+    });
   }
 }

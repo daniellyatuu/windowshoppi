@@ -8,10 +8,11 @@ import 'dart:io';
 
 class FollowUnfollowAPIClient {
   Future followUnfollow(followData) async {
+    print('here please');
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var token = localStorage.getString('token');
 
-    var _url = Uri.parse(followAccount);
+    var _url = Uri.parse(followUnfollowAccountUri);
 
     Map<String, String> headers = {
       'Content-Type': 'application/json; charset=UTF-8',
@@ -29,12 +30,7 @@ class FollowUnfollowAPIClient {
       print(response.body);
 
       if (response.statusCode == 201) {
-        var _result = json.decode(response.body);
-        if (_result == true) {
-          return _result;
-        }
-      } else if (response.statusCode == 200) {
-        return 'already_followed';
+        return json.decode(response.body);
       } else {
         throw Exception('Error From Server');
       }

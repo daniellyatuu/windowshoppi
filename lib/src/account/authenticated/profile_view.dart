@@ -295,23 +295,38 @@ class _ProfileViewState extends State<ProfileView> {
                         style: Theme.of(context).textTheme.bodyText2,
                       ),
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      AccountInfo(
-                        name: 'Followers',
-                        number: 12,
-                      ),
-                      AccountInfo(
-                        name: 'Following',
-                        number: 15,
-                      ),
-                      AccountInfo(
-                        name: 'Posts',
-                        number: 30,
-                      ),
-                    ],
+                  // AccountInfoLoader(),
+                  BlocBuilder<AccountInfoBloc, AccountInfoStates>(
+                    builder: (context, accountInfoState) {
+                      if (accountInfoState is AccountInfoLoading) {
+                        return AccountInfoLoader();
+                      } else if (accountInfoState is AccountInfoSuccess) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            AccountInfo(
+                              name: 'Followers',
+                              number:
+                                  '${accountInfoState.accountInfo.followerNumber}',
+                            ),
+                            AccountInfo(
+                              name: 'Following',
+                              number:
+                                  '${accountInfoState.accountInfo.followingNumber}',
+                            ),
+                            AccountInfo(
+                              name: 'Posts',
+                              number:
+                                  '${accountInfoState.accountInfo.postNumber}',
+                            ),
+                          ],
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
                   ),
+
                   // if (data.group == 'windowshopper') Divider(),
 
                   if (data.group == 'vendor')

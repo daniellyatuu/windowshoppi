@@ -88,3 +88,18 @@ export 'create_recommendation_repository/create_recommendation_api_client.dart';
 
 // repo files for follow_unfollow
 export 'follow_unfollow_repository/follow_unfollow_api_client.dart';
+
+// repo files for auth search post
+export 'search_post_repository/auth/auth_search_post_repository.dart';
+export 'search_post_repository/auth/auth_search_post_api_client.dart';
+
+// repo files for account info
+export 'account_info_repo/account_info_api_client.dart';
+
+export 'account_list_repo/account_list_api_client.dart';
+
+export 'following_post_repo/following_post_api_client.dart';
+
+export 'fcm_token_repo/fcm_token_api_client.dart';
+
+export 'notification_repo/notification_api_client.dart';

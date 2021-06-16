@@ -17,7 +17,13 @@ class AuthPostInitFetch extends AuthPostEvents {
 
 class AuthPostLoadMore extends AuthPostEvents {}
 
-class AuthPostRefresh extends AuthPostEvents {}
+class AuthPostRefresh extends AuthPostEvents {
+  final int accountId;
+  AuthPostRefresh({@required this.accountId});
+
+  @override
+  List<Object> get props => [accountId];
+}
 
 // class AllPostFetched extends AllPostEvents {
 //   final String from;
@@ -26,22 +32,22 @@ class AuthPostRefresh extends AuthPostEvents {}
 //
 // class AllPostRefresh extends AllPostEvents {}
 //
-// class AllPostInsert extends AllPostEvents {
-//   final Post post;
-//
-//   AllPostInsert({this.post});
-//
-//   @override
-//   List<Object> get props => [post];
-// }
-//
-// class PostRemove extends AllPostEvents {
-//   final Post post;
-//
-//   PostRemove({this.post});
-//
-//   @override
-//   List<Object> get props => [post];
-// }
-//
+class AuthAllPostInsert extends AuthPostEvents {
+  final Post post;
+
+  AuthAllPostInsert({this.post});
+
+  @override
+  List<Object> get props => [post];
+}
+
+class AuthPostRemove extends AuthPostEvents {
+  final Post post;
+
+  AuthPostRemove({this.post});
+
+  @override
+  List<Object> get props => [post];
+}
+
 // class AllPostRetry extends AllPostEvents {}

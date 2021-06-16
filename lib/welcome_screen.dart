@@ -70,10 +70,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       showSkipButton: true,
       skipFlex: 0,
       nextFlex: 0,
-      skip: Text('Skip'),
-      next: const Icon(Icons.arrow_forward),
+      skip: Text(
+        'Skip',
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
+      next: const Icon(
+        Icons.arrow_forward,
+        color: Colors.black,
+      ),
       onDone: () => _onIntroEnd(context),
-      done: Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
+      done: Text(
+        'Done',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+        ),
+      ),
       dotsDecorator: const DotsDecorator(
         activeColor: Colors.red,
         size: Size(10.0, 10.0),

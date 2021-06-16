@@ -12,7 +12,7 @@ class AuthenticationLoading extends AuthenticationStates {}
 
 class AuthNoInternet extends AuthenticationStates {}
 
-class AuthenticationError extends AuthenticationStates {}
+class AuthenticationError extends AuthenticationStates {} // will be removed
 
 class IsAuthenticated extends AuthenticationStates {
   final User user;

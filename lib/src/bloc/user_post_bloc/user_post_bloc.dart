@@ -67,9 +67,11 @@ class UserPostBloc extends Bloc<UserPostEvents, UserPostStates> {
     }
 
     if (event is UserPostRemove) {
+      print('inside UserPostRemove');
       yield UserPostInitial();
       if (currentState is UserPostSuccess) {
-        currentState.posts.remove(event.post);
+        currentState.posts
+            .removeWhere((element) => element.id == event.post.id);
 
         yield UserPostSuccess(
           posts: currentState.posts,

@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:line_awesome_flutter/line_awesome_flutter.dart';
+import 'package:uuid/uuid.dart';
 import 'package:windowshoppi/src/location/flutter_google_places.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
@@ -7,10 +10,12 @@ import 'package:google_maps_webservice/places.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:windowshoppi/src/google_location/google_location_files.dart';
 import 'package:windowshoppi/api.dart';
+import 'package:windowshoppi/src/widget/widget_files.dart';
 
-// to get places detail (lat/lng)
-GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
+// // to get places detail (lat/lng)
+// GoogleMapsPlaces _places = GoogleMapsPlaces(apiKey: kGoogleApiKey);
 
 class CreateRecommendPage extends StatefulWidget {
   final String name;
@@ -24,6 +29,9 @@ class CreateRecommendPage extends StatefulWidget {
 class _CreateRecommendPageState extends State<CreateRecommendPage> {
   final _recommendFormKey = GlobalKey<FormState>();
   final homeScaffoldKey = GlobalKey<ScaffoldState>();
+  final _locationTextFieldController = TextEditingController();
+
+  bool _searchLocation = false;
 
   String _recommendedName;
   String _recommendedCaptionText;
@@ -42,24 +50,25 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
 
   // for location
   String _activeLocation;
-  String latitude, longitude;
+  double latitude, longitude;
 
   Widget _buildRecommendedName() {
     return Row(
       children: <Widget>[
-        Icon(Icons.drive_file_rename_outline, size: 30, color: Colors.grey),
-        SizedBox(width: 10.0),
+        // Icon(Icons.drive_file_rename_outline, size: 30, color: Colors.grey),
+        // SizedBox(width: 10.0),
         Expanded(
           child: TextFormField(
             maxLines: null,
             keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
+              prefixIcon: Icon(LineAwesomeIcons.product_hunt),
               labelText: 'Name of ${widget.name}*',
               labelStyle: TextStyle(
                 color: Colors.grey[700],
-                fontWeight: FontWeight.bold,
+                // fontWeight: FontWeight.bold,
               ),
-              border: InputBorder.none,
+              border: OutlineInputBorder(),
             ),
             style: TextStyle(
               color: Colors.grey[700],
@@ -80,78 +89,138 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
   Widget _buildRecommendCaption() {
     return Row(
       children: <Widget>[
-        BlocBuilder<AuthenticationBloc, AuthenticationStates>(
-          builder: (context, state) {
-            if (state is IsAuthenticated) {
-              return Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  shape: BoxShape.circle,
-                ),
-                child: state.user.profileImage == null
-                    ? FittedBox(
-                        child:
-                            Icon(Icons.account_circle, color: Colors.grey[400]),
-                      )
-                    : ClipOval(
-                        child: ExtendedImage.network(
-                          '${state.user.profileImage}',
-                          cache: true,
-                          loadStateChanged: (ExtendedImageState state) {
-                            switch (state.extendedImageLoadState) {
-                              case LoadState.loading:
-                                return FittedBox(
-                                  child: Icon(Icons.account_circle,
-                                      color: Colors.grey[400]),
-                                );
-                                break;
-
-                              ///if you don't want override completed widget
-                              ///please return null or state.completedWidget
-                              //return null;
-                              //return state.completedWidget;
-                              case LoadState.completed:
-                                return ExtendedRawImage(
-                                  fit: BoxFit.cover,
-                                  image: state.extendedImageInfo?.image,
-                                );
-                                break;
-                              case LoadState.failed:
-                                // _controller.reset();
-                                return GestureDetector(
-                                  child: Center(
-                                    child: Icon(Icons.refresh),
-                                  ),
-                                  onTap: () {
-                                    state.reLoadImage();
-                                  },
-                                );
-                                break;
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-              );
-            } else {
-              return Container();
-            }
-          },
-        ),
-        SizedBox(width: 10.0),
+        // BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+        //   builder: (context, state) {
+        //     if (state is IsAuthenticated) {
+        //       return Container(
+        //         width: 30,
+        //         height: 30,
+        //         decoration: BoxDecoration(
+        //           color: Colors.grey[200],
+        //           shape: BoxShape.circle,
+        //         ),
+        //         child: state.user.profileImage == null
+        //             ? FittedBox(
+        //                 child:
+        //                     Icon(Icons.account_circle, color: Colors.grey[400]),
+        //               )
+        //             : ClipOval(
+        //                 child: ExtendedImage.network(
+        //                   '${state.user.profileImage}',
+        //                   cache: true,
+        //                   loadStateChanged: (ExtendedImageState state) {
+        //                     switch (state.extendedImageLoadState) {
+        //                       case LoadState.loading:
+        //                         return FittedBox(
+        //                           child: Icon(Icons.account_circle,
+        //                               color: Colors.grey[400]),
+        //                         );
+        //                         break;
+        //
+        //                       ///if you don't want override completed widget
+        //                       ///please return null or state.completedWidget
+        //                       //return null;
+        //                       //return state.completedWidget;
+        //                       case LoadState.completed:
+        //                         return ExtendedRawImage(
+        //                           fit: BoxFit.cover,
+        //                           image: state.extendedImageInfo?.image,
+        //                         );
+        //                         break;
+        //                       case LoadState.failed:
+        //                         // _controller.reset();
+        //                         return GestureDetector(
+        //                           child: Center(
+        //                             child: Icon(Icons.refresh),
+        //                           ),
+        //                           onTap: () {
+        //                             state.reLoadImage();
+        //                           },
+        //                         );
+        //                         break;
+        //                     }
+        //                     return null;
+        //                   },
+        //                 ),
+        //               ),
+        //       );
+        //     } else {
+        //       return Container();
+        //     }
+        //   },
+        // ),
+        // SizedBox(width: 10.0),
         Expanded(
           child: TextFormField(
             maxLines: null,
             keyboardType: TextInputType.multiline,
             decoration: InputDecoration(
-              labelText: 'Write Caption*',
+              prefixIcon: BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                builder: (context, state) {
+                  if (state is IsAuthenticated) {
+                    return Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        shape: BoxShape.circle,
+                      ),
+                      child: state.user.profileImage == null
+                          ? FittedBox(
+                              child: Icon(Icons.account_circle,
+                                  color: Colors.grey[400]),
+                            )
+                          : ClipOval(
+                              child: ExtendedImage.network(
+                                '${state.user.profileImage}',
+                                cache: true,
+                                loadStateChanged: (ExtendedImageState state) {
+                                  switch (state.extendedImageLoadState) {
+                                    case LoadState.loading:
+                                      return FittedBox(
+                                        child: Icon(Icons.account_circle,
+                                            color: Colors.grey[400]),
+                                      );
+                                      break;
+
+                                    ///if you don't want override completed widget
+                                    ///please return null or state.completedWidget
+                                    //return null;
+                                    //return state.completedWidget;
+                                    case LoadState.completed:
+                                      return ExtendedRawImage(
+                                        fit: BoxFit.cover,
+                                        image: state.extendedImageInfo?.image,
+                                      );
+                                      break;
+                                    case LoadState.failed:
+                                      // _controller.reset();
+                                      return GestureDetector(
+                                        child: Center(
+                                          child: Icon(Icons.refresh),
+                                        ),
+                                        onTap: () {
+                                          state.reLoadImage();
+                                        },
+                                      );
+                                      break;
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                    );
+                  } else {
+                    return Container();
+                  }
+                },
+              ),
+              labelText: ' Write Caption*',
               labelStyle: TextStyle(
                 color: Colors.grey[700],
-                fontWeight: FontWeight.bold,
+                // fontWeight: FontWeight.bold,
               ),
-              border: InputBorder.none,
+              border: OutlineInputBorder(),
             ),
             style: TextStyle(
               color: Colors.grey[700],
@@ -177,11 +246,11 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
   // images selection .start
   // #######################
 
-  List<Asset> images = List<Asset>();
+  List<Asset> images = [];
   String _error;
 
   Future<void> loadAssets() async {
-    List<Asset> resultList = List<Asset>();
+    List<Asset> resultList = [];
     String error = 'No Error Detected';
 
     try {
@@ -222,50 +291,25 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
   // #####################
 
   Widget _buildImageSelection() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: FlatButton(
-                padding: EdgeInsets.zero,
-                onPressed: () {
-                  FocusScope.of(context).requestFocus(FocusNode());
-                  loadAssets();
-                },
-                child: Row(
-                  children: <Widget>[
-                    Icon(Icons.image_outlined, size: 30, color: Colors.grey),
-                    SizedBox(width: 10.0),
-                    Expanded(
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          'Choose Photos*',
-                          style: TextStyle(
-                            color: Colors.grey[700],
-                            fontSize: 16.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-        if (_noImage)
-          Container(
-            margin: EdgeInsets.only(left: 40.0),
-            alignment: Alignment.centerLeft,
-            child: Text(
-              'This field is required',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-      ],
+    return TextFormField(
+      readOnly: true,
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+        loadAssets();
+      },
+      decoration: InputDecoration(
+        isDense: true,
+        // prefixIcon: Icon(Icons.account_circle, color: Colors.black54),
+        labelText: 'Choose Photos*',
+        prefixIcon: Icon(LineAwesomeIcons.image),
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'This field is required';
+        }
+        return null;
+      },
     );
   }
 
@@ -326,44 +370,44 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
     );
   }
 
-  // LOCATION .START
-  void onError(PlacesAutocompleteResponse response) {
-    homeScaffoldKey.currentState.showSnackBar(
-      SnackBar(content: Text(response.errorMessage)),
-    );
-  }
-
-  Future<void> _searchLocation() async {
-    // show input autocomplete with selected mode
-    // then get the Prediction selected
-    Prediction p = await PlacesAutocomplete.show(
-      context: context,
-      apiKey: kGoogleApiKey,
-      onError: onError,
-      mode: Mode.overlay,
-//      mode: _mode,
-//       language: 'en',
-//       components: [Component(Component.country, 'tz')],
-    );
-
-    displayPrediction(p, homeScaffoldKey.currentState);
-  }
-
-  Future<Null> displayPrediction(Prediction p, ScaffoldState scaffold) async {
-    if (p != null) {
-      // get detail (lat/lng)
-      PlacesDetailsResponse detail =
-          await _places.getDetailsByPlaceId(p.placeId);
-      final lat = detail.result.geometry.location.lat;
-      final lng = detail.result.geometry.location.lng;
-      setState(() {
-        _activeLocation = p.description;
-        latitude = lat.toString();
-        longitude = lng.toString();
-      });
-    }
-  }
-  // LOCATION .END
+//   // LOCATION .START
+//   void onError(PlacesAutocompleteResponse response) {
+//     homeScaffoldKey.currentState.showSnackBar(
+//       SnackBar(content: Text(response.errorMessage)),
+//     );
+//   }
+//
+//   Future<void> _searchLocation() async {
+//     // show input autocomplete with selected mode
+//     // then get the Prediction selected
+//     Prediction p = await PlacesAutocomplete.show(
+//       context: context,
+//       apiKey: kGoogleApiKey,
+//       onError: onError,
+//       mode: Mode.overlay,
+// //      mode: _mode,
+// //       language: 'en',
+// //       components: [Component(Component.country, 'tz')],
+//     );
+//
+//     displayPrediction(p, homeScaffoldKey.currentState);
+//   }
+//
+//   Future<Null> displayPrediction(Prediction p, ScaffoldState scaffold) async {
+//     if (p != null) {
+//       // get detail (lat/lng)
+//       PlacesDetailsResponse detail =
+//           await _places.getDetailsByPlaceId(p.placeId);
+//       final lat = detail.result.geometry.location.lat;
+//       final lng = detail.result.geometry.location.lng;
+//       setState(() {
+//         _activeLocation = p.description;
+//         latitude = lat.toString();
+//         longitude = lng.toString();
+//       });
+//     }
+//   }
+//   // LOCATION .END
 
   Widget _buildPhoneNumberTF() {
     return Column(
@@ -385,11 +429,9 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
             labelText: 'Phone number (option)',
             labelStyle: TextStyle(
               color: Colors.grey[700],
-              fontWeight: FontWeight.bold,
+              // fontWeight: FontWeight.bold,
             ),
-            border: OutlineInputBorder(
-              borderSide: BorderSide.none,
-            ),
+            border: OutlineInputBorder(),
             isDense: true,
           ),
           onInputChanged: (PhoneNumber number) {
@@ -426,56 +468,133 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
     );
   }
 
-  Widget _buildPostTagLocation() {
-    return Row(
+  // Widget _buildPostTagLocation() {
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //         child: FlatButton(
+  //           padding: EdgeInsets.zero,
+  //           onPressed: () {
+  //             FocusScope.of(context).requestFocus(FocusNode());
+  //             _searchLocation();
+  //           },
+  //           child: Row(
+  //             children: <Widget>[
+  //               Icon(Icons.location_on_outlined, size: 30, color: Colors.grey),
+  //               SizedBox(width: 10.0),
+  //               Expanded(
+  //                 child: Container(
+  //                   padding: EdgeInsets.symmetric(vertical: 8.0),
+  //                   child: _activeLocation != null
+  //                       ? Text(
+  //                           _activeLocation,
+  //                           style: TextStyle(
+  //                             color: Colors.grey[700],
+  //                           ),
+  //                         )
+  //                       : Text(
+  //                           'Add Location (option)',
+  //                           style: TextStyle(
+  //                             color: Colors.grey[700],
+  //                             fontSize: 16.0,
+  //                             fontWeight: FontWeight.bold,
+  //                           ),
+  //                         ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //       if (_activeLocation != null)
+  //         IconButton(
+  //           onPressed: () {
+  //             setState(() {
+  //               _activeLocation = null;
+  //               latitude = null;
+  //               longitude = null;
+  //             });
+  //           },
+  //           icon: Icon(Icons.clear),
+  //           color: Colors.black54,
+  //         ),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildLocationTF() {
+    return Column(
       children: [
-        Expanded(
-          child: FlatButton(
-            padding: EdgeInsets.zero,
-            onPressed: () {
-              FocusScope.of(context).requestFocus(FocusNode());
-              _searchLocation();
-            },
-            child: Row(
-              children: <Widget>[
-                Icon(Icons.location_on_outlined, size: 30, color: Colors.grey),
-                SizedBox(width: 10.0),
-                Expanded(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                    child: _activeLocation != null
-                        ? Text(
-                            _activeLocation,
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                            ),
-                          )
-                        : Text(
-                            'Add Location (option)',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        if (_activeLocation != null)
-          IconButton(
-            onPressed: () {
+        TextFormField(
+          readOnly: true,
+          onTap: () async {
+            // generate a new token here
+            final sessionToken = Uuid().v4();
+            final Suggestion result = await showSearch(
+              context: context,
+              delegate: AddressSearch(sessionToken),
+            );
+
+            // This will change the text displayed in the TextField
+            print(result);
+            if (result != null) {
+              print('GET RESULT IN HERE');
               setState(() {
-                _activeLocation = null;
-                latitude = null;
-                longitude = null;
+                _searchLocation = true;
               });
-            },
-            icon: Icon(Icons.clear),
-            color: Colors.black54,
+              final placeDetails = await PlaceApiProvider(sessionToken)
+                  .getPlaceDetailFromId(result.placeId);
+              setState(() {
+                _searchLocation = false;
+              });
+
+              setState(() {
+                _locationTextFieldController.text = result.description;
+                _activeLocation = result.description;
+                latitude = placeDetails.lat;
+                longitude = placeDetails.lng;
+              });
+            }
+          },
+          controller: _locationTextFieldController,
+          decoration: InputDecoration(
+            isDense: true,
+            // prefixIcon: Icon(Icons.account_circle, color: Colors.black54),
+            labelText: 'Add Location (option)',
+
+            prefixIcon: _searchLocation
+                ? CupertinoActivityIndicator()
+                : Icon(LineAwesomeIcons.map_marker),
+            border: OutlineInputBorder(),
           ),
+          // validator: (value) {
+          //   if (value.isEmpty) {
+          //     return 'Pharmacy location is required';
+          //   }
+          //   return null;
+          // },
+        ),
+        // if (_lat != null && _lng != null)
+        //   Row(
+        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //     children: [
+        //       Expanded(
+        //         child: Text(
+        //           'lat:$_lat',
+        //           style: Theme.of(context).textTheme.caption,
+        //         ),
+        //       ),
+        //       Expanded(
+        //         child: Align(
+        //           alignment: Alignment.centerRight,
+        //           child: Text(
+        //             'lng:$_lng',
+        //             style: Theme.of(context).textTheme.caption,
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
       ],
     );
   }
@@ -509,17 +628,16 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                 },
                 child: Row(
                   children: <Widget>[
-                    Icon(Icons.add_link, size: 30, color: Colors.grey),
-                    SizedBox(width: 10.0),
                     Expanded(
                       child: TextFormField(
                         decoration: InputDecoration(
+                          prefixIcon: Icon(LineAwesomeIcons.link),
                           labelText: 'Add Link (option)',
                           labelStyle: TextStyle(
                             color: Colors.grey[700],
-                            fontWeight: FontWeight.bold,
+                            // fontWeight: FontWeight.bold,
                           ),
-                          border: InputBorder.none,
+                          border: OutlineInputBorder(),
                         ),
                         style: TextStyle(
                           color: Colors.grey[700],
@@ -592,8 +710,8 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                       ),
                       Container(
                         child: RadioListTile(
-                          title: Text('Buy'),
-                          value: 'buy',
+                          title: Text('Learn More'),
+                          value: 'learn more',
                           groupValue: _buttonSelected,
                           onChanged: (value) {
                             setSelectedRadio(value);
@@ -625,12 +743,18 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
         fontSize: 14.0);
   }
 
+  Widget _divider() {
+    return SizedBox(
+      height: 20.0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: homeScaffoldKey,
       appBar: AppBar(
-        title: Text('Recommend ${widget.name}'),
+        title: Text('Recommend ${widget.name}'.capitalizeFirstofEach),
         actions: <Widget>[
           BlocBuilder<AuthenticationBloc, AuthenticationStates>(
             builder: (context, state) {
@@ -690,6 +814,13 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                       BlocProvider.of<AllPostBloc>(context)
                         ..add(AllPostInsert(post: state.post));
 
+                      BlocProvider.of<AuthPostBloc>(context)
+                        ..add(AuthAllPostInsert(post: state.post));
+
+                      // Increment Added Post
+                      BlocProvider.of<AccountInfoBloc>(context)
+                        ..add(IncrementPostNo());
+
                       // close create post page
                       Navigator.of(context).pop();
 
@@ -737,8 +868,8 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
                                       _selectedDialCode,
                                   recommendationPhoneNumber: _phoneNumber,
                                   location: _activeLocation,
-                                  lat: latitude,
-                                  long: longitude,
+                                  lat: latitude.toString(),
+                                  long: longitude.toString(),
                                   url: _link,
                                   urlText: _buttonSelected,
                                   resultList: images,
@@ -776,19 +907,21 @@ class _CreateRecommendPageState extends State<CreateRecommendPage> {
             physics: BouncingScrollPhysics(),
             child: Column(
               children: <Widget>[
+                _divider(),
                 _buildRecommendedName(),
-                Divider(),
+                _divider(),
                 _buildRecommendCaption(),
-                Divider(),
+                _divider(),
                 _buildRecommendationPhotos(),
-                Divider(),
+                _divider(),
                 _buildPhoneNumberTF(),
-                Divider(),
-                _buildPostTagLocation(),
+                _divider(),
+                _buildLocationTF(),
+                // _buildPostTagLocation(),
                 // _buildPostView(),
                 // Divider(),
                 // _buildPostTagLocation(),
-                Divider(),
+                _divider(),
                 _buildAddLink(),
               ],
             ),

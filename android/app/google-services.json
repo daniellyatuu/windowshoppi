@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "284146723233",
+    "project_id": "windowshoppi",
+    "storage_bucket": "windowshoppi.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:284146723233:android:08b538d3d4e1f4f37203e0",
+        "android_client_info": {
+          "package_name": "com.project.windowshoppi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "284146723233-r10qiku2f7b7n9op2c7sbecohnmc28ll.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDvy_ip3XdsGDOeE3I8JzP3DRmKNi3zvzY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "284146723233-r10qiku2f7b7n9op2c7sbecohnmc28ll.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

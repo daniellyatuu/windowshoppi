@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
 
 abstract class AuthPostStates extends Equatable {
@@ -16,11 +17,16 @@ class AuthPostNoInternet extends AuthPostStates {}
 
 class AuthPostSuccess extends AuthPostStates {
   final List<Post> posts;
+  final int activeAccountId;
   final bool hasReachedMax;
   final bool hasFailedToLoadMore;
 
-  const AuthPostSuccess(
-      {this.posts, this.hasReachedMax, this.hasFailedToLoadMore = false});
+  const AuthPostSuccess({
+    @required this.posts,
+    @required this.activeAccountId,
+    @required this.hasReachedMax,
+    this.hasFailedToLoadMore = false,
+  });
 
   @override
   List<Object> get props => [posts, hasReachedMax];

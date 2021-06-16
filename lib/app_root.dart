@@ -65,14 +65,14 @@ class _AppRootState extends State<AppRoot> {
   Widget build(BuildContext context) {
     return BlocConsumer<NavigationBloc, NavigationStates>(
       listener: (context, state) {
-        if (state is CurrentIndex) {
+        if (state is AppCurrentIndex) {
           setState(() {
             currentIndex = state.index;
           });
         }
       },
       builder: (context, state) {
-        if (state is CurrentIndex) {
+        if (state is AppCurrentIndex) {
           return Scaffold(
             body: CustomNavigator(
               navigatorKey: navigatorKey,
@@ -100,14 +100,13 @@ class _AppRootState extends State<AppRoot> {
                 ),
                 CustomNavigationBarItem(
                   icon: Icon(Icons.search_outlined),
-                  selectedIcon: Icon(Icons.search),
                   title: Text(
                     'Search',
                     style: Theme.of(context).textTheme.caption,
                   ),
                 ),
                 CustomNavigationBarItem(
-                  icon: Icon(Icons.add_box_outlined),
+                  icon: Icon(LineAwesomeIcons.plus_circle),
                   title: Text(
                     'Post',
                     style: Theme.of(context).textTheme.caption,
@@ -115,7 +114,7 @@ class _AppRootState extends State<AppRoot> {
                 ),
                 CustomNavigationBarItem(
                   badgeCount: 2,
-                  showBadge: true,
+                  showBadge: false,
                   icon: Icon(
                     LineAwesomeIcons.bell,
                   ),
@@ -130,7 +129,7 @@ class _AppRootState extends State<AppRoot> {
                     builder: (context, state) {
                       if (state is IsAuthenticated) {
                         return state.user.profileImage == null
-                            ? Icon(Icons.account_circle_outlined)
+                            ? Icon(LineAwesomeIcons.user_circle)
                             : Container(
                                 width: 40,
                                 height: 40,
@@ -180,7 +179,7 @@ class _AppRootState extends State<AppRoot> {
                                 ),
                               );
                       } else {
-                        return Icon(Icons.account_circle_outlined);
+                        return Icon(LineAwesomeIcons.user_circle);
                       }
                     },
                   ),

@@ -9,6 +9,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
 
 class AccountPageProfile extends StatelessWidget {
+  final int followingId;
+  final bool isFollowed;
+  AccountPageProfile({@required this.followingId, @required this.isFollowed});
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountDetailBloc, AccountDetailStates>(
@@ -109,25 +113,38 @@ class AccountPageProfile extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyText2,
                     ),
                   ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    AccountInfo(
-                      name: 'Followers',
-                      number: 12,
-                    ),
-                    AccountInfo(
-                      name: 'Following',
-                      number: 15,
-                    ),
-                    AccountInfo(
-                      name: 'Posts',
-                      number: 30,
-                    ),
-                  ],
+
+                BlocBuilder<OtherAccountInfoBloc, OtherAccountInfoStates>(
+                  builder: (context, accountInfoState) {
+                    if (accountInfoState is OtherAccountInfoLoading) {
+                      return AccountInfoLoader();
+                    } else if (accountInfoState is OtherAccountInfoSuccess) {
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          AccountInfo(
+                            name: 'Followers',
+                            number:
+                                '${accountInfoState.accountInfo.followerNumber}',
+                          ),
+                          AccountInfo(
+                            name: 'Following',
+                            number:
+                                '${accountInfoState.accountInfo.followingNumber}',
+                          ),
+                          AccountInfo(
+                            name: 'Posts',
+                            number:
+                                '${accountInfoState.accountInfo.postNumber}',
+                          ),
+                        ],
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
                 ),
-                // if (data.group == 'windowshopper')
-                //   if (data.accountBio != null) Divider(),
+
                 if (data.group == 'vendor')
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,20 +205,82 @@ class AccountPageProfile extends StatelessWidget {
                         ),
                     ],
                   ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: Colors.teal,
+                BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                  builder: (context, authState) {
+                    if (authState is IsAuthenticated) {
+                      if (authState.user.accountId != followingId) {
+                        return Container(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.teal,
+                            ),
+                            onPressed: () {
+                              dynamic data = {
+                                'follower': authState.user.accountId,
+                                'following': followingId,
+                              };
+
+                              BlocProvider.of<FollowUnfollowBloc>(context)
+                                ..add(FollowAccount(followData: data));
+                            },
+                            child: BlocBuilder<FollowUnfollowBloc,
+                                FollowUnfollowStates>(
+                              builder: (context, state) {
+                                if (state is FollowSuccess) {
+                                  // return Text('Follow btn');
+
+                                  return state.followingId == followingId
+                                      ? Text('Following')
+                                      : Text(
+                                          isFollowed ? 'Following' : 'Follow',
+                                        );
+                                } else if (state is UnfollowSuccess) {
+                                  return state.unFollowingId == followingId
+                                      ? Text('Follow')
+                                      : Text(
+                                          isFollowed ? 'Following' : 'Follow',
+                                        );
+                                } else {
+                                  return Text(
+                                    isFollowed ? 'Following' : 'Follow',
+                                  );
+                                }
+                              },
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Container();
+                      }
+                    } else if (authState is IsNotAuthenticated) {
+                      return Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.teal,
+                          ),
+                          onPressed: () async {
+                            var res = await showDialog(
+                              context: context,
+                              builder: (context) {
+                                return LoginOrRegister();
+                              },
+                            );
+                            if (res != null) {
+                              Navigator.of(context).pop();
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: Text('Follow'),
                         ),
-                        onPressed: () {},
-                        child: Text('Follow'),
-                      ),
-                    ),
-                  ],
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
                 ),
+
                 if (data.group == 'vendor')
                   Column(
                     children: [

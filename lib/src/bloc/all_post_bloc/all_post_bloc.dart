@@ -29,6 +29,7 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
     final currentState = state;
 
     if (event is AllPostRefresh) {
+      print('refresh');
       if (currentState is AllPostFailure || currentState is AllPostNoInternet)
         yield AllPostInitial();
 
@@ -38,12 +39,10 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
 
         if (_posts == 'no_internet') {
           // SHOW ALERT ON UI WITHOUT REMOVE currentState
-          _toastNotification('No internet connection', Colors.red,
+          _toastNotification('No internet connection.', Colors.red,
               Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
 
-          if (currentState is! AllPostSuccess) {
-            yield AllPostNoInternet();
-          }
+          if (currentState is! AllPostSuccess) yield AllPostNoInternet();
         } else if (_posts is List<Post>) {
           yield AllPostSuccess(
             posts: _posts,
@@ -52,31 +51,12 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
         }
       } catch (_) {
         // SHOW ALERT ON UI WITHOUT REMOVE currentState
-        _toastNotification('Failed to fetch posts.Try again', Colors.red,
+        _toastNotification('Failed to fetch posts, try again.', Colors.red,
             Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
 
-        if (currentState is! AllPostSuccess) {
-          yield AllPostFailure();
-        }
+        if (currentState is! AllPostSuccess) yield AllPostFailure();
       }
     }
-
-    // if (event is AllPostRetry) {
-    //   yield AllPostInitial();
-    //   try {
-    //     if (currentState is AllPostFailure) {
-    //       // get new posts
-    //       final List<Post> _posts = await allPostRepository.userPost(0, _limit);
-    //
-    //       yield AllPostSuccess(
-    //         posts: _posts,
-    //         hasReachedMax: _posts.length < _limit ? true : false,
-    //       );
-    //     }
-    //   } catch (_) {
-    //     yield AllPostFailure();
-    //   }
-    // }
 
     if (event is AllPostInsert) {
       yield AllPostInitial();
@@ -92,7 +72,9 @@ class AllPostBloc extends Bloc<AllPostEvents, AllPostStates> {
     if (event is PostRemove) {
       yield AllPostInitial();
       if (currentState is AllPostSuccess) {
-        currentState.posts.remove(event.post);
+        currentState.posts
+            .removeWhere((element) => element.id == event.post.id);
+
         yield AllPostSuccess(
           posts: currentState.posts,
           hasReachedMax: currentState.posts.length < _limit ? true : false,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AccountInfo extends StatelessWidget {
   final String name;
-  final int number;
+  final String number;
   AccountInfo({@required this.name, @required this.number});
   @override
   Widget build(BuildContext context) {
