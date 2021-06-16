@@ -9,9 +9,10 @@ class UserAccountInit extends StatelessWidget {
     return BlocBuilder<AuthenticationBloc, AuthenticationStates>(
       builder: (context, state) {
         if (state is IsAuthenticated) {
-          return UserAccount(
-            accountId: state.user.accountId,
-          );
+          return PostView();
+          // return UserAccount(
+          //   accountId: state.user.accountId,
+          // );
         } else {
           return Container();
         }

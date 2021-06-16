@@ -7,10 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
 class AccountPostListInit extends StatelessWidget {
-  final AccountPostRepository accountPostRepository = AccountPostRepository(
-    accountPostAPIClient: AccountPostAPIClient(),
-  );
-
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AccountDetailBloc, AccountDetailStates>(

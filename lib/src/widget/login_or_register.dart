@@ -28,7 +28,7 @@ class LoginOrRegister extends StatelessWidget {
                       child: OutlineButton(
                         onPressed: () {
                           // close popup
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop('register');
 
                           // open account page
                           BlocProvider.of<NavigationBloc>(context)
@@ -55,7 +55,7 @@ class LoginOrRegister extends StatelessWidget {
                       child: OutlineButton(
                         onPressed: () {
                           // close popup
-                          Navigator.of(context).pop();
+                          Navigator.of(context).pop('login');
 
                           // open account page
                           BlocProvider.of<NavigationBloc>(context)

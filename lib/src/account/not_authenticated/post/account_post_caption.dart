@@ -1,4 +1,5 @@
 import 'package:url_launcher/url_launcher.dart';
+import 'package:windowshoppi/src/in_app_web_view/in_app_web_view.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:flutter/material.dart';
@@ -114,7 +115,17 @@ class _AccountPostCaptionState extends State<AccountPostCaption> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(18.0),
                               ),
-                              onPressed: () => _launchURL('${widget.post.url}'),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => InAppWebView(
+                                      url: widget.post.url,
+                                    ),
+                                  ),
+                                );
+                              },
+                              // onPressed: () => _launchURL('${widget.post.url}'),
                               child: Row(
                                 children: [
                                   Text(

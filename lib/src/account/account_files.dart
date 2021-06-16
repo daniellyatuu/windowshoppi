@@ -46,3 +46,8 @@ export 'authenticated/post/post_action_button.dart';
 export 'authenticated/update/post/update_post_init.dart';
 export 'authenticated/update/post/update_post_form.dart';
 export 'authenticated/post/my_account_explore.dart';
+export 'authenticated/post/auth_post_header.dart';
+export 'authenticated/post/account_owner_profile.dart';
+export 'authenticated/post/other_account_profile.dart';
+export 'authenticated/post/follow_button.dart';
+export 'authenticated/auth_other_account.dart';

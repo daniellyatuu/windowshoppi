@@ -1,4 +1,5 @@
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:windowshoppi/src/account/not_authenticated/other_post_header.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
 import 'package:windowshoppi/src/widget/widget_files.dart';
@@ -9,7 +10,12 @@ import 'package:flutter/material.dart';
 class AccountExplore extends StatefulWidget {
   final int accountId;
   final int index;
-  AccountExplore({@required this.accountId, @required this.index}) : super();
+  final bool isFollowed;
+  AccountExplore(
+      {@required this.accountId,
+      @required this.index,
+      @required this.isFollowed})
+      : super();
 
   @override
   _AccountExploreState createState() => _AccountExploreState();
@@ -59,7 +65,7 @@ class _AccountExploreState extends State<AccountExplore> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Explore'),
+        title: Text('Posts'),
       ),
       body: BlocBuilder<AccountPostBloc, AccountPostStates>(
         builder: (context, state) {
@@ -90,8 +96,10 @@ class _AccountExploreState extends State<AccountExplore> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            PostHeader(
+                            OtherPostHeader(
                               post: data[index],
+                              accountId: widget.accountId,
+                              isFollowed: widget.isFollowed,
                               from: 'post_list',
                             ),
                             if (data[index].group == 'vendor')

@@ -5,8 +5,14 @@ import 'package:windowshoppi/api.dart';
 import 'dart:convert';
 
 class AccountDetailAPIClient {
-  Future getAccountDetail(accountId) async {
-    var _uri = accountInfoUri + '$accountId/';
+  Future getAccountDetail(accountId, loggedInAccountId) async {
+    var _uri = '';
+    if (loggedInAccountId == null) {
+      _uri = accountInfoUri + '$accountId/0/';
+    } else {
+      _uri = accountInfoUri + '$accountId/$loggedInAccountId/';
+    }
+
     var _url = Uri.http('$getRequestServerName', '$_uri');
 
     Map<String, String> headers = {

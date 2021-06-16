@@ -79,10 +79,24 @@ class _IntroScreenState extends State<IntroScreen> {
       showSkipButton: true,
       skipFlex: 0,
       nextFlex: 0,
-      skip: const Text('Skip'),
-      next: const Icon(Icons.arrow_forward),
+      skip: const Text(
+        'Skip',
+        style: TextStyle(
+          color: Colors.black,
+        ),
+      ),
+      next: const Icon(
+        Icons.arrow_forward,
+        color: Colors.black,
+      ),
       onDone: () => _onIntroEnd(context),
-      done: Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
+      done: Text(
+        'Done',
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: Colors.black,
+        ),
+      ),
       dotsDecorator: const DotsDecorator(
         activeColor: Colors.red,
         size: Size(10.0, 10.0),

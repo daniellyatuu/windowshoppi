@@ -1,3 +1,7 @@
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:windowshoppi/app_init_root.dart';
 import 'package:windowshoppi/src/repository/repository_files.dart';
 import 'package:windowshoppi/src/bloc/bloc_files.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
@@ -9,6 +13,33 @@ import 'package:flutter/material.dart';
 import 'package:sentry/sentry.dart';
 import 'dart:async';
 import 'dsn.dart';
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
+  print(message.data);
+  flutterLocalNotificationsPlugin.show(
+      message.data.hashCode,
+      message.data['title'],
+      message.data['body'],
+      NotificationDetails(
+        android: AndroidNotificationDetails(
+          channel.id,
+          channel.name,
+          channel.description,
+        ),
+      ));
+}
+
+const AndroidNotificationChannel channel = AndroidNotificationChannel(
+  'high_importance_channel', // id
+  'High Importance Notifications', // title
+  'This channel is used for important notifications.', // description
+  importance: Importance.high,
+);
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
 final SentryClient _sentry = new SentryClient(dsn: dsn);
 
@@ -59,10 +90,17 @@ Future<Null> main() async {
   };
 
   runZonedGuarded<Future<Null>>(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
+
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+
     runApp(
-      Phoenix(
-        child: MyApp(),
-      ),
+      Phoenix(child: MyApp()),
     );
   }, (error, stackTrace) async {
     await _reportError(error, stackTrace);
@@ -85,6 +123,24 @@ class MyApp extends StatelessWidget {
 
   final AccountPostRepository accountPostRepository = AccountPostRepository(
     accountPostAPIClient: AccountPostAPIClient(),
+  );
+
+  final AuthPostRepository authPostRepository = AuthPostRepository(
+    authPostAPIClient: AuthPostAPIClient(),
+  );
+
+  final SearchPostRepository searchPostRepository = SearchPostRepository(
+    searchPostAPIClient: SearchPostAPIClient(),
+  );
+
+  final AuthSearchPostRepository authSearchPostRepository =
+      AuthSearchPostRepository(
+    authSearchPostAPIClient: AuthSearchPostAPIClient(),
+  );
+
+  final SearchAccountRepository searchAccountRepository =
+      SearchAccountRepository(
+    searchAccountAPIClient: SearchAccountAPIClient(),
   );
 
   @override
@@ -119,15 +175,54 @@ class MyApp extends StatelessWidget {
               UserPostBloc(userPostRepository: userPostRepository),
         ),
         BlocProvider<AllPostBloc>(
-          create: (context) => AllPostBloc(allPostRepository: allPostRepository)
-            ..add(AllPostFetched()),
-        ),
+            create: (context) =>
+                AllPostBloc(allPostRepository: allPostRepository)),
         BlocProvider<AccountPostBloc>(
           create: (context) =>
               AccountPostBloc(accountPostRepository: accountPostRepository),
         ),
+        BlocProvider<AuthPostBloc>(
+          create: (context) =>
+              AuthPostBloc(authPostRepository: authPostRepository),
+        ),
         BlocProvider<FollowUnfollowBloc>(
           create: (context) => FollowUnfollowBloc(),
+        ),
+        BlocProvider<DeletePostBloc>(
+          create: (context) => DeletePostBloc(),
+        ),
+        BlocProvider<SearchTextFieldBloc>(
+          create: (context) => SearchTextFieldBloc(),
+        ),
+        BlocProvider<SearchPostBloc>(
+          create: (context) =>
+              SearchPostBloc(searchPostRepository: searchPostRepository),
+        ),
+        BlocProvider<AuthSearchPostBloc>(
+          create: (context) => AuthSearchPostBloc(
+              authSearchPostRepository: authSearchPostRepository),
+        ),
+        BlocProvider<SearchAccountBloc>(
+          create: (context) => SearchAccountBloc(
+              searchAccountRepository: searchAccountRepository),
+        ),
+        BlocProvider<AccountInfoBloc>(
+          create: (context) => AccountInfoBloc(),
+        ),
+        BlocProvider<AccountListBloc>(
+          create: (context) => AccountListBloc(),
+        ),
+        BlocProvider<FollowingPostBloc>(
+          create: (context) => FollowingPostBloc(),
+        ),
+        BlocProvider<FcmTokenBloc>(
+          create: (context) => FcmTokenBloc(),
+        ),
+        BlocProvider<NotificationBloc>(
+          create: (context) => NotificationBloc(),
+        ),
+        BlocProvider<FollowedAccountBloc>(
+          create: (context) => FollowedAccountBloc(),
         ),
       ],
       child: MaterialApp(
@@ -170,11 +265,11 @@ class _RootState extends State<Root> {
       listener: (context, state) {
         if (state is ConnectionSuccess) {
           if (state.prevState is ConnectionFailure) {
-            _toastNotification('Back online', Colors.teal, Toast.LENGTH_SHORT,
+            _toastNotification('Back online.', Colors.teal, Toast.LENGTH_SHORT,
                 ToastGravity.BOTTOM);
           }
         } else if (state is ConnectionFailure) {
-          _toastNotification('No internet connection', Colors.red,
+          _toastNotification('No internet connection.', Colors.red,
               Toast.LENGTH_SHORT, ToastGravity.BOTTOM);
         }
       },
@@ -187,7 +282,7 @@ class _RootState extends State<Root> {
               ),
             );
           } else if (state is IsNotFirstTime) {
-            return AppRoot();
+            return AppInitRoot();
           } else if (state is IsFirstTime) {
             return WelcomeScreen();
           } else {

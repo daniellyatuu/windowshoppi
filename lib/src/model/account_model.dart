@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 class Account extends Equatable {
   final int accountId;
+  final bool isFollowed;
   final String accountName;
   final String username;
   final String group;
@@ -16,6 +17,7 @@ class Account extends Equatable {
 
   const Account({
     this.accountId,
+    this.isFollowed,
     this.accountName,
     this.username,
     this.group,
@@ -32,6 +34,7 @@ class Account extends Equatable {
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
       accountId: json['account_id'],
+      isFollowed: json['is_followed'],
       accountName: json['account_name'],
       username: json['username'],
       group: json['group'],
@@ -49,6 +52,7 @@ class Account extends Equatable {
   @override
   List<Object> get props => [
         accountId,
+        isFollowed,
         accountName,
         username,
         group,

@@ -6,6 +6,7 @@ class Post extends Equatable {
   final String group;
   final String businessBio;
   final int accountId;
+  final bool isFollowed;
   final String accountProfile;
   final String caption;
   final String recommendationName;
@@ -29,6 +30,7 @@ class Post extends Equatable {
     this.group,
     this.businessBio,
     this.accountId,
+    this.isFollowed,
     this.accountProfile,
     this.caption,
     this.recommendationName,
@@ -54,6 +56,7 @@ class Post extends Equatable {
       group: json['group'],
       businessBio: json['business_bio'],
       accountId: json['account_id'],
+      isFollowed: json['is_followed'],
       accountProfile: json['account_profile'],
       caption: json['caption'],
       recommendationName: json['recommendation_name'],
@@ -81,6 +84,7 @@ class Post extends Equatable {
         group,
         businessBio,
         accountId,
+        isFollowed,
         accountProfile,
         caption,
         recommendationName,

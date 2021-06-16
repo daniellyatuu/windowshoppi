@@ -8,8 +8,9 @@ abstract class AccountDetailEvents extends Equatable {
 
 class GetAccountDetail extends AccountDetailEvents {
   final int accountId;
+  final int loggedInAccountId;
 
-  GetAccountDetail({@required this.accountId});
+  GetAccountDetail({@required this.accountId, this.loggedInAccountId});
 
   @override
   List<Object> get props => [accountId];

@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:windowshoppi/src/account/account_files.dart';
+import 'package:windowshoppi/src/bloc/bloc_files.dart';
 
 class ExpandableText extends StatefulWidget {
   final int accountId;
@@ -118,9 +120,9 @@ class ExpandableTextState extends State<ExpandableText> {
           text: TextSpan(children: [
             TextSpan(
               recognizer: TapGestureRecognizer()
-                ..onTap = () {
+                ..onTap = () async {
                   if (widget.accountId != null)
-                    Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => AccountPageInit(
@@ -128,6 +130,8 @@ class ExpandableTextState extends State<ExpandableText> {
                         ),
                       ),
                     );
+                  BlocProvider.of<AccountPostBloc>(context)
+                    ..add(ResetAccountPostState());
                 },
               text: widget.username != null
                   ? "@" + widget.username + " "

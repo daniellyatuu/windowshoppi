@@ -1,4 +1,9 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:windowshoppi/src/app/home/home_files.dart';
+import 'package:windowshoppi/src/app/search/search_files.dart';
+import 'package:windowshoppi/src/bloc/authentication_bloc/authentication_bloc.dart';
+import 'package:windowshoppi/src/bloc/authentication_bloc/authentication_states.dart';
 import 'package:windowshoppi/src/utilities/expandable_text.dart';
 import 'package:windowshoppi/src/app/explore/explore_files.dart';
 import 'package:windowshoppi/src/model/model_files.dart';
@@ -10,13 +15,14 @@ import 'package:flutter/material.dart';
 class SinglePost extends StatelessWidget {
   final List<Post> data;
   final String tabName;
-  SinglePost({@required this.tabName, @required this.data});
+  final String from;
+  SinglePost({@required this.tabName, @required this.data, this.from});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: StaggeredGridView.countBuilder(
-          key: PageStorageKey<String>(tabName),
+          key: PageStorageKey<String>('authHome'),
           padding: EdgeInsets.zero,
           shrinkWrap: true,
           physics: ScrollPhysics(),
@@ -35,134 +41,182 @@ class SinglePost extends StatelessWidget {
                 child: Column(
                   children: [
                     Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            PageTransition(
-                              type: PageTransitionType.rightToLeft,
-                              duration: Duration(milliseconds: 200),
-                              child: Explore(
-                                index: index,
-                              ),
-                            ),
-                          );
-                          // Navigator.push(
-                          //     context,
-                          //     SlideFromRightPageRoute(
-                          //       widget: Explore(),
-                          //     ));
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => Detail(
-                          //       post: data[index],
-                          //     ),
-                          //   ),
-                          // );
-                        },
-                        child: Column(
-                          children: [
-                            if (data[index].group == 'vendor')
-                              if (data[index].businessBio != '')
-                                Container(
-                                  alignment: Alignment.centerLeft,
-                                  padding: EdgeInsets.all(5.0),
-                                  color: Colors.black87,
-                                  child: ExpandableText(
-                                    text: '${data[index].businessBio}',
-                                    widgetColor: Colors.white,
-                                    textBold: true,
-                                    trimLines: 2,
-                                    readMore: false,
-                                    readLess: false,
-                                  ),
-                                ),
-                            Expanded(
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: <Widget>[
-                                  ExtendedImage.network(
-                                    '${data[index].productPhoto[0].filename}',
-                                    cache: true,
-                                    loadStateChanged:
-                                        (ExtendedImageState state) {
-                                      switch (state.extendedImageLoadState) {
-                                        case LoadState.loading:
-                                          return CupertinoActivityIndicator();
-                                          break;
-
-                                        ///if you don't want override completed widget
-                                        ///please return null or state.completedWidget
-                                        //return null;
-                                        //return state.completedWidget;
-                                        case LoadState.completed:
-                                          return ExtendedRawImage(
-                                            fit: BoxFit.cover,
-                                            image:
-                                                state.extendedImageInfo?.image,
-                                          );
-                                          break;
-                                        case LoadState.failed:
-                                          // _controller.reset();
-                                          return GestureDetector(
-                                            child: Center(
-                                              child: Icon(Icons.refresh),
-                                            ),
-                                            onTap: () {
-                                              state.reLoadImage();
-                                            },
-                                          );
-                                          break;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  if (data[index]
-                                          .productPhoto
-                                          .toList()
-                                          .length !=
-                                      1)
-                                    Positioned(
-                                      top: 3.0,
-                                      right: 3.0,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                          color: Colors.black.withOpacity(0.3),
-                                        ),
-                                        padding: EdgeInsets.all(5.0),
-                                        child: Text(
-                                          '${data[index].productPhoto.toList().length - 1}+',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 10.0),
-                                        ),
+                      child:
+                          BlocBuilder<AuthenticationBloc, AuthenticationStates>(
+                        builder: (context, authState) {
+                          return GestureDetector(
+                            onTap: () {
+                              if (from == 'search_post') {
+                                if (authState is IsAuthenticated) {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      duration: Duration(milliseconds: 200),
+                                      child: AuthSearchedExplore(
+                                        index: index,
                                       ),
                                     ),
-                                  if (data[index].recommendationName != null)
-                                    Positioned(
-                                      bottom: 3.0,
-                                      left: 3.0,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5.0),
-                                          color: Colors.black.withOpacity(0.4),
+                                  );
+                                } else if (authState is IsNotAuthenticated) {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      duration: Duration(milliseconds: 200),
+                                      child: NotAuthSearchedExplore(
+                                        index: index,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                if (authState is IsAuthenticated) {
+                                  if (from == 'following_tab') {
+                                    Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        duration: Duration(milliseconds: 200),
+                                        child: FollowingPostExplore(
+                                          index: index,
+                                          accountId: authState.user.accountId,
                                         ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.recommend,
-                                              color: Colors.white,
-                                              size: 18.0,
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.push(
+                                      context,
+                                      PageTransition(
+                                        type: PageTransitionType.rightToLeft,
+                                        duration: Duration(milliseconds: 200),
+                                        child: AuthExplore(
+                                          index: index,
+                                          accountId: authState.user.accountId,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } else if (authState is IsNotAuthenticated) {
+                                  Navigator.push(
+                                    context,
+                                    PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      duration: Duration(milliseconds: 200),
+                                      child: Explore(
+                                        index: index,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                            child: Column(
+                              children: [
+                                if (data[index].group == 'vendor')
+                                  if (data[index].businessBio != '')
+                                    Container(
+                                      alignment: Alignment.centerLeft,
+                                      padding: EdgeInsets.all(5.0),
+                                      color: Colors.black87,
+                                      child: ExpandableText(
+                                        text: '${data[index].businessBio}',
+                                        widgetColor: Colors.white,
+                                        textBold: true,
+                                        trimLines: 2,
+                                        readMore: false,
+                                        readLess: false,
+                                      ),
+                                    ),
+                                Expanded(
+                                  child: Stack(
+                                    fit: StackFit.expand,
+                                    children: <Widget>[
+                                      ExtendedImage.network(
+                                        '${data[index].productPhoto[0].filename}',
+                                        cache: true,
+                                        loadStateChanged:
+                                            (ExtendedImageState state) {
+                                          switch (
+                                              state.extendedImageLoadState) {
+                                            case LoadState.loading:
+                                              return CupertinoActivityIndicator();
+                                              break;
+
+                                            ///if you don't want override completed widget
+                                            ///please return null or state.completedWidget
+                                            //return null;
+                                            //return state.completedWidget;
+                                            case LoadState.completed:
+                                              return ExtendedRawImage(
+                                                fit: BoxFit.cover,
+                                                image: state
+                                                    .extendedImageInfo?.image,
+                                              );
+                                              break;
+                                            case LoadState.failed:
+                                              // _controller.reset();
+                                              return GestureDetector(
+                                                child: Center(
+                                                  child: Icon(Icons.refresh),
+                                                ),
+                                                onTap: () {
+                                                  state.reLoadImage();
+                                                },
+                                              );
+                                              break;
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      if (data[index]
+                                              .productPhoto
+                                              .toList()
+                                              .length !=
+                                          1)
+                                        Positioned(
+                                          top: 3.0,
+                                          right: 3.0,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                              color:
+                                                  Colors.black.withOpacity(0.3),
                                             ),
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                maxWidth:
-                                                    (MediaQuery.of(context)
+                                            padding: EdgeInsets.all(5.0),
+                                            child: Text(
+                                              '${data[index].productPhoto.toList().length - 1}+',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 10.0),
+                                            ),
+                                          ),
+                                        ),
+                                      if (data[index].recommendationName !=
+                                          null)
+                                        Positioned(
+                                          bottom: 3.0,
+                                          left: 3.0,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                              color:
+                                                  Colors.black.withOpacity(0.4),
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.recommend,
+                                                  color: Colors.white,
+                                                  size: 18.0,
+                                                ),
+                                                Container(
+                                                  constraints: BoxConstraints(
+                                                    maxWidth: (MediaQuery.of(
+                                                                    context)
                                                                 .size
                                                                 .width /
                                                             4) +
@@ -171,29 +225,33 @@ class SinglePost extends StatelessWidget {
                                                                     .width /
                                                                 4) /
                                                             2),
-                                              ),
-                                              padding:
-                                                  EdgeInsets.only(right: 5.0),
-                                              child: Text(
-                                                " ${data[index].recommendationName}",
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                softWrap: false,
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12.0),
-                                              ),
+                                                  ),
+                                                  padding: EdgeInsets.only(
+                                                      right: 5.0),
+                                                  child: Text(
+                                                    " ${data[index].recommendationName}",
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    softWrap: false,
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 12.0),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
                     ),
                   ],

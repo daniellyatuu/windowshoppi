@@ -20,54 +20,66 @@ class AuthenticationBloc
           user: event.user,
           notification: 'login',
           isAlertDialogActive: event.isAlertDialogActive);
-    } else if (event is UserUpdated) {
+    }
+
+    if (event is UserUpdated) {
       yield IsAuthenticated(
           user: event.user,
           notification: 'update',
           isAlertDialogActive: event.isAlertDialogActive);
-    } else if (event is UserVisitLoginRegister) {
+    }
+
+    if (event is UserVisitLoginRegister) {
       yield IsNotAuthenticated(
           isAlreadyCreateAccount: event.redirectTo == 'register' ? false : true,
           logout: false);
-    } else {
+    }
+
+    // get token from SharedPreferences
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    bool isRegistered = localStorage.getBool('isRegistered') ?? false;
+
+    if (event is CheckUserLoggedInStatus) {
       yield AuthenticationLoading();
 
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      bool isRegistered = localStorage.getBool('isRegistered') ?? false;
+      var token = localStorage.getString('token');
 
-      if (event is CheckUserLoggedInStatus) {
-        var token = localStorage.getString('token');
+      if (token != null) {
+        try {
+          // get user
+          final _user = await authenticationRepository.getUser(token);
 
-        if (token != null) {
-          try {
-            // get user
-            final _user = await authenticationRepository.getUser(token);
-
-            if (_user == 'no_internet') {
-              yield AuthNoInternet();
-            } else if (_user is User) {
-              final User user = _user;
-              yield IsAuthenticated(
-                  user: user, isAlertDialogActive: {'status': false});
-            }
-          } catch (_) {
-            yield AuthenticationError();
+          if (_user == 'no_internet') {
+            yield AuthNoInternet();
+          } else if (_user is User) {
+            final User user = _user;
+            yield IsAuthenticated(
+                user: user, isAlertDialogActive: {'status': false});
           }
-        } else {
+        } catch (_) {
+          /// IF ERROR OCCUR IN AUTHENTICATION, CONSIDER USER NOT LOGGED-IN
+          //delete the token
+          localStorage.remove('token');
+
           yield IsNotAuthenticated(
               isAlreadyCreateAccount: isRegistered, logout: false);
         }
-      } else if (event is UserLoggedOut) {
-        localStorage.remove('token');
-
-        yield IsNotAuthenticated(
-            isAlreadyCreateAccount: isRegistered, logout: true);
-      } else if (event is DeleteToken) {
-        localStorage.remove('token');
-
+      } else {
         yield IsNotAuthenticated(
             isAlreadyCreateAccount: isRegistered, logout: false);
       }
+    }
+    if (event is UserLoggedOut) {
+      localStorage.remove('token');
+
+      yield IsNotAuthenticated(
+          isAlreadyCreateAccount: isRegistered, logout: true);
+    }
+    if (event is DeleteToken) {
+      localStorage.remove('token');
+
+      yield IsNotAuthenticated(
+          isAlreadyCreateAccount: isRegistered, logout: false);
     }
   }
 }

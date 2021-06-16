@@ -59,7 +59,7 @@ class _MyAccountExploreState extends State<MyAccountExplore> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Explore'),
+        title: Text('Posts'),
       ),
       body: BlocBuilder<UserPostBloc, UserPostStates>(
         builder: (context, state) {
@@ -90,9 +90,9 @@ class _MyAccountExploreState extends State<MyAccountExplore> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: <Widget>[
-                            PostHeader(
+                            AuthPostHeader(
                               post: data[index],
-                              from: 'post_list',
+                              accountId: widget.accountId,
                             ),
                             if (data[index].group == 'vendor')
                               if (data[index].businessBio != '')

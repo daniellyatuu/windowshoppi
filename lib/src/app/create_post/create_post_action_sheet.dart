@@ -17,10 +17,10 @@ class _CreatePostActionSheetState extends State<CreatePostActionSheet> {
   // images selection .start
   // #######################
 
-  List<Asset> _images = List<Asset>();
+  List<Asset> _images = [];
 
   Future<void> loadAssets() async {
-    List<Asset> resultList = List<Asset>();
+    List<Asset> resultList = [];
     String error = 'NoError';
 
     try {

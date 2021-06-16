@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 
 class PostActionButtonInit extends StatefulWidget {
   final Post post;
-  final String from;
-  PostActionButtonInit({@required this.post, this.from});
+
+  PostActionButtonInit({@required this.post});
 
   @override
   _PostActionButtonInitState createState() => _PostActionButtonInitState();
@@ -70,32 +70,35 @@ class _PostActionButtonInitState extends State<PostActionButtonInit> {
           );
         } else if (state is DeletePostNoInternet) {
           Navigator.of(context, rootNavigator: true).pop();
-          _toastNotification('No internet connection', Colors.red,
+          _toastNotification('No internet connection.', Colors.red,
               Toast.LENGTH_SHORT, ToastGravity.CENTER);
         } else if (state is DeletePostError) {
           Navigator.of(context, rootNavigator: true).pop();
-          _toastNotification('Error occurred, please try again', Colors.red,
+          _toastNotification('Error occurred, please try again.', Colors.red,
               Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
         } else if (state is DeletePostSuccess) {
-          // remove post
+          // Remove Post
           BlocProvider.of<UserPostBloc>(context)
             ..add(UserPostRemove(post: widget.post));
 
           BlocProvider.of<AllPostBloc>(context)
             ..add(PostRemove(post: widget.post));
 
+          BlocProvider.of<AuthPostBloc>(context)
+            ..add(AuthPostRemove(post: widget.post));
+
           BlocProvider.of<AccountPostBloc>(context)
             ..add(AccountPostRemove(post: widget.post));
 
+          // Close Loader
           Navigator.of(context, rootNavigator: true).pop();
-          // if (widget.from != 'post_list') Navigator.of(context).pop();
-          _toastNotification('post deleted successfully', Colors.teal,
-              Toast.LENGTH_LONG, ToastGravity.SNACKBAR);
+
+          _toastNotification('post deleted successfully.', Colors.teal,
+              Toast.LENGTH_LONG, ToastGravity.BOTTOM);
         }
       },
       child: PostActionButton(
         post: widget.post,
-        from: widget.from,
       ),
     );
   }
@@ -103,8 +106,8 @@ class _PostActionButtonInitState extends State<PostActionButtonInit> {
 
 class PostActionButton extends StatefulWidget {
   final Post post;
-  final String from;
-  PostActionButton({@required this.post, @required this.from});
+
+  PostActionButton({@required this.post});
 
   @override
   _PostActionButtonState createState() => _PostActionButtonState();

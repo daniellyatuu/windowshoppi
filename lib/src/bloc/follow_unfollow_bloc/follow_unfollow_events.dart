@@ -7,9 +7,9 @@ abstract class FollowUnfollowEvents extends Equatable {
 }
 
 class FollowAccount extends FollowUnfollowEvents {
-  final int accountId;
-  FollowAccount({@required this.accountId});
+  final dynamic followData;
+  FollowAccount({@required this.followData});
 
   @override
-  List<Object> get props => [accountId];
+  List<Object> get props => [followData];
 }

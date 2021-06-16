@@ -6,7 +6,7 @@ import 'package:windowshoppi/src/bloc/bloc_files.dart';
 
 class OtherAccount extends StatefulWidget {
   final int accountId;
-  OtherAccount({@required this.accountId});
+  OtherAccount({Key key, @required this.accountId}) : super(key: key);
 
   @override
   _OtherAccountState createState() => _OtherAccountState();

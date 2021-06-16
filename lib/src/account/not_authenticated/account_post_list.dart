@@ -19,7 +19,10 @@ class AccountPostList extends StatelessWidget {
                       (BuildContext context, int pdIndex) {
                         return Column(
                           children: [
-                            AccountPageProfile(),
+                            AccountPageProfile(
+                              followingId: state.account.accountId,
+                              isFollowed: state.account.isFollowed,
+                            ),
                           ],
                         );
                       },
@@ -48,7 +51,9 @@ class AccountPostList extends StatelessWidget {
                         child: TabBarView(
                           children: [
                             AccountPostGridView(
-                                innerScrollController, state.account.accountId),
+                                innerScrollController,
+                                state.account.accountId,
+                                state.account.isFollowed),
                             // AccountPostListView(
                             //     innerScrollController, state.account.accountId),
                           ],
